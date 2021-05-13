@@ -1,6 +1,6 @@
 import tensorflow as tf
-from layers.Upsample import Upsample
-from Resnet_blocks import ResnetBranch
+from models.layers.Upsample import Upsample
+from blocks.resnet_blocks import ResnetBranch
 
 class LabelBranch(tf.keras.Model):
     """ A semantic segmentation head block that works like a decoder. 

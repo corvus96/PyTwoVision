@@ -1,6 +1,6 @@
 import tensorflow as tf
-from network_builder.constants import L2_REGULARIZER_WEIGHT
-from network_builder.layers.Resnet import ResnetModule
+from models.constants import L2_REGULARIZER_WEIGHT
+from models.layers.Resnet import ResnetModule
 
 class ResnetBackbone(tf.keras.Model):
     """ Create a network block for simultaneous semantic segmentation 

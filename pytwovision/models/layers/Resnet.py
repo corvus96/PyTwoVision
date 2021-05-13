@@ -1,5 +1,5 @@
 import tensorflow as tf
-from network_builder.constants import L2_REGULARIZER_WEIGHT
+from models.constants import L2_REGULARIZER_WEIGHT
 
 class ResnetModule(tf.keras.Model):
     """ A resnet block with depthwise separable convolutions to reduce the computational demand.

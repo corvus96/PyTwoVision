@@ -1,5 +1,5 @@
 import tensorflow as tf
-from network_builder.constants import L2_REGULARIZER_WEIGHT
+from models.constants import L2_REGULARIZER_WEIGHT
 
 class Upsample(tf.keras.Model):
     """ A stack that unsample by a factor to compensate downsampling.

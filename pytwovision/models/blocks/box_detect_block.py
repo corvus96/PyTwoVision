@@ -1,7 +1,8 @@
 import tensorflow as tf
-from layers.singleDecoder import SingleDecoder
-from network_builder.constants import L2_REGULARIZER_WEIGHT
-from Resnet_blocks import ResnetBranch
+from blocks.resnet_blocks import ResnetBranch
+from models.layers.singleDecoder import SingleDecoder
+from models.constants import L2_REGULARIZER_WEIGHT
+
 
 class BoxDecoder(tf.keras.Model):
     """ A block that solves 

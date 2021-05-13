@@ -1,5 +1,5 @@
 import tensorflow as tf
-from Resnet import ResnetModule
+from .Resnet import ResnetModule
 
 class SingleDecoder(tf.keras.Model):
     """A decoder formed by two ResnetModules and 1 conv2D with 1x1 kernel 
