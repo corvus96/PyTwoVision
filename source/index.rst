@@ -6,6 +6,9 @@
 Welcome to pytwovision's documentation!
 =======================================
 
+.. automodule:: pytwovision.models.layers.Resnet
+    :members:
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
