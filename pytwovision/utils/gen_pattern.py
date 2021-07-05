@@ -18,7 +18,7 @@ python gen_pattern.py -o out.svg -r 11 -c 8 -T circles -s 20.0 -R 5.0 -u mm -w 2
 
 import argparse
 
-from svgfig import *
+from utils.svgfig import *
 
 
 class PatternMaker:
