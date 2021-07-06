@@ -348,12 +348,11 @@ class SSDCalculus:
             # get all non max probability & set it as new nonbg
             nonbg = nonbg[nonbg != score_idx]
 
-            # if max obj probability is less than threshold (def 0.8)
+            # if max obj probability is less than threshold
             if score_max < args.class_threshold:
                 # we are done
                 break
 
-            # Line 5
             indexes.append(score_idx)
             score_anc = anchors[score_idx]
             score_off = offsets[score_idx][0:4]
@@ -361,7 +360,6 @@ class SSDCalculus:
             score_box = np.expand_dims(score_box, axis=0)
             nonbg_copy = np.copy(nonbg)
 
-            # get all overlapping predictions (Line 6)
             # perform Non-Max Suppression (NMS)
             for idx in nonbg_copy:
                 anchor = anchors[idx]
@@ -369,18 +367,17 @@ class SSDCalculus:
                 box = anchor + offset
                 box = np.expand_dims(box, axis=0)
                 iou = self.iou(box, score_box)[0][0]
-                # if soft NMS is chosen (Line 7)
+                # if soft NMS is chosen
                 if args.soft_nms:
-                    # adjust score: Line 8
+                    # adjust score
                     iou = -2 * iou * iou
                     classes[idx] *= math.exp(iou)
-                # else NMS (Line 9), (iou threshold def 0.2)
+                # else NMS (iou threshold def 0.2)
                 elif iou >= args.iou_threshold:
                     # remove overlapping predictions with iou>threshold
-                    # Line 10
                     nonbg = nonbg[nonbg != idx]
 
-            # Line 2, nothing else to process
+            # nothing else to process
             if nonbg.size == 0:
                 break
 
