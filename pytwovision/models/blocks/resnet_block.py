@@ -250,7 +250,7 @@ class V2(ResnetStrategy):
         # additional feature map layers
         for i in range(n_layers - 1):
             postfix = "_layer" + str(i+2)
-            conv = Conv2dBNEluLayer("Featured layer " + str(i + 1), n_filters, kernel_size=3, strides=2, use_maxpool=False, postfix=postfix)
+            conv = Conv2dBNEluLayer("Aditional Featured layer " + str(i + 1), n_filters, kernel_size=3, strides=2, use_maxpool=False, postfix=postfix)
             conv = conv(prev_conv)
             outputs.append(conv)
             prev_conv = conv
