@@ -16,7 +16,7 @@ from tensorflow.keras.layers import Add
 from tensorflow.keras.models import Model
 
 from models.layers.conv2d_bn_elu_layer import Conv2dBNEluLayer
-from models.layers.conv2d_bn_relu import Conv2dBNReluLayer
+from models.layers.conv2d_bn_relu_layer import Conv2dBNReluLayer
 
 class ResnetStrategy(ABC):
     """

@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from models.blocks.resnet_blocks import ResnetBackbone
-from models.blocks.simultaneous_heads import Heads
-from models.blocks.pretrain_simultaneous_heads import PretrainHead
+from ssd_model import BuildSSD
+from models.blocks.resnet_block import ResnetBlock, V1
 
 class ModelManagerInterface(metaclass=ABCMeta):
     """
@@ -9,37 +8,38 @@ class ModelManagerInterface(metaclass=ABCMeta):
     """
     @staticmethod
     @abstractmethod
-    def simultaneous_OD_SS():
-        """Implements simultaneous object detection and semantic segmentation model."""
+    def build_SSD():
+        """Implements simultaneous SSD."""
 
 
 class ModelManager(ModelManagerInterface):
     """A selector of models that depends of which method is used."""
     def __init__(self):
-        self.model1 = ObjectDetectSemanticSegmentationNet()
-    def simultaneous_OD_SS(self, name, pretrain = False, backboneNet = True, config = None):
-        """ Create the model to do simultaneous  object detection and semantic segmentation.
-        
-        Attributes:
-            name: Name of the model
-            pretrain: is a Boolean, which if it is true the last layers in Resnetbackbone will have a dilation_rate of 1.Otherwise dilation rate will be greather than 1.
-            backboneNet: is a Boolean, which if is true create only backbone network that works as a feature extraction net. Otherwise it will create two heads network for object detection and semantic segmentation.
-            config: is an object,
-
+        self.model1 = SSDModel()
+    def build_SSD(self, name, backbone: ResnetBlock, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
+        """ Create the model to do SSD.
+        Arguments:
+            input_shape (list): input image shape
+            backbone (model): Keras backbone model
+            n_layers (int): Number of layers of ssd head
+            n_classes (int): Number of obj classes
+            aspect_ratios (list): annchor box aspect ratios
+        Returns:
+            n_anchors (int): Number of anchor boxes per feature pt
+            feature_shape (tensor): SSD head feature maps
+            model (Keras model): SSD model
         """
-        return self.model1.build(name, pretrain, backboneNet, config)
+        return self.model1.build(name, backbone, n_layers, n_classes, aspect_ratios)
 
-class ObjectDetectSemanticSegmentationNet:
-    def build(self, name, pretrain, backboneNet, config) -> None:
-        if backboneNet:
-            return ResnetBackbone(name, pretrain)
-        else:
-            return Heads(name, config)
+class SSDModel:
+    def build(self, name, backbone, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
+        return BuildSSD(name, backbone, n_layers, n_classes, aspect_ratios)
 
 
 if __name__ == "__main__":
     # The client code.
     
     manager = ModelManager()
+    x = manager.build_SSD('SSD1', ResnetBlock(V1()))
     #manager.simultaneous_OD_SS('backbone')
     #manager.simultaneous_OD_SS('heads', backboneNet= False)
