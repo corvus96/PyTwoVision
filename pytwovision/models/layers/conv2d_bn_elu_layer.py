@@ -40,4 +40,3 @@ class Conv2dBNEluLayer(tf.keras.Model):
         
         return x
         
-        

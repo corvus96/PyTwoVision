@@ -12,10 +12,6 @@ class Recognizer:
     def __init__(self, neural_network: NeuralNetwork):
         self.implementation = neural_network
 
-    def train(self):
-        return (f"Abstraction: Base operation with:\n"
-                f"{self.implementation.train_net()}")
-
 
 
 
@@ -29,8 +25,27 @@ class NeuralNetwork(ABC):
     """
 
     @abstractmethod
-    def train_net(self):
+    def train(self):
         pass
+    
+    @abstractmethod
+    def inference(self):
+        pass
+    
+    @abstractmethod
+    def restore_weights(self):
+        pass
+    
+    @abstractmethod
+    def evaluate(self):
+        pass
+    
+    @abstractmethod
+    def print_summary(self):
+        pass
+    
+
+    
 
 
 

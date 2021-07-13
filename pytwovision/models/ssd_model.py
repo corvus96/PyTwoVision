@@ -38,6 +38,7 @@ class BuildSSD(tf.keras.Model):
         self.out_off = []
         self.n_layers = n_layers
         self.n_classes = n_classes
+        
     def call(self, input_shape):
         inputs = Input(shape=input_shape)
         # Backbone network

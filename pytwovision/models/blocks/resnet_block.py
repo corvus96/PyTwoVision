@@ -7,7 +7,6 @@ ResNet v2
 [b] Identity Mappings in Deep Residual Networks
 https://arxiv.org/pdf/1603.05027.pdf
 """
-
 from abc import ABC, abstractmethod
 
 from tensorflow.keras.layers import BatchNormalization, Activation
@@ -70,11 +69,10 @@ class ResnetBlock():
         # Returns
             model (Keras Model)
         """
-        if type(self._strategy).__name__ is 'V1':
+        if type(self._strategy).__name__ == 'V1':
             depth = n * 6 + 2
-        elif type(self._strategy).__name__ is 'V2':
+        elif type(self._strategy).__name__ == 'V2':
             depth = n * 9 + 2
-
         return self._strategy.build(input_shape=input_shape, depth=depth, n_layers=n_layers)
 
 class V1(ResnetStrategy):
@@ -258,9 +256,8 @@ class V2(ResnetStrategy):
         
 
         # instantiate model.
-        name = 'ResNet%dv2' % (depth)
+        name = "ResNet{depth}v2".format(depth=depth)
         model = Model(inputs=inputs,
                     outputs=outputs,
                     name=name)
         return model
-    
