@@ -14,6 +14,9 @@ python gen_pattern.py -o out.svg -r 11 -c 8 -T circles -s 20.0 -R 5.0 -u mm -w 2
 -h, --page_height - page height in units (default 279)
 -a, --page_size - page size (default A4), supersedes -h -w arguments
 -H, --help - show help
+
+python gen_pattern.py -o chessboard.svg --rows 9 --columns 6 --type checkerboard --square_size 30
+python gen_pattern.py -o circleboard.svg --rows 7 --columns 5 --type circles --square_size 25
 """
 
 import argparse

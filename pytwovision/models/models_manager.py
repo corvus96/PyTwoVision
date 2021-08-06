@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from ssd_model import BuildSSD
+from models.ssd_model import BuildSSD
 from models.blocks.resnet_block import ResnetBlock, V1
 
 class ModelManagerInterface(metaclass=ABCMeta):

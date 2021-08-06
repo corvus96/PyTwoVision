@@ -314,7 +314,7 @@ class SSDCalculus:
 
         return gt_class, gt_offset, gt_mask
 
-    def nms(self, args, classes, offsets, anchors):
+    def nms(self, classes, offsets, anchors, class_threshold=0.5, soft_nms=False, iou_threshold=0.2):
         """Perform NMS (Algorithm 11.12.1).
         Arguments:
             args : User-defined configurations
@@ -349,7 +349,7 @@ class SSDCalculus:
             nonbg = nonbg[nonbg != score_idx]
 
             # if max obj probability is less than threshold
-            if score_max < args.class_threshold:
+            if score_max < class_threshold:
                 # we are done
                 break
 
@@ -368,12 +368,12 @@ class SSDCalculus:
                 box = np.expand_dims(box, axis=0)
                 iou = self.iou(box, score_box)[0][0]
                 # if soft NMS is chosen
-                if args.soft_nms:
+                if soft_nms:
                     # adjust score
                     iou = -2 * iou * iou
                     classes[idx] *= math.exp(iou)
                 # else NMS (iou threshold def 0.2)
-                elif iou >= args.iou_threshold:
+                elif iou >= iou_threshold:
                     # remove overlapping predictions with iou>threshold
                     nonbg = nonbg[nonbg != idx]
 

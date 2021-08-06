@@ -7,15 +7,18 @@ import os
 
 from matplotlib.patches import Rectangle
 from matplotlib.lines import Line2D
-from math.ssd_calculus import SSDCalculus
+from compute.ssd_calculus import SSDCalculus
 from utils.label_utils import index2class, get_box_color
 
-def show_boxes(args,
-               image,
+def show_boxes(image,
                classes,
                offsets,
                feature_shapes,
-               show=True):
+               class_threshold=0.5,
+               normalize=False,
+               show=True,
+               soft_nms=False,
+               iou_threshold=0.2):
     """Show detected objects on an image. Show bounding boxes
     and class names.
     Arguments:
@@ -47,7 +50,7 @@ def show_boxes(args,
     # objects = np.argmax(classes, axis=1)
     # print(np.unique(objects, return_counts=True))
     # nonbg = np.nonzero(objects)[0]
-    if args.normalize:
+    if normalize:
         print("Normalize")
         anchors_centroid = SSDCalculus().minmax2centroid(anchors)
         offsets[:, 0:2] *= 0.1
@@ -60,10 +63,12 @@ def show_boxes(args,
         # convert fr cx,cy,w,h to real offsets
         offsets[:, 0:4] = offsets[:, 0:4] - anchors
 
-    objects, indexes, scores = SSDCalculus().nms(args,
-                                   classes,
+    objects, indexes, scores = SSDCalculus().nms(classes,
                                    offsets,
-                                   anchors)
+                                   anchors,
+                                   class_threshold=class_threshold,
+                                   soft_nms=soft_nms,
+                                   iou_threshold=iou_threshold)
 
     class_names = []
     rects = []
