@@ -3,8 +3,11 @@ class Frame():
     The base Component interface defines operations that can be altered by
     decorators.
     """
-    def apply(self, input_image):
-        return input_image
+    def __init__(self, input_image):
+        self.img = input_image
+        
+    def apply(self):
+        return self.img
 
 class FrameDecorator(Frame):
     """
@@ -18,7 +21,7 @@ class FrameDecorator(Frame):
     _frame: Frame = None
 
     def __init__(self, frame: Frame):
-        self._frame = Frame
+        self._frame = frame
 
     @property
     def frame(self):
@@ -28,8 +31,8 @@ class FrameDecorator(Frame):
 
         return self._frame
 
-    def apply(self):
+    def apply(self, input_image):
         
-        return self._frame.apply()
+        return self._frame.apply(input_image)
 
 
