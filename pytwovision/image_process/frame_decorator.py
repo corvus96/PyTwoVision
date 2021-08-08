@@ -21,7 +21,10 @@ class FrameDecorator(Frame):
     _frame: Frame = None
 
     def __init__(self, frame: Frame):
-        self._frame = frame
+        if isinstance(frame, Frame):
+            self._frame = frame
+        else:
+            self._frame = Frame(frame)
 
     @property
     def frame(self):
