@@ -4,6 +4,7 @@ import cv2 as cv
 import numpy as np 
 import requests
 import re
+import errno
 
 class Camera:
     
@@ -29,11 +30,12 @@ class Camera:
         else:
             self.type_source = 'webcam'
 
-    def take_photos(self, num_photos=15, save_dir="/temp/root", prefix_name="photo"):
+    def take_photos(self, num_photos=15, save_dir="images", prefix_name="photo"):
         """ A simple way to take photos by console and save in a folder
         Arguments:
-            num_photos (int): Number of photos
-            save_dir ()
+            num_photos (int): Number of photos to take
+            save_dir (str): Directory name where the photos will be saved
+            prefix_name (str): A prefix for the names of the photos
         """
         # initial directory
         cwd = os.getcwd()
@@ -42,10 +44,10 @@ class Camera:
             os.mkdir(save_dir)
             os.chdir(save_dir)
         except OSError as error:
-            print(error)    
-        # control variables
-        stop = False
-        event = False
+            print(error)   
+            if error.errno == errno.EEXIST:
+                os.chdir(save_dir)
+
 
         if self.type_source == 'other' or 'webcam':
             cap = cv.VideoCapture(self.source)
@@ -54,9 +56,8 @@ class Camera:
                 exit()
 
         for i in range(num_photos):
-            if stop:
-                break
-            while event is False:
+            print("Please press enter to take a photo")
+            while True:
                 if self.type_source == 'stream':
                     img_resp = requests.get(self.source)
                     img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
@@ -65,12 +66,20 @@ class Camera:
                 elif self.type_source == 'other' or 'webcam':
                     _, frame = cap.read()
                     cv.imshow("webcam: {}".format(self.id), frame)
-
-                input_key = input("Please press enter to take a photo\n")
-                if input_key == '':
-                    cv.imwrite('{}_{}.png'.format(prefix_name, i), frame)
+                input_key = cv.waitKey(1)
+                
+                if input_key == 32:
+                    #space pressed
+                    cv.imwrite('{}_{}.png'.format(prefix_name, i + 1), frame)
                     print("{} photos left".format(num_photos - i - 1))
                     break
+                if input_key == 27:
+                    #esc pressed
+                    print("Escape hit, closing...")
+                    break
+            if input_key == 27:
+                #esc pressed
+                break
         
         # restore to initial directory
         os.chdir(cwd)
@@ -113,5 +122,5 @@ class Camera:
         except OSError:
             print("Could not find any image in {}".format(images_path))
 
-cam1 = Camera("cam1")
+cam1 = Camera("cam1", 0)
 cam1.take_photos()
