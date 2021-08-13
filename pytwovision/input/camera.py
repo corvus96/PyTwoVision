@@ -9,13 +9,12 @@ import errno
 class Camera:
     
     def __init__(self, id, source):
-        """Build SSD model given a backbone
+        """An emulation of a real world camera with his relevant parameters, like 
+        camera matrix, extrinsics and intrinsics parameters. 
         Arguments:
             id (str): An identifier to our camera.
             source (int | str): When you use webcam you need to put (int) 0,
             if you want to use videos or streaming, you will need to put his URL or path.
-        Returns:
-            A model of the real world camera to use in stereo problems 
         """
         self.id = id
         self.source = source
@@ -84,7 +83,7 @@ class Camera:
         # restore to initial directory
         os.chdir(cwd)
 
-    def calibrate(self, images_path='', pattern_type='chessboard', pattern_size=(7,6)):
+    def calibrate(self, images_path='', pattern_type='chessboard', pattern_size=(7,6), export_file=False):
         # adjust image path
         images_path, _ = os.path.splitext(images_path)
         # available formats
@@ -115,12 +114,52 @@ class Camera:
                 # If found, add object points, image points (after refining them)
                 if ret == True:
                     objpoints.append(objp)
-                    corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
+                    corners = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
                     imgpoints.append(corners)
-            ret, matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
             
+            self.ret, self.matrix, self.dist_coeffs, self.rvecs, self.tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+            
+            height, width = img.shape[:2]
+            self.matrix, self.roi = cv.getOptimalNewCameraMatrix(self.matrix, self.dist_coeffs, (width, height), 1, (width, height))
+            
+            # export an xml with camera parameters
+            if export_file:
+                print("Saving parameters!")
+                cv_file = cv.FileStorage('{}_parameters.xml'.format(self.id), cv.FILE_STORAGE_WRITE)
+                cv_file.write('camera_mtx', self.matrix)
+                cv_file.write('distortion_coeff', self.dist_coeffs)
+                cv_file.write('rotation_mtx', self.rvecs)
+                cv_file.write('translation_mtx', self.tvecs)
+                cv_file.write('ROI', self.roi)
+                cv_file.write('returnal value', self.ret)
+                cv_file.release()
+
         except OSError:
             print("Could not find any image in {}".format(images_path))
+
+        return self.matrix, self.dist_coeffs, self.rvecs, self.tvecs, self.roi, self.ret
+
+    def get_parameters(self, path):
+        """ Loads stereo camara parameters from a xml file
+        Arguments: 
+            path (str): path where is saved xml file. (Note: if you don't 
+            have any parameters you can use calibrate method 
+            and pass true in export file argument)
+         """
+
+        # file storage read
+        cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
+        self.matrix = cv_file.getNode('camera_mtx').mat()
+        self.dist_coeffs = cv_file.getNode('distortion_coeff').mat()
+        self.rvecs = cv_file.getNode('rotation_mtx').mat()
+        self.tvecs = cv_file.getNode('translation_mtx').mat()
+        self.roi = cv_file.getNode('ROI').mat()
+        self.ret = cv_file.getNode('returnal value').mat()
+
+        cv_file.release()
+
+        return self.matrix, self.dist_coeffs, self.rvecs, self.tvecs, self.roi, self.ret
+
 
 cam1 = Camera("cam1", 0)
 cam1.take_photos()
