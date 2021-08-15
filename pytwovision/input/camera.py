@@ -6,6 +6,10 @@ import requests
 import re
 import errno
 
+from image_process.frame_decorator import Frame
+from image_process.resize import Resize
+from image_process.rotate import Rotate
+
 class Camera:
     
     def __init__(self, id, source):
@@ -29,8 +33,8 @@ class Camera:
         else:
             self.type_source = 'webcam'
 
-    def take_photos(self, num_photos=15, save_dir="images", prefix_name="photo"):
-        """ A simple way to take photos by console and save in a folder
+    def take_photos(self, num_photos=15, save_dir="images", prefix_name="photo", rotate=0, resize=False, resize_dim=(640,480)):
+        """ A simple way to take photos in console and save in a folder
         Arguments:
             num_photos (int): Number of photos to take
             save_dir (str): Directory name where the photos will be saved
@@ -48,7 +52,7 @@ class Camera:
                 os.chdir(save_dir)
 
 
-        if self.type_source == 'other' or 'webcam':
+        if self.type_source == 'other' or self.type_source == 'webcam':
             cap = cv.VideoCapture(self.source)
             if not cap.isOpened():
                 print("Cannot open camera")
@@ -61,15 +65,31 @@ class Camera:
                     img_resp = requests.get(self.source)
                     img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
                     frame = cv.imdecode(img_arr, -1)
+                    if rotate != 0:
+                        transf_frame = Frame(frame)
+                        frame = Rotate(transf_frame).apply(90)
+                        frame = cv.flip(frame, 0)
+                    if resize:
+                        transf_frame = Frame(frame)
+                        frame = Resize(transf_frame).apply(resize_dim[0], resize_dim[1])
+                    cv.namedWindow("streaming: {}".format(self.id), cv.WINDOW_NORMAL)
                     cv.imshow("streaming: {}".format(self.id), frame)
                 elif self.type_source == 'other' or 'webcam':
                     _, frame = cap.read()
+                    if rotate != 0:
+                        transf_frame = Frame(frame)
+                        frame = Rotate(transf_frame).apply(90)
+                        frame = cv.flip(frame, -1)
+                    if resize:
+                        transf_frame = Frame(frame)
+                        frame = Resize(transf_frame).apply(resize_dim[0], resize_dim[1])
                     cv.imshow("webcam: {}".format(self.id), frame)
                 input_key = cv.waitKey(1)
                 
                 if input_key == 32:
                     #space pressed
                     cv.imwrite('{}_{}.png'.format(prefix_name, i + 1), frame)
+                    print("saved as {}_{}.png".format(prefix_name, i + 1))
                     print("{} photos left".format(num_photos - i - 1))
                     break
                 if input_key == 27:
@@ -79,7 +99,7 @@ class Camera:
             if input_key == 27:
                 #esc pressed
                 break
-        
+        cv.destroyAllWindows()
         # restore to initial directory
         os.chdir(cwd)
 
@@ -111,6 +131,8 @@ class Camera:
                 # Find the chess board corners
                 if pattern_type == 'chessboard':
                     ret, corners = cv.findChessboardCorners(gray, pattern_size, None)
+                elif pattern_size == 'circles':
+                    ret, corners = cv.findCirclesGrid(gray, pattern_size, None)
                 # If found, add object points, image points (after refining them)
                 if ret == True:
                     objpoints.append(objp)
@@ -161,5 +183,8 @@ class Camera:
         return self.matrix, self.dist_coeffs, self.rvecs, self.tvecs, self.roi, self.ret
 
 
-cam1 = Camera("cam1", 0)
-cam1.take_photos()
+cam1 = Camera("cam1", 'http://192.168.0.108:8080/shot.jpg')
+cam1.take_photos(resize=True)
+
+#cam2 = Camera("CAM2", 0)
+#cam2.take_photos(rotate=270, resize=True, resize_dim=(240, 120))

@@ -1,6 +1,6 @@
 import numpy as np
 
-from frame_decorator import FrameDecorator
+from image_process.frame_decorator import FrameDecorator
 from skimage import exposure
 
 class RandomExposure(FrameDecorator):
