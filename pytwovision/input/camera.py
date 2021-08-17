@@ -103,7 +103,7 @@ class Camera:
         # restore to initial directory
         os.chdir(cwd)
 
-    def calibrate(self, images_path='', pattern_type='chessboard', pattern_size=(7,6), export_file=False):
+    def calibrate(self, images_path='', pattern_type='chessboard', pattern_size=(7,6), export_file=True):
         # adjust image path
         images_path, _ = os.path.splitext(images_path)
         # available formats
@@ -112,13 +112,13 @@ class Camera:
         files_grabbed = [glob.glob((images_path + '/' + e)  if len(images_path) > 0 else e) for e in formats]
         # flatting files list
         images = [item for sublist in files_grabbed for item in sublist]
-
+        
         # termination criteria
         criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         
         # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-        objp = np.zeros((6*7,3), np.float32)
-        objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
+        objp = np.zeros((pattern_size[1]*pattern_size[0],3), np.float32)
+        objp[:,:2] = np.mgrid[0:pattern_size[0],0:pattern_size[1]].T.reshape(-1,2)
         # Arrays to store object points and image points from all the images.
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
@@ -131,7 +131,7 @@ class Camera:
                 # Find the chess board corners
                 if pattern_type == 'chessboard':
                     ret, corners = cv.findChessboardCorners(gray, pattern_size, None)
-                elif pattern_size == 'circles':
+                elif pattern_type == 'circles':
                     ret, corners = cv.findCirclesGrid(gray, pattern_size, None)
                 # If found, add object points, image points (after refining them)
                 if ret == True:
@@ -143,23 +143,26 @@ class Camera:
             
             height, width = img.shape[:2]
             self.matrix, self.roi = cv.getOptimalNewCameraMatrix(self.matrix, self.dist_coeffs, (width, height), 1, (width, height))
-            
             # export an xml with camera parameters
             if export_file:
                 print("Saving parameters!")
                 cv_file = cv.FileStorage('{}_parameters.xml'.format(self.id), cv.FILE_STORAGE_WRITE)
                 cv_file.write('camera_mtx', self.matrix)
                 cv_file.write('distortion_coeff', self.dist_coeffs)
-                cv_file.write('rotation_mtx', self.rvecs)
-                cv_file.write('translation_mtx', self.tvecs)
+                for i, rvec in enumerate(self.rvecs):
+                    cv_file.write('rotation_mtx_col_{}'.format(i), rvec) 
+                num_rvecs = i + 1
+                cv_file.write('num_rvecs', num_rvecs)
+                for i, tvec in enumerate(self.tvecs):
+                    cv_file.write('translation_mtx_col_{}'.format(i), tvec)
+                num_tvecs = i + 1
+                cv_file.write('num_tvecs', num_tvecs)
                 cv_file.write('ROI', self.roi)
-                cv_file.write('returnal value', self.ret)
+                cv_file.write('returnal_value', self.ret)
                 cv_file.release()
-
+                print("Saved as {}_parameters.xml".format(self.id))
         except OSError:
             print("Could not find any image in {}".format(images_path))
-
-        return self.matrix, self.dist_coeffs, self.rvecs, self.tvecs, self.roi, self.ret
 
     def get_parameters(self, path):
         """ Loads stereo camara parameters from a xml file
@@ -173,18 +176,27 @@ class Camera:
         cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
         self.matrix = cv_file.getNode('camera_mtx').mat()
         self.dist_coeffs = cv_file.getNode('distortion_coeff').mat()
-        self.rvecs = cv_file.getNode('rotation_mtx').mat()
-        self.tvecs = cv_file.getNode('translation_mtx').mat()
-        self.roi = cv_file.getNode('ROI').mat()
-        self.ret = cv_file.getNode('returnal value').mat()
+        num_rvecs = int(cv_file.getNode('num_rvecs').real())
+        self.rvecs = [cv_file.getNode('rotation_mtx_col_{}'.format(i)).mat() for i in range(num_rvecs)]
+        num_tvecs = int(cv_file.getNode('num_tvecs').real())
+        self.tvecs = [cv_file.getNode('translation_mtx_col_{}'.format(i)).mat() for i in range(num_tvecs)]
+        self.roi = tuple(cv_file.getNode('ROI').mat().astype(int).reshape(1, -1)[0])
+        self.ret = int(cv_file.getNode('returnal_value').real())
 
         cv_file.release()
 
-        return self.matrix, self.dist_coeffs, self.rvecs, self.tvecs, self.roi, self.ret
-
-
-cam1 = Camera("cam1", 'http://192.168.0.108:8080/shot.jpg')
-cam1.take_photos(resize=True)
-
-#cam2 = Camera("CAM2", 0)
-#cam2.take_photos(rotate=270, resize=True, resize_dim=(240, 120))
+#cam5 = Camera("note_9t_horizontal_circles", 'http://192.168.0.106:8080/shot.jpg')
+#cam5.take_photos(save_dir="redmi_note_9t_horizontal_circles")
+#cam5.calibrate(images_path="redmi_note_9t_horizontal_circles", pattern_size=(7, 5), pattern_type='circles')
+# #cam5.get_parameters("note_8_horizontal_circles_parameters.xml")
+# print(cam5.matrix)
+# print("ret")
+# print(cam5.ret)
+# print("roi")
+# print(cam5.roi)
+# print("dist coeff")
+# print(cam5.dist_coeffs)
+# print("rvecs")
+# print(cam5.rvecs)
+# print("tvecs")
+# print(cam5.tvecs)
