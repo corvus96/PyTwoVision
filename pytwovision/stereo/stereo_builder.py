@@ -13,15 +13,15 @@ class StereoSystemBuilder(ABC):
         pass
 
     @abstractmethod
-    def produce_part_a(self) -> None:
+    def pre_process(self) -> None:
         pass
 
     @abstractmethod
-    def produce_part_b(self) -> None:
+    def match(self) -> None:
         pass
 
     @abstractmethod
-    def produce_part_c(self) -> None:
+    def post_process(self) -> None:
         pass
 
 
