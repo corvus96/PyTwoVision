@@ -9,4 +9,4 @@ class Resize(FrameDecorator):
     """
     def apply(self, width, height):
         """Apply resizing on an image"""
-        return cv.resize(self._frame.apply(), (width, height), interpolation= cv.INTER_LINEAR)
+        return cv.resize(self._frame.apply(), (width, height), interpolation= cv.INTER_LINEAR_EXACT)

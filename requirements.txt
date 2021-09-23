@@ -1,5 +1,5 @@
 numpy
 tensorflow
-opencv-python
+opencv-contrib-python
 pyyaml 
 h5py

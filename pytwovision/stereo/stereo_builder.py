@@ -9,19 +9,21 @@ class StereoSystemBuilder(ABC):
 
     @property
     @abstractmethod
-    def product(self) -> None:
+    def get_product(self):
         pass
 
     @abstractmethod
-    def pre_process(self) -> None:
+    def pre_process(self):
         pass
 
     @abstractmethod
-    def match(self) -> None:
+    def match(self):
         pass
 
     @abstractmethod
-    def post_process(self) -> None:
+    def post_process(self):
+        pass
+    def find_epilines(self):
         pass
 
 
@@ -54,8 +56,15 @@ class StereoController:
     building steps.
     """
 
-    def make_minimal_viable_product(self) -> None:
-        self.stereo_builder.produce_part_a()
+    def compute_disparity(self, frameL, frameR):
+        rectify_left, rectify_right = self.stereo_builder.pre_process(frameL, frameR)
+        left_disp, right_disp, left_matcher = self.stereo_builder.match(rectify_left, rectify_right)
+        return self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher)
+    def compute_disparity_without_refinement(self, frameL, frameR):
+        rectify_left, rectify_right = self.stereo_builder.pre_process(frameL, frameR)
+        return self.stereo_builder.match(rectify_left, rectify_right)
+    def make_epilines(self, frameL, frameR):
+        return self.stereo_builder.find_epilines(frameL, frameR)
 
     def make_full_featured_product(self) -> None:
         self.stereo_builder.produce_part_a()

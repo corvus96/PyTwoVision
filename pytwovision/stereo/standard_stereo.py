@@ -1,16 +1,17 @@
-from _typeshed import Self
 import os
 import glob
 import numpy as np
 import cv2 as cv 
+import requests
+import time
 
 from stereo.stereo_builder import StereoSystemBuilder
 from stereo.stereo_builder import StereoController 
-from typing import Any
 from input_output.camera import Camera
-
-
-
+from utils.draw import drawlines
+from compute.error_compute import re_projection_error
+from image_process.frame_decorator import Frame
+from image_process.resize import Resize
 
 class StandardStereo():
     """An emulation of a real world stereo system with his relevant parameters, like 
@@ -23,6 +24,103 @@ class StandardStereo():
         self.camL = cam_left
         self.camR = cam_right
     
+    def take_dual_photos(self, num_photos=15, save_dir_left="images_left", save_dir_right="images_right", prefix_name="photo"):
+        """ A simple way to take photos in console and save in a folder
+        Arguments:
+            num_photos (int): Number of photos to take, 15 by default.
+            save_dir (str): Directory name where the photos will be saved.
+            prefix_name (str): A prefix for the names of the photos.
+            rotate (int): rotate input image around his center, 0 grades by default.
+            resize (boolean): To resize input image.
+            resize_dim (tuple): resize input image dimensions (width, height), its default is (640, 480).
+
+        Raises:
+            OSError: if folder exist.
+        """
+        # initial directory
+        cwd = os.getcwd()
+        # make directory
+        try:
+            os.mkdir(save_dir_left)
+        except OSError as error:
+            print(error)   
+        try:
+            os.mkdir(save_dir_right)
+        except OSError as error:
+            print(error)   
+
+
+        if self.camL.type_source == 'other' or self.camL.type_source == 'webcam':
+            capL = cv.VideoCapture(self.camL.source)
+            if not capL.isOpened():
+                print("Cannot open left camera")
+                exit()
+        if self.camR.type_source == 'other' or self.camR.type_source == 'webcam':
+            capR = cv.VideoCapture(self.camR.source)
+            if not capR.isOpened():
+                print("Cannot open right camera")
+                exit()
+
+        for i in range(num_photos):
+            print("Please press enter to take a photo")
+            while True:
+                if self.camL.type_source == 'stream' and self.camR.type_source == 'stream':
+                    img_respL = requests.get(self.camL.source)
+                    img_arrL = np.array(bytearray(img_respL.content), dtype=np.uint8)
+                    frameL = cv.imdecode(img_arrL, -1)
+                    img_respR = requests.get(self.camR.source)
+                    img_arrR = np.array(bytearray(img_respR.content), dtype=np.uint8)
+                    frameR = cv.imdecode(img_arrR, -1)
+                    cv.namedWindow("streaming: {}".format(self.camL.id), cv.WINDOW_NORMAL)
+                    cv.imshow("streaming: {}".format(self.camL.id), frameL)
+                    cv.namedWindow("streaming: {}".format(self.camR.id), cv.WINDOW_NORMAL)
+                    cv.imshow("streaming: {}".format(self.camR.id), frameR)
+                elif (self.camL.type_source == 'other' or 'webcam') and self.camR.type_source == 'stream':
+                    _, frameL = capL.read()
+                    img_respR = requests.get(self.camR.source)
+                    img_arrR = np.array(bytearray(img_respR.content), dtype=np.uint8)
+                    frameR = cv.imdecode(img_arrR, -1)
+                    cv.imshow("webcam: {}".format(self.camL.id), frameL)
+                    cv.namedWindow("streaming: {}".format(self.camR.id), cv.WINDOW_NORMAL)
+                    cv.imshow("streaming: {}".format(self.camR.id), frameR)
+                elif (self.camR.type_source == 'other' or 'webcam') and self.camL.type_source == 'stream':
+                    _, frameR = capR.read()
+                    img_respL = requests.get(self.camL.source)
+                    img_arrL = np.array(bytearray(img_respL.content), dtype=np.uint8)
+                    frameL = cv.imdecode(img_arrL, -1)
+                    cv.imshow("webcam: {}".format(self.camR.id), frameR)
+                    cv.namedWindow("streaming: {}".format(self.camL.id), cv.WINDOW_NORMAL)
+                    cv.imshow("streaming: {}".format(self.camL.id), frameL)
+                else:
+                    _, frameL = capL.read()
+                    _, frameR = capR.read()
+                    cv.imshow("webcam: {}".format(self.camL.id), frameL)
+                    cv.imshow("webcam: {}".format(self.camR.id), frameR)
+                input_key = cv.waitKey(1)
+                
+                if input_key == 32:
+                    #space pressed
+                    os.chdir(save_dir_left)
+                    cv.imwrite('{}_{}.png'.format(prefix_name, i + 1), frameL)
+                    print("saved as {}_{}.png".format(prefix_name, i + 1))
+                    os.chdir(cwd)
+                    os.chdir(save_dir_right)
+                    cv.imwrite('{}_{}.png'.format(prefix_name, i + 1), frameR)
+                    print("saved as {}_{}.png".format(prefix_name, i + 1))
+                    os.chdir(cwd)
+                    print("{} photos left".format(num_photos - i - 1))
+                    break
+                if input_key == 27:
+                    #esc pressed
+                    print("Escape hit, closing...")
+                    break
+            if input_key == 27:
+                #esc pressed
+                break
+        cv.destroyAllWindows()
+        # restore to initial directory
+        os.chdir(cwd)
+
     def calibrate(self, images_left_path, images_right_path, pattern_type='chessboard', pattern_size=(7,6)):
         """ Compute stereo parameters like a fundamental matrix, 
         rotation and traslation matrix and esential matrix.
@@ -110,10 +208,14 @@ class StandardStereo():
                 self.camL.ret, self.camL.matrix, self.camL.dist_coeffs, self.camL.rvecs, self.camL.tvecs = cv.calibrateCamera(objpoints, imgpointsL, grayL.shape[::-1], None, None)
                 heightL, widthL = imgL.shape[:2]
                 self.camL.matrix, self.camL.roi = cv.getOptimalNewCameraMatrix(self.camL.matrix, self.camL.dist_coeffs, (widthL, heightL), 1, (widthL, heightL))
+                errorL = re_projection_error(objpoints, self.camL.rvecs, self.camL.tvecs, self.camL.matrix, imgpointsL, self.camL.dist_coeffs)
+                print("Left camera error {}".format(errorL))
                 print("Fixing Right camera...")
                 self.camR.ret, self.camR.matrix, self.camR.dist_coeffs, self.camR.rvecs, self.camR.tvecs = cv.calibrateCamera(objpoints, imgpointsR, grayR.shape[::-1], None, None)
                 heightR, widthR = imgL.shape[:2]
                 self.camR.matrix, self.camR.roi = cv.getOptimalNewCameraMatrix(self.camR.matrix, self.camR.dist_coeffs, (widthR, heightR), 1, (widthR, heightR))
+                errorR = re_projection_error(objpoints, self.camR.rvecs, self.camR.tvecs, self.camR.matrix, imgpointsR, self.camR.dist_coeffs)
+                print("Right camera error {}".format(errorR))
                 print("Calibrating estereo...")
                 # This step is performed to transformation between the two cameras and calculate Essential and Fundamenatl matrix
                 self.ret_stereo, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, self.e_matrix, self.f_matrix = cv.stereoCalibrate(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], criteria_stereo, flags)
@@ -233,7 +335,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
         """
         return self._product
 
-    def pre_process(self, frameL, frameR) -> None:
+    def pre_process(self, frameL, frameR):
         img_left_gray = cv.cvtColor(frameL,cv.COLOR_BGR2GRAY)
         img_right_gray = cv.cvtColor(frameR,cv.COLOR_BGR2GRAY)
 
@@ -243,6 +345,94 @@ class StandardStereoBuilder(StereoSystemBuilder):
         retify_right = cv.remap(img_right_gray, self._product.stereoMapR[0], self._product.stereoMapR[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
         
         return retify_left, retify_right
+    
+    def find_epilines(self, frameL, frameR):
+        sift = cv.SIFT_create()
+        # find the keypoints and descriptors with SIFT
+        kp1, des1 = sift.detectAndCompute(frameL,None)
+        kp2, des2 = sift.detectAndCompute(frameR,None)
+        # FLANN parameters
+        FLANN_INDEX_KDTREE = 1
+        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+        search_params = dict(checks=50)
+        flann = cv.FlannBasedMatcher(index_params,search_params)
+        matches = flann.knnMatch(des1,des2,k=2)
+        pts1 = []
+        pts2 = []
+        # ratio test as per Lowe's paper
+        for i,(m,n) in enumerate(matches):
+            if m.distance < 0.8*n.distance:
+                pts2.append(kp2[m.trainIdx].pt)
+                pts1.append(kp1[m.queryIdx].pt)
+
+        pts1 = np.int32(pts1)
+        pts2 = np.int32(pts2)
+        F, mask = cv.findFundamentalMat(pts1,pts2,cv.FM_LMEDS)
+        # We select only inlier points
+        pts1 = pts1[mask.ravel()==1]
+        pts2 = pts2[mask.ravel()==1]
+        # Find epilines corresponding to points in right image (second image) and
+        # drawing its lines on left image
+        lines1 = cv.computeCorrespondEpilines(pts2.reshape(-1,1,2), 2,F)
+        lines1 = lines1.reshape(-1,3)
+        img5, _ = drawlines(frameL, frameR,lines1,pts1,pts2)
+        # Find epilines corresponding to points in left image (first image) and
+        # drawing its lines on right image
+        lines2 = cv.computeCorrespondEpilines(pts1.reshape(-1,1,2), 1,F)
+        lines2 = lines2.reshape(-1,3)
+        img3, _ = drawlines(frameR, frameL,lines2,pts2,pts1)
+        return img5, img3
+
+    def match(self, frameL, frameR, max_disp=160, window_size=3, downsample=True, metrics=True):
+        try:
+            if max_disp <= 0 or max_disp % 16 != 0:
+                raise ValueError
+        except ValueError:
+            print("Incorrect max_disparity value: it should be positive and divisible by 16")
+            exit()
+        try:
+            if window_size <= 0 or window_size % 2 != 1:
+                raise ValueError
+        except ValueError:
+            print("Incorrect window_size value: it should be positive and odd")
+            exit()
+        max_disp /= 2
+        if(max_disp % 16 != 0):
+            max_disp += 16-(max_disp % 16)
+        # Downsample input
+        if downsample:
+            left_for_matcher = Frame(frameL)
+            left_for_matcher = Resize(left_for_matcher).apply(int(frameL.shape[0]/2), int(frameL.shape[1]/2))
+            right_for_matcher = Frame(frameR)
+            right_for_matcher = Resize(right_for_matcher).apply(int(frameR.shape[0]/2), int(frameR.shape[1]/2))
+        else: 
+            left_for_matcher = frameL
+            right_for_matcher = frameR
+        left_matcher = cv.StereoSGBM_create(0, int(max_disp), window_size, P1=24*window_size*window_size, P2=96*window_size*window_size, preFilterCap=63, mode=cv.StereoSGBM_MODE_SGBM_3WAY)
+        right_matcher = cv.ximgproc.createRightMatcher(left_matcher)
+        print('computing disparity...')
+        if metrics:
+            matching_time = time.time()
+        left_disp = left_matcher.compute(left_for_matcher, right_for_matcher)
+        right_disp = right_matcher.compute(right_for_matcher, left_for_matcher)
+        if metrics:
+            print("matching time: {} s".format(time.time() - matching_time))
+        return left_disp, right_disp, left_matcher
+         
+    
+    def post_process(self, frameL, left_disp, right_disp, matcher, lmbda=128.0, sigma=1.5, metrics=True):
+        wls_filter = cv.ximgproc.createDisparityWLSFilter(matcher)
+        wls_filter.setLambda(lmbda);
+        wls_filter.setSigmaColor(sigma);
+        if metrics:
+            postprocessing_time = time.time()
+        filtered_disp = wls_filter.filter(left_disp, frameL, disparity_map_right=right_disp);
+        if metrics:
+            print("postprocessing time: {} s".format(time.time() - postprocessing_time))
+        return filtered_disp
+        
+def nothing(x):
+    pass
 
 if __name__ == "__main__":
     """
@@ -251,23 +441,36 @@ if __name__ == "__main__":
     builder object.
     """
     # Test without previous calibration
-    # cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.107:8080/shot.jpg')
-    # cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.109:8080/shot.jpg')
-    # stereo = StandardStereo(cam1, cam2)
-    # stereo.calibrate("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/left_camera_xiaomi_redmi_note_8_pro", "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/right_camera_xiaomi_redmi_9T", pattern_size=(8, 5))
-
-    # Test with previous calibration
-    cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.107:8080/shot.jpg')
-    cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.109:8080/shot.jpg')
-    cam1.get_parameters("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/xiaomi_redmi_note_8_pro_parameters.xml")
-    cam2.get_parameters("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/xiaomi_redmi_9T_parameters.xml")
+    cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.112:8080/shot.jpg')
+    cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.105:8080/shot.jpg')
     stereo = StandardStereo(cam1, cam2)
-    stereo.calibrate("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/left_camera_xiaomi_redmi_note_8_pro", "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/right_camera_xiaomi_redmi_9T", pattern_size=(8, 5))
-    stereo.rectify("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/left_camera_xiaomi_redmi_note_8_pro/photo_1.png",  "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/right_camera_xiaomi_redmi_9T/photo_1.png", "different_left_right")
-    print("Not equals images test parameters:")
-    stereo.print_parameters()
-    stereo.rectify("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/left_one_photo/photo_1.png",  "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/input_output/right_one_photo/photo_1.png", "equal_left_right")
-    stereo.print_parameters()
+    stereo.calibrate("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro", "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T", pattern_size=(8, 5))
+    stereo.rectify("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro/photo_1.png",  "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T/photo_1.png", "equal_left_right")
+    stereo_builder = StandardStereoBuilder(cam1, cam2, 'equal_left_right.xml')
+    stereo_controller = StereoController()
+    stereo_controller.stereo_builder = stereo_builder
+    
+    cv.namedWindow('disp',cv.WINDOW_NORMAL)
+    stereo = cv.StereoSGBM_create()
+
+    while True:
+        img_respL = requests.get(cam1.source)
+        img_arrL = np.array(bytearray(img_respL.content), dtype=np.uint8)
+        frameL = cv.imdecode(img_arrL, -1)
+        img_respR = requests.get(cam2.source)
+        img_arrR = np.array(bytearray(img_respR.content), dtype=np.uint8)
+        frameR = cv.imdecode(img_arrR, -1)
+
+        disp = stereo_controller.compute_disparity(frameL, frameR)
+        cv.imshow('disp', disp)
+        if cv.waitKey(1) == 27:
+            #esc pressed
+            print("Escape hit, closing...")
+            break
+    
+    cv.destroyAllWindows()
+
+
 
     # director = StereoController()
     # builder = StandardStereoBuilder()
