@@ -4,6 +4,7 @@ import numpy as np
 import cv2 as cv 
 import requests
 import time
+import stereo_tuner
 
 from stereo.stereo_builder import StereoSystemBuilder
 from stereo.stereo_builder import StereoController 
@@ -12,6 +13,7 @@ from utils.draw import drawlines
 from compute.error_compute import re_projection_error
 from image_process.frame_decorator import Frame
 from image_process.resize import Resize
+
 
 class StandardStereo():
     """An emulation of a real world stereo system with his relevant parameters, like 
@@ -28,11 +30,9 @@ class StandardStereo():
         """ A simple way to take photos in console and save in a folder
         Arguments:
             num_photos (int): Number of photos to take, 15 by default.
-            save_dir (str): Directory name where the photos will be saved.
+            save_dir_left (str): Directory name where the left photos will be saved.
+            save_dir_right (str): Directory name where the right photos will be saved.
             prefix_name (str): A prefix for the names of the photos.
-            rotate (int): rotate input image around his center, 0 grades by default.
-            resize (boolean): To resize input image.
-            resize_dim (tuple): resize input image dimensions (width, height), its default is (640, 480).
 
         Raises:
             OSError: if folder exist.
@@ -128,7 +128,7 @@ class StandardStereo():
             images_left_path (str): folder where is saved left calibration pattern photos.
             images_right_path (str): folder where is saved right calibration pattern photos.
             pattern_type (str): It can be "circles" pattern or "chessboard" pattern (default).
-            pattern_sizev(tuple): If pattern_type is "chessboard"  this the Number of inner corners per a chessboard row and column. But If pattern_type is "circles" this will be the number of circles per row and column. 
+            pattern_size (tuple): If pattern_type is "chessboard"  this the Number of inner corners per a chessboard row and column. But If pattern_type is "circles" this will be the number of circles per row and column. 
         Raises:
             OSError: If didn't find photos on images_left_path or images_right_path folders.
         """
@@ -245,7 +245,7 @@ class StandardStereo():
         grayR = cv.cvtColor(imgR, cv.COLOR_BGR2GRAY)
 
         try:
-            rectL, rectR, projMatrixL, projMatrixR, Q, self.camL.roi, self.camR.roi = cv.stereoRectify(self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], self.rot, self.trans, alpha, output_size)
+            rectL, rectR, projMatrixL, projMatrixR, self.Q, self.camL.roi, self.camR.roi = cv.stereoRectify(self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], self.rot, self.trans, alpha, output_size, flags=cv.CALIB_ZERO_DISPARITY)
 
             self.stereoMapL = cv.initUndistortRectifyMap(self.camL.matrix, self.camL.dist_coeffs, rectL, projMatrixL, grayL.shape[::-1], cv.CV_16SC2)
             self.stereoMapR = cv.initUndistortRectifyMap(self.camR.matrix, self.camR.dist_coeffs, rectR, projMatrixR, grayR.shape[::-1], cv.CV_16SC2)
@@ -283,7 +283,7 @@ class StandardStereo():
         self.stereoMapR = temp_stereoMapR
         cv_file.release()
     
-    def print_parameters(self, one_camera_parameters=['matrix', 'dist_coeffs', 'roi'], stereo_parameters=['ret_stereo', 'rot', 'trans', 'e_matrix', 'f_matrix']):
+    def print_parameters(self, one_camera_parameters=['matrix', 'dist_coeffs', 'roi'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']):
         """ Print required individual camera parameters and stereo parameters already defined
         Arguments: 
             one_camera_parameters (list): All elements in list  will be printed, 
@@ -335,18 +335,39 @@ class StandardStereoBuilder(StereoSystemBuilder):
         """
         return self._product
 
-    def pre_process(self, frameL, frameR):
+    def pre_process(self, frameL, frameR, downsample=True):
+        """ First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.
+        Arguments: 
+            frameL (arr): it's the left frame
+            frameR (arr): it's the right frame
+            downsample (bool): if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor is 2.
+        Returns:
+            Both frames to apply stereo correspondence or apply more processing to the images.
+        """
         img_left_gray = cv.cvtColor(frameL,cv.COLOR_BGR2GRAY)
         img_right_gray = cv.cvtColor(frameR,cv.COLOR_BGR2GRAY)
 
         # Applying stereo image rectification on the left image
-        retify_left = cv.remap(img_left_gray, self._product.stereoMapL[0], self._product.stereoMapL[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        rectified_left = cv.remap(img_left_gray, self._product.stereoMapL[0], self._product.stereoMapL[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
         # Applying stereo image rectification on the right image
-        retify_right = cv.remap(img_right_gray, self._product.stereoMapR[0], self._product.stereoMapR[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        rectified_right = cv.remap(img_right_gray, self._product.stereoMapR[0], self._product.stereoMapR[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        if downsample:
+            left_for_matcher = cv.pyrDown(rectified_left)
+            right_for_matcher = cv.pyrDown(rectified_right)
+        else: 
+            left_for_matcher = frameL
+            right_for_matcher = frameR
         
-        return retify_left, retify_right
+        return left_for_matcher, right_for_matcher
     
     def find_epilines(self, frameL, frameR):
+        """ Draw epilines to both frames
+        Arguments: 
+            frameL (arr): it's the left frame
+            frameR (arr): it's the right frame
+        Returns:
+            Two elements, the left and right frame with epilines
+        """
         sift = cv.SIFT_create()
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(frameL,None)
@@ -383,7 +404,15 @@ class StandardStereoBuilder(StereoSystemBuilder):
         img3, _ = drawlines(frameR, frameL,lines2,pts2,pts1)
         return img5, img3
 
-    def match(self, frameL, frameR, max_disp=160, window_size=3, downsample=True, metrics=True):
+    def match(self, frameL, frameR, min_disp=0, max_disp=160, window_size=3, p1=24*3*3, p2=96*3*3, pre_filter_cap=63, mode=cv.StereoSGBM_MODE_SGBM_3WAY, speckle_window_size=1100, speckle_range=1, uniqueness_ratio=5, disp_12_max_diff=-1, metrics=True):
+        """ Apply stereo SGBM
+        Arguments: 
+            frameL (arr): it's the left frame
+            frameR (arr): it's the right frame
+            metrics (bool): if is true print by console the time of execution of correspondence step.
+        Returns:
+            left and right disparity maps and even matcher instance
+        """
         try:
             if max_disp <= 0 or max_disp % 16 != 0:
                 raise ValueError
@@ -399,28 +428,30 @@ class StandardStereoBuilder(StereoSystemBuilder):
         max_disp /= 2
         if(max_disp % 16 != 0):
             max_disp += 16-(max_disp % 16)
-        # Downsample input
-        if downsample:
-            left_for_matcher = Frame(frameL)
-            left_for_matcher = Resize(left_for_matcher).apply(int(frameL.shape[0]/2), int(frameL.shape[1]/2))
-            right_for_matcher = Frame(frameR)
-            right_for_matcher = Resize(right_for_matcher).apply(int(frameR.shape[0]/2), int(frameR.shape[1]/2))
-        else: 
-            left_for_matcher = frameL
-            right_for_matcher = frameR
-        left_matcher = cv.StereoSGBM_create(0, int(max_disp), window_size, P1=24*window_size*window_size, P2=96*window_size*window_size, preFilterCap=63, mode=cv.StereoSGBM_MODE_SGBM_3WAY)
+        
+        left_matcher = cv.StereoSGBM_create(min_disp, int(max_disp), window_size, p1, p2, disp_12_max_diff, pre_filter_cap, uniqueness_ratio, speckle_window_size, speckle_range, mode)
         right_matcher = cv.ximgproc.createRightMatcher(left_matcher)
-        print('computing disparity...')
         if metrics:
+            print('computing disparity...') 
             matching_time = time.time()
-        left_disp = left_matcher.compute(left_for_matcher, right_for_matcher)
-        right_disp = right_matcher.compute(right_for_matcher, left_for_matcher)
+        left_disp = left_matcher.compute(frameL, frameR)
+        right_disp = right_matcher.compute(frameR, frameL)
         if metrics:
             print("matching time: {} s".format(time.time() - matching_time))
         return left_disp, right_disp, left_matcher
          
     
     def post_process(self, frameL, left_disp, right_disp, matcher, lmbda=128.0, sigma=1.5, metrics=True):
+        """ Apply wls filter in disparity maps to smooth contours
+        Arguments: 
+            frameL (arr): it's the left frame
+            left_disp (arr): it's the left disparity frame
+            right_disp (arr): it's the right disparity frame
+            matcher (arr): it's the matcher instance
+            metrics (bool): if is true print by console the time of execution of post process step.
+        Returns:
+            Improved disparity map
+        """
         wls_filter = cv.ximgproc.createDisparityWLSFilter(matcher)
         wls_filter.setLambda(lmbda);
         wls_filter.setSigmaColor(sigma);
@@ -430,9 +461,82 @@ class StandardStereoBuilder(StereoSystemBuilder):
         if metrics:
             print("postprocessing time: {} s".format(time.time() - postprocessing_time))
         return filtered_disp
-        
-def nothing(x):
-    pass
+
+    def estimate_disparity_colormap(self, disparity, max_disp=160):
+        """ It converts disparity maps with a shape of (w, h, 1) to  (w, h, 3)
+        Arguments: 
+            disparity (arr): a disparity map with a shape of (w, h, 1)
+        Returns:
+            disparity with color
+        """
+        try:
+            if max_disp <= 0 or max_disp % 16 != 0:
+                raise ValueError
+        except ValueError:
+            print("Incorrect max_disparity value: it should be positive and divisible by 16")
+            exit()
+        max_disp /= 2
+        if(max_disp % 16 != 0):
+            max_disp += 16-(max_disp % 16)
+        # _, disparity = cv.threshold( disparity, 0, max_disp * 16, cv.THRESH_TOZERO)
+        # disparity_scaled = (disparity / 16.).astype(np.uint8)
+        return cv.applyColorMap((disparity).astype(np.uint8), cv.COLORMAP_JET)
+    
+    def estimate_depth_map(self, disparity, Q, frame, metrics=True):
+        """ Convert disparity map to depth map
+        Arguments:
+            frame (arr): left or right frame.
+            disparity (arr): a disparity map with a shape of (w, h, 1)
+            Q (arr): a 4x4 array with the following structure, 
+                    [[1 0   0          -cx     ]
+                     [0 1   0          -cy     ]
+                     [0 0   0           f      ]
+                     [0 0 -1/Tx (cx - cx')/Tx ]]
+                    cx: is the principal point x in left image
+                    cx': is the principal point x in right image
+                    cy: is the principal point y in left image
+                    f: is the focal lenth in left image
+                    Tx: The x coordinate in Translation matrix  
+            metrics (bool): if is true print by console the time of execution of depth map step.
+        """
+        if metrics:
+            get_3D_points_time = time.time()
+        disparity = disparity.astype(np.float32) / 16.0
+        points = cv.reprojectImageTo3D(disparity, Q)
+        colors = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+        mask = disparity > disparity.min()
+        out_points = points[mask]
+        out_colors = colors[mask]
+        if metrics:
+            print("3D points time: {} s".format(time.time() - get_3D_points_time))
+        return out_points, out_colors
+
+    def estimate_3D_points(self, points, disparity, Q):
+        """ Convert image plane points to homogeneous 3d points
+        Arguments:
+            points (arr): contains the (x, y) coordinates in image plane to convert to (X, Y, Z)
+            disparity (arr): a disparity map with a shape of (w, h, 1)
+            Q (arr): a 4x4 array with the following structure, 
+                    [[1 0   0          -cx     ]
+                     [0 1   0          -cy     ]
+                     [0 0   0           f      ]
+                     [0 0 -1/Tx (cx - cx')/Tx ]]
+                    cx: is the principal point x in left image
+                    cx': is the principal point x in right image
+                    cy: is the principal point y in left image
+                    f: is the focal lenth in left image
+                    Tx: The x coordinate in Translation matrix
+        Returns:
+            An array of points in 3D homogeneous coordinates (X, Y, Z, W)
+        """
+        points = np.array(points)
+        disparity = np.array(disparity)
+        homogeneous_3D_points = []
+        for point in points:
+            point_xy_disp = np.append(point, [disparity[point[0]][point[1]], 1], axis=0)
+            projected_point = np.matmul(Q, point_xy_disp)
+            homogeneous_3D_points.append(projected_point)
+        return homogeneous_3D_points
 
 if __name__ == "__main__":
     """
@@ -441,18 +545,28 @@ if __name__ == "__main__":
     builder object.
     """
     # Test without previous calibration
-    cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.112:8080/shot.jpg')
-    cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.105:8080/shot.jpg')
+    cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.105:8080/shot.jpg')
+    cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.101:8080/shot.jpg')
     stereo = StandardStereo(cam1, cam2)
+    # stereo.take_dual_photos(15, "left_camera_xiaomi_redmi_note_8_pro", "right_camera_xiaomi_redmi_9T")
     stereo.calibrate("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro", "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T", pattern_size=(8, 5))
-    stereo.rectify("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro/photo_1.png",  "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T/photo_1.png", "equal_left_right")
-    stereo_builder = StandardStereoBuilder(cam1, cam2, 'equal_left_right.xml')
+    stereo.rectify("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro/photo_1.png",  "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T/photo_1.png", "test_12_oct")
+    stereo.print_parameters()
+    stereo_builder = StandardStereoBuilder(cam1, cam2, 'test_12_oct.xml')
     stereo_controller = StereoController()
     stereo_controller.stereo_builder = stereo_builder
-    
-    cv.namedWindow('disp',cv.WINDOW_NORMAL)
-    stereo = cv.StereoSGBM_create()
-
+    cv.namedWindow("disp", cv.WINDOW_NORMAL)
+    trackbars = stereo_tuner.StereoSGBMTrackBars("disp")
+    trackbars.attach(stereo_tuner.UniquenessRatioTrackBarUpdater(), 5, 15)
+    trackbars.attach(stereo_tuner.SpeckleRangeTrackBarUpdater(), 0, 100)
+    trackbars.attach(stereo_tuner.SpeckleWindowSizeTrackBarUpdater(), 50, 1200)
+    trackbars.attach(stereo_tuner.MinDisparityTrackBarUpdater(), 0, 128)
+    trackbars.attach(stereo_tuner.Disp12MaxDiffTrackBarUpdater(), 0, 512)
+    trackbars.attach(stereo_tuner.BlockSizeTrackBarUpdater(), 3, 51)
+    trackbars.attach(stereo_tuner.NumDisparitiesTrackBarUpdater(), 80, 256)
+    trackbars.attach(stereo_tuner.P1TrackBarUpdater(), 216, 432)
+    trackbars.attach(stereo_tuner.P2TrackBarUpdater(), 864, 1728)
+    trackbars.attach(stereo_tuner.PreFilterCapTrackBarUpdater(), 1, 63)
     while True:
         img_respL = requests.get(cam1.source)
         img_arrL = np.array(bytearray(img_respL.content), dtype=np.uint8)
@@ -460,8 +574,8 @@ if __name__ == "__main__":
         img_respR = requests.get(cam2.source)
         img_arrR = np.array(bytearray(img_respR.content), dtype=np.uint8)
         frameR = cv.imdecode(img_arrR, -1)
-
-        disp = stereo_controller.compute_disparity(frameL, frameR)
+        disp, matcher = stereo_controller.compute_disparity_color_map(frameL, frameR)
+        trackbars.tune_matcher(matcher)
         cv.imshow('disp', disp)
         if cv.waitKey(1) == 27:
             #esc pressed
@@ -469,27 +583,3 @@ if __name__ == "__main__":
             break
     
     cv.destroyAllWindows()
-
-
-
-    # director = StereoController()
-    # builder = StandardStereoBuilder()
-    # director.builder = builder
-
-    # print("Standard basic product: ")
-    # director.build_minimal_viable_product()
-    # builder.product.list_parts()
-
-    # print("\n")
-
-    # print("Standard full featured product: ")
-    # director.build_full_featured_product()
-    # builder.product.list_parts()
-
-    # print("\n")
-
-    # # Remember, the Builder pattern can be used without a Director class.
-    # print("Custom product: ")
-    # builder.produce_part_a()
-    # builder.produce_part_b()
-    # builder.product.list_parts()
