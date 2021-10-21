@@ -1,7 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-
-from numpy.lib.function_base import disp
+from stereo.match_method import Matcher
 
 class StereoSystemBuilder(ABC):
     """
@@ -82,42 +81,46 @@ class StereoController:
         left_epilines, right_epilines = self.stereo_builder.find_epilines(frameL, frameR)
         return left_epilines, right_epilines
         
-    def compute_disparity(self, frameL, frameR, downsample=True, post_process=True, metrics=True):
+    def compute_disparity(self, frameL, frameR, matcher: Matcher, downsample=True, lmbda=128.0, sigma=1.5, post_process=True, metrics=True):
         """ Apply the pre process step, next compute left and right disparity maps, and finally execute the post process with a wls filter to improve the final result
          Arguments: 
             frameL (arr): it's the left frame
             frameR (arr): it's the right frame
             downsample (bool): if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor is 2.
+            lmbda (float): is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
+            sigma (float): is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step
             post_process (bool): if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.
             metrics (bool): if is true print by console the time of execution of correspondence and post process steps.
         Returns:
             Two elements, disparity map and correspondence method used
         """
         left_for_matcher, right_for_matcher = self.stereo_builder.pre_process(frameL, frameR, downsample)
-        left_disp, right_disp, left_matcher = self.stereo_builder.match(left_for_matcher, right_for_matcher, metrics=metrics)
+        left_disp, right_disp, left_matcher = self.stereo_builder.match(left_for_matcher, right_for_matcher, matcher, metrics=metrics)
         if post_process:
-            disparity = self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher, metrics=metrics)
+            disparity = self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher, lmbda=lmbda, sigma=sigma, metrics=metrics)
         else:
             disparity = left_disp
         return disparity, left_matcher
 
-    def compute_disparity_color_map(self, frameL, frameR, downsample=True, post_process=True, metrics=True):
+    def compute_disparity_color_map(self, frameL, frameR, matcher: Matcher, downsample=True, lmbda=128.0, sigma=1.5, post_process=True, metrics=True):
         """ Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute disparity map with color.
          Arguments: 
             frameL (arr): it's the left frame
             frameR (arr): it's the right frame
             downsample (bool): if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor is 2.
+            lmbda (float): is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
+            sigma (float): is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step
             post_process (bool): if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.
             metrics (bool): if is true print by console the time of execution of correspondence and post process steps.
         Returns:
             Two elements, disparity map (with 3 colors channels) and correspondence method used
         """
-        disparity, matcher = self.compute_disparity(frameL, frameR, downsample, post_process, metrics)
+        disparity, matcher = self.compute_disparity(frameL, frameR, matcher, downsample, post_process, lmbda=lmbda, sigma=sigma, metrics=metrics)
         disparity_colormap = self.stereo_builder.estimate_disparity_colormap(disparity)
         return disparity_colormap, matcher
 
 
-    def compute_3D_map(self, frameL, frameR, Q, downsample=True, post_process=True,  metrics=True):
+    def compute_3D_map(self, frameL, frameR, Q, matcher: Matcher, downsample=True, lmbda=128.0, sigma=1.5, post_process=True,  metrics=True):
         """ Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute depth map.
          Arguments: 
             frameL (arr): it's the left frame
@@ -133,20 +136,22 @@ class StereoController:
                     f: is the focal lenth in left image
                     Tx: The x coordinate in Translation matrix   
             downsample (bool): if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor is 2.
+            lmbda (float): is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
+            sigma (float): is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step
             post_process (bool): if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.
             metrics (bool): if is true print by console the time of execution of correspondence, post process and depth map step.
         Returns:
             Two elements, depth map and correspondence method used
         """
         left_for_matcher, right_for_matcher = self.stereo_builder.pre_process(frameL, frameR, downsample)
-        left_disp, right_disp, left_matcher = self.stereo_builder.match(left_for_matcher, right_for_matcher, metrics=metrics)
+        left_disp, right_disp, left_matcher = self.stereo_builder.match(left_for_matcher, right_for_matcher, matcher, metrics=metrics)
         if post_process:
-            disparity = self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher, metrics=metrics)
+            disparity = self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher, lmbda=lmbda, sigma=sigma, metrics=metrics)
         else:
             disparity = left_disp
         return self.stereo_builder.estimate_depth_map(disparity, Q, left_for_matcher, metrics=metrics), left_matcher
 
-    def compute_3D_points(self, frameL, frameR, points, Q, downsample=True, post_process=True,  metrics=True):
+    def compute_3D_points(self, frameL, frameR, points, Q, matcher: Matcher, downsample=True, lmbda=128.0, sigma=1.5, post_process=True,  metrics=True):
         """ Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute 3D points for an input array that can be [[x1, y1], [x2, y2], [x3, y3], ... [xn, yn]].
          Arguments: 
             frameL (arr): it's the left frame
@@ -163,15 +168,17 @@ class StereoController:
                     f: is the focal lenth in left image
                     Tx: The x coordinate in Translation matrix   
             downsample (bool): if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor is 2.
+            lmbda (float): is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
+            sigma (float): is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step
             post_process (bool): if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.
             metrics (bool): if is true print by console the time of execution of correspondence, post process and depth map step.
         Returns:
             Two elements, an array of points in 3D homogeneous coordinates (X, Y, Z, W) and correspondence method used
         """
         left_for_matcher, right_for_matcher = self.stereo_builder.pre_process(frameL, frameR, downsample)
-        left_disp, right_disp, left_matcher = self.stereo_builder.match(left_for_matcher, right_for_matcher, metrics=metrics)
+        left_disp, right_disp, left_matcher = self.stereo_builder.match(left_for_matcher, right_for_matcher, matcher, metrics=metrics)
         if post_process:
-            disparity = self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher, metrics=metrics)
+            disparity = self.stereo_builder.post_process(frameL, left_disp, right_disp, left_matcher, lmbda=lmbda, sigma=sigma, metrics=metrics)
         else:
             disparity = left_disp
         return self.stereo_builder.estimate_3D_points(points, disparity, Q), left_matcher

@@ -8,6 +8,8 @@ import stereo_tuner
 
 from stereo.stereo_builder import StereoSystemBuilder
 from stereo.stereo_builder import StereoController 
+from stereo.match_method import Matcher
+from stereo.match_method import StereoSGBM
 from input_output.camera import Camera
 from utils.draw import drawlines
 from compute.error_compute import re_projection_error
@@ -404,7 +406,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
         img3, _ = drawlines(frameR, frameL,lines2,pts2,pts1)
         return img5, img3
 
-    def match(self, frameL, frameR, min_disp=0, max_disp=160, window_size=3, p1=24*3*3, p2=96*3*3, pre_filter_cap=63, mode=cv.StereoSGBM_MODE_SGBM_3WAY, speckle_window_size=1100, speckle_range=1, uniqueness_ratio=5, disp_12_max_diff=-1, metrics=True):
+    def match(self, frameL, frameR, matcher: Matcher, metrics=True):
         """ Apply stereo SGBM
         Arguments: 
             frameL (arr): it's the left frame
@@ -413,23 +415,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
         Returns:
             left and right disparity maps and even matcher instance
         """
-        try:
-            if max_disp <= 0 or max_disp % 16 != 0:
-                raise ValueError
-        except ValueError:
-            print("Incorrect max_disparity value: it should be positive and divisible by 16")
-            exit()
-        try:
-            if window_size <= 0 or window_size % 2 != 1:
-                raise ValueError
-        except ValueError:
-            print("Incorrect window_size value: it should be positive and odd")
-            exit()
-        max_disp /= 2
-        if(max_disp % 16 != 0):
-            max_disp += 16-(max_disp % 16)
-        
-        left_matcher = cv.StereoSGBM_create(min_disp, int(max_disp), window_size, p1, p2, disp_12_max_diff, pre_filter_cap, uniqueness_ratio, speckle_window_size, speckle_range, mode)
+        left_matcher = matcher.match()
         right_matcher = cv.ximgproc.createRightMatcher(left_matcher)
         if metrics:
             print('computing disparity...') 
@@ -448,6 +434,8 @@ class StandardStereoBuilder(StereoSystemBuilder):
             left_disp (arr): it's the left disparity frame
             right_disp (arr): it's the right disparity frame
             matcher (arr): it's the matcher instance
+            lmbda (float): is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
+            sigma (float): is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step
             metrics (bool): if is true print by console the time of execution of post process step.
         Returns:
             Improved disparity map
@@ -462,24 +450,13 @@ class StandardStereoBuilder(StereoSystemBuilder):
             print("postprocessing time: {} s".format(time.time() - postprocessing_time))
         return filtered_disp
 
-    def estimate_disparity_colormap(self, disparity, max_disp=160):
+    def estimate_disparity_colormap(self, disparity):
         """ It converts disparity maps with a shape of (w, h, 1) to  (w, h, 3)
         Arguments: 
             disparity (arr): a disparity map with a shape of (w, h, 1)
         Returns:
             disparity with color
         """
-        try:
-            if max_disp <= 0 or max_disp % 16 != 0:
-                raise ValueError
-        except ValueError:
-            print("Incorrect max_disparity value: it should be positive and divisible by 16")
-            exit()
-        max_disp /= 2
-        if(max_disp % 16 != 0):
-            max_disp += 16-(max_disp % 16)
-        # _, disparity = cv.threshold( disparity, 0, max_disp * 16, cv.THRESH_TOZERO)
-        # disparity_scaled = (disparity / 16.).astype(np.uint8)
         return cv.applyColorMap((disparity).astype(np.uint8), cv.COLORMAP_JET)
     
     def estimate_depth_map(self, disparity, Q, frame, metrics=True):
@@ -555,6 +532,7 @@ if __name__ == "__main__":
     stereo_builder = StandardStereoBuilder(cam1, cam2, 'test_12_oct.xml')
     stereo_controller = StereoController()
     stereo_controller.stereo_builder = stereo_builder
+    matcherSGBM = Matcher(StereoSGBM())
     cv.namedWindow("disp", cv.WINDOW_NORMAL)
     trackbars = stereo_tuner.StereoSGBMTrackBars("disp")
     trackbars.attach(stereo_tuner.UniquenessRatioTrackBarUpdater(), 5, 15)
@@ -574,7 +552,7 @@ if __name__ == "__main__":
         img_respR = requests.get(cam2.source)
         img_arrR = np.array(bytearray(img_respR.content), dtype=np.uint8)
         frameR = cv.imdecode(img_arrR, -1)
-        disp, matcher = stereo_controller.compute_disparity_color_map(frameL, frameR)
+        disp, matcher = stereo_controller.compute_disparity_color_map(frameL, frameR, matcherSGBM)
         trackbars.tune_matcher(matcher)
         cv.imshow('disp', disp)
         if cv.waitKey(1) == 27:
