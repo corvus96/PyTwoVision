@@ -19,7 +19,6 @@ class SSDCalculus:
         s = np.linspace(0.2, 0.9, n_layers + 1)
         sizes = []
         for i in range(len(s) - 1):
-            # size = [s[i], (s[i] * 0.5)]
             size = [s[i], math.sqrt(s[i] * s[i + 1])]
             sizes.append(size)
 
@@ -44,18 +43,17 @@ class SSDCalculus:
         
         # anchor box sizes given an index of layer in ssd head
         sizes = self.anchor_sizes(n_layers)[index]
-        # number of anchor boxes per feature map pt
+        # number of anchor boxes per feature map
         n_boxes = len(aspect_ratios) + 1
-        # ignore number of channels (last)
+        # ignore number of channels 
         image_height, image_width, _ = image_shape
-        # ignore number of feature maps (last)
+        # ignore number of feature maps 
         feature_height, feature_width, _ = feature_shape
 
         # normalized width and height
         # sizes[0] is scale size, sizes[1] is sqrt(scale*(scale+1))
         norm_height = image_height * sizes[0]
         norm_width = image_width * sizes[0]
-
         # list of anchor boxes (width, height)
         width_height = []
         # anchor box by aspect ratio on resized image dims
@@ -84,23 +82,20 @@ class SSDCalculus:
         # ending at midpoint of last receptive field
         end = (feature_width - 0.5) * grid_width
         cx = np.linspace(start, end, feature_width)
-
         start = grid_height * 0.5
         end = (feature_height - 0.5) * grid_height
         cy = np.linspace(start, end, feature_height)
 
         # grid of box centers
         cx_grid, cy_grid = np.meshgrid(cx, cy)
-
+        
         # for np.tile()
         cx_grid = np.expand_dims(cx_grid, -1) 
         cy_grid = np.expand_dims(cy_grid, -1)
-
         # tensor = (feature_map_height, feature_map_width, n_boxes, 4)
         # aligned with image tensor (height, width, channels)
         # last dimension = (cx, cy, w, h)
         boxes = np.zeros((feature_height, feature_width, n_boxes, 4))
-        
         # (cx, cy)
         boxes[..., 0] = np.tile(cx_grid, (1, 1, n_boxes))
         boxes[..., 1] = np.tile(cy_grid, (1, 1, n_boxes))

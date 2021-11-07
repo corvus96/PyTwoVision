@@ -38,6 +38,60 @@ class TestSSDCalculus(unittest.TestCase):
         self.assertEqual(np.alltrue(expected_minmax == minmax), True)
         centroid = self.compute.minmax2centroid(minmax)
         self.assertEqual(np.alltrue(boxes == centroid), True)
+    
+    def test_not_intersection(self):
+        scaling_factor = 30
+        np.random.seed(2021)
+        box1 = np.random.rand(1,4)*scaling_factor
+        np.random.seed(2022)
+        box2 = np.random.rand(1,4)*scaling_factor
+        intersection_area = self.compute.intersection(box1, box2)
+        self.assertEqual(intersection_area[0][0], 0)
+    
+    def test_intersection_area(self):
+        box1 = np.array([[20, 60, 10, 70]])
+        box2 = np.array([[10, 30, 40, 100]])
+        intersection_area = self.compute.intersection(box1, box2)
+        self.assertEqual(intersection_area[0][0], 300)
+    
+    def test_union_without_intersection(self):
+        scaling_factor = 30
+        np.random.seed(2021)
+        xmin = 0
+        xmax = 1
+        ymin = 2
+        ymax = 3
+        box1 = np.random.rand(1,4)*scaling_factor
+        box1_area = (box1[:, xmax] - box1[:, xmin]) * (box1[:, ymax] - box1[:, ymin])
+        np.random.seed(2010)
+        box2 = np.random.rand(1,4)*scaling_factor
+        box2_area = (box2[:, xmax] - box2[:, xmin]) * (box2[:, ymax] - box2[:, ymin])
+        intersection_area = self.compute.intersection(box1, box2)
+        union_area = self.compute.union(box1, box2, intersection_area)
+        self.assertEqual(union_area, box1_area + box2_area)
+    
+    def test_union_with_intersection(self):
+        xmin = 0
+        xmax = 1
+        ymin = 2
+        ymax = 3
+        box1 = np.array([[20, 60, 10, 70]])
+        box1_area = (box1[:, xmax] - box1[:, xmin]) * (box1[:, ymax] - box1[:, ymin])
+        box2 = np.array([[10, 30, 40, 100]])
+        box2_area = (box2[:, xmax] - box2[:, xmin]) * (box2[:, ymax] - box2[:, ymin])
+        intersection_area = self.compute.intersection(box1, box2)
+        union_area = self.compute.union(box1, box2, intersection_area)
+        self.assertEqual(union_area, box1_area + box2_area - intersection_area)
+    
+    def test_iou_better_choice(self):
+        box1 = np.array([[20, 60, 10, 70]])
+        box2 = np.array([[10, 30, 40, 100]])
+        iou_a = self.compute.iou(box1, box2)
+        # Better choice
+        iou_b = self.compute.iou(box1, box1)
+        self.assertGreater(iou_b, iou_a)
+
+        
 
 if __name__ == '__main__':
     unittest.main()

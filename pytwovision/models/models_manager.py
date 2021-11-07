@@ -34,12 +34,3 @@ class ModelManager(ModelManagerInterface):
 class SSDModel:
     def build(self, name, backbone, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
         return BuildSSD(name, backbone, n_layers, n_classes, aspect_ratios)
-
-
-if __name__ == "__main__":
-    # The client code.
-    
-    manager = ModelManager()
-    x = manager.build_SSD('SSD1', ResnetBlock(V1()))
-    #manager.simultaneous_OD_SS('backbone')
-    #manager.simultaneous_OD_SS('heads', backboneNet= False)
