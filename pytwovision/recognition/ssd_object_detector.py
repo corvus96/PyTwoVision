@@ -40,19 +40,17 @@ class ObjectDetectorSSD(NeuralNetwork):
         threshold (float): Labels IoU threshold.
         normalize (bool): Use normalized predictions.   
         batch_size (int): Batch size during training.
-        epochs (int): Number of epochs to train.
         loss (str): Use focal and smooth L1 loss functions "focal-smooth-l1" 
         or smoth L1 "smooth-l1" even L1 "l1".
         class_threshold (float): Class probability threshold (>= is an object).
         iou_threshold (float): NMS IoU threshold.
         soft_nms (bool): Use soft NMS or not.
-        workers (int): Number of data generator worker threads
-        save_dir_path: Directory for saving filenames
+        save_dir_path: Directory for saving model and weights
     Attributes:
         ssd (model): SSD network model
         train_generator: Multi-threaded data generator for training
     """
-    def __init__(self, backbone: ResnetBlock, data_path, train_labels_csv, test_labels_csv, input_shape=(480, 640, 3), save_dir_path="weights", layers=4, batch_size=4, epochs=200, workers=4, threshold=0.6, loss="l1", normalize=False, class_threshold=0.5, iou_threshold=0.2, soft_nms=False) -> None:
+    def __init__(self, backbone: ResnetBlock, data_path, train_labels_csv, test_labels_csv, input_shape=(480, 640, 3), save_dir_path="weights", layers=4, batch_size=4, threshold=0.6, normalize=False, class_threshold=0.5, iou_threshold=0.2, soft_nms=False) -> None:
         super().__init__()
         self.data_path = data_path
         self.train_labels_csv = train_labels_csv
@@ -61,9 +59,7 @@ class ObjectDetectorSSD(NeuralNetwork):
         self.layers =layers
         self.normalize = normalize
         self.threshold = threshold
-        self.loss = loss
         self.save_dir = save_dir_path
-        self.epochs = epochs
         self.class_threshold = class_threshold
         self.soft_nms = soft_nms
         self.iou_threshold = iou_threshold
@@ -127,18 +123,23 @@ class ObjectDetectorSSD(NeuralNetwork):
                               shuffle=True)
 
 
-    def train(self):
-        """Train an ssd network."""
+    def train(self, epochs=200,  loss_function="l1"):
+        """Train an ssd network.
+        Arguments:
+            epochs (int): Number of epochs to train.
+            loss (str): Use focal and smooth L1 loss functions "focal-smooth-l1" 
+            or smoth L1 "smooth-l1" even L1 "l1".
+        """
         # build the train data generator
         if self.train_generator is None:
             self.build_generator()
 
         optimizer = Adam(lr=1e-3)
         # choice of loss functions 
-        if self.loss == "focal-smooth-l1":
+        if loss_function == "focal-smooth-l1":
             print("Focal loss and smooth L1")
             loss = [focal_loss_categorical, smooth_l1_loss]
-        elif self.loss == "smooth-l1":
+        elif loss_function == "smooth-l1":
             print("Smooth L1")
             loss = ['categorical_crossentropy', smooth_l1_loss]
         else:
@@ -154,9 +155,9 @@ class ObjectDetectorSSD(NeuralNetwork):
         model_name += '-' + str(self.layers) + "layer"
         if self.normalize:
             model_name += "-norm"
-        if self.loss == "focal-smooth-l1":
+        if loss_function == "focal-smooth-l1":
             model_name += "-improved_loss"
-        elif self.loss == "smooth-l1":
+        elif loss_function == "smooth-l1":
             model_name += "-smooth_l1"
 
         if self.threshold < 1.0:
@@ -193,7 +194,7 @@ class ObjectDetectorSSD(NeuralNetwork):
         self.ssd.fit(self.train_generator,
                      use_multiprocessing=False,
                      callbacks=callbacks,
-                     epochs=self.epochs)
+                     epochs=epochs)
 
 
     def restore_weights(self, restore_weights):
@@ -219,18 +220,19 @@ class ObjectDetectorSSD(NeuralNetwork):
         return image, classes, offsets
 
 
-    def evaluate(self, image_file=None, image=None):
+    def evaluate(self, classes_names, image_file=None, image=None):
         """Evaluate image based on image (np tensor) or filename"""
         show = False
         if image is None:
             image = skimage.img_as_float(imread(image_file))
             show = True
 
-        image, classes, offsets = self.detect_objects(image)
+        image, classes, offsets = self.inference(image)
         class_names, rects, _, _ = show_boxes(image,
                                               classes,
                                               offsets,
                                               self.feature_shapes,
+                                              classes_names,
                                               class_threshold=self.class_threshold,
                                               soft_nms=self.soft_nms,
                                               normalize=self.normalize,
@@ -239,7 +241,7 @@ class ObjectDetectorSSD(NeuralNetwork):
         return class_names, rects
 
 
-    def evaluate_test(self, data_path, test_labels_csv):
+    def evaluate_test(self, data_path, test_labels_csv, classes_names):
         # test labels csv path
         path = os.path.join(data_path,
                             test_labels_csv)
@@ -263,12 +265,13 @@ class ObjectDetectorSSD(NeuralNetwork):
             # load image id by key
             image_file = os.path.join(data_path, key)
             image = skimage.img_as_float(imread(image_file))
-            image, classes, offsets = self.detect_objects(image)
+            image, classes, offsets = self.inference(image)
             # perform nms
             _, _, class_ids, boxes = show_boxes(image,
                                               classes,
                                               offsets,
                                               self.feature_shapes,
+                                              classes_names,
                                               class_threshold=self.class_threshold,
                                               soft_nms=self.soft_nms,
                                               normalize=self.normalize,

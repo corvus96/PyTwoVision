@@ -27,12 +27,12 @@ def get_box_rgbcolor(index=None):
     return colors[index % len(colors)]
 
 
-def index2class(index=0, classes=["background", "Water", "Soda", "Juice"]):
+def index2class(index=0, classes=['car', 'person', 'dog', 'chair', 'boat', 'sofa', 'tvmonitor', 'bird', 'aeroplane', 'cow', 'cat', 'pottedplant', 'bottle', 'horse', 'bicycle', 'motorbike', 'diningtable', 'bus', 'train', 'sheep']):
     """Convert index (int) to class name (string)"""
     return classes[index]
 
 
-def class2index(class_="background", classes=["background", "Water", "Soda", "Juice"]):
+def class2index(class_="background", classes=['car', 'person', 'dog', 'chair', 'boat', 'sofa', 'tvmonitor', 'bird', 'aeroplane', 'cow', 'cat', 'pottedplant', 'bottle', 'horse', 'bicycle', 'motorbike', 'diningtable', 'bus', 'train', 'sheep']):
     """Convert class_ name (string) to index (int)"""
     return classes.index(class_)
 
@@ -96,7 +96,7 @@ def build_label_dictionary(path):
     dictionary = get_label_dictionary(labels, keys)
     classes = np.unique(labels[:,-1]).astype(int).tolist()
     # insert background label 0
-    classes.insert(0, 0)
+    # classes.insert(0, 0)
     print("Num of unique classes: ", classes)
     return dictionary, classes
 

@@ -141,15 +141,15 @@ class SSDDataGenerator(Sequence):
                                  threshold=self.threshold)
                 gt_cls, gt_off, gt_msk = gt
                 if index == 0:
-                    cls = np.array(gt_cls)
+                    clss = np.array(gt_cls)
                     off = np.array(gt_off)
                     msk = np.array(gt_msk)
                 else:
-                    cls = np.append(cls, gt_cls, axis=0)
+                    clss = np.append(clss, gt_cls, axis=0)
                     off = np.append(off, gt_off, axis=0)
                     msk = np.append(msk, gt_msk, axis=0)
 
-            gt_class[i] = cls
+            gt_class[i] = clss
             gt_offset[i] = off
             gt_mask[i] = msk
 

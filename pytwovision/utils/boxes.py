@@ -14,6 +14,7 @@ def show_boxes(image,
                classes,
                offsets,
                feature_shapes,
+               classes_names=['car', 'person', 'dog', 'chair', 'boat', 'sofa', 'tvmonitor', 'bird', 'aeroplane', 'cow', 'cat', 'pottedplant', 'bottle', 'horse', 'bicycle', 'motorbike', 'diningtable', 'bus', 'train', 'sheep'],
                class_threshold=0.5,
                normalize=False,
                show=True,
@@ -93,7 +94,7 @@ def show_boxes(image,
         y = anchor[2]
         category = int(objects[idx])
         class_ids.append(category)
-        class_name = index2class(category)
+        class_name = index2class(category, classes_names)
         class_name = "%s: %0.2f" % (class_name, scores[idx])
         class_names.append(class_name)
         rect = (x, y, w, h)
@@ -131,6 +132,7 @@ def show_boxes(image,
 def show_anchors(image,
                  feature_shape,
                  anchors,
+                 classes_names=['car', 'person', 'dog', 'chair', 'boat', 'sofa', 'tvmonitor', 'bird', 'aeroplane', 'cow', 'cat', 'pottedplant', 'bottle', 'horse', 'bicycle', 'motorbike', 'diningtable', 'bus', 'train', 'sheep'],
                  maxiou_indexes=None,
                  maxiou_per_gt=None,
                  labels=None,
@@ -183,7 +185,7 @@ def show_anchors(image,
             # offset
             label = labels[index]
             category = int(label[4])
-            class_name = index2class(category)
+            class_name = index2class(category, classes_names)
             color = get_box_color(category)
             bbox = dict(facecolor=color, color=color, alpha=1.0)
             ax.text(label[0],
