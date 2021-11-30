@@ -27,14 +27,7 @@ class ObjectDetectorSSD(NeuralNetwork):
         backbone (class): Contains resnet network which can be version 1 or 2
         data_path (str): beginning by project root this is the path 
                          where is save your dataset; example: "dataset/drinks".
-        train_labels_csv (str):  beginning by "data_path" directory this is the 
-                                 filename csv for example: train_labels.csv, 
-                                 so your train labels must be save inside
-                                 "data_path" folder. 
-        test_labels_csv (str):  beginning by "data_path" directory this is the 
-                                filename csv for example: test_labels.csv, 
-                                so your test labels must be save inside
-                                data_path folder.  
+        train_labels_csv (str): contains the path of train labels csv.
         input_shape: A tuple with dims shape (height, weight, channels). 
         layers (int): Number of feature extraction layers of SSD head after backbone.
         threshold (float): Labels IoU threshold.
@@ -50,11 +43,10 @@ class ObjectDetectorSSD(NeuralNetwork):
         ssd (model): SSD network model
         train_generator: Multi-threaded data generator for training
     """
-    def __init__(self, backbone: ResnetBlock, data_path, train_labels_csv, test_labels_csv, input_shape=(480, 640, 3), save_dir_path="weights", layers=4, batch_size=4, threshold=0.6, normalize=False, class_threshold=0.5, iou_threshold=0.2, soft_nms=False) -> None:
+    def __init__(self, backbone: ResnetBlock, data_path, train_labels_csv, input_shape=(480, 640, 3), save_dir_path="weights", layers=4, batch_size=4, threshold=0.6, normalize=False, class_threshold=0.5, iou_threshold=0.2, soft_nms=False) -> None:
         super().__init__()
         self.data_path = data_path
         self.train_labels_csv = train_labels_csv
-        self.test_labels_csv = test_labels_csv
         self.batch_size = batch_size
         self.layers =layers
         self.normalize = normalize
@@ -95,14 +87,11 @@ class ObjectDetectorSSD(NeuralNetwork):
         """Read input image filenames and obj detection labels
         from a csv file and store in a dictionary.
         """
-        # train dataset path
-        path = os.path.join(self.data_path,
-                            self.train_labels_csv)
 
         # build dictionary: 
         # key=image filaname, value=box coords + class label
         # self.classes is a list of class labels
-        self.dictionary, self.classes = build_label_dictionary(path)
+        self.dictionary, self.classes = build_label_dictionary(self.train_labels_csv)
         self.n_classes = len(self.classes)
         self.keys = np.array(list(self.dictionary.keys()))
     
@@ -212,6 +201,10 @@ class ObjectDetectorSSD(NeuralNetwork):
 
 
     def inference(self, image):
+        """ Apply inference with trained model
+        Arguments:
+            image (tensor): contains an image converted in tensor.
+        """
         image = np.expand_dims(image, axis=0)
         classes, offsets = self.ssd.predict(image)
         image = np.squeeze(image, axis=0)
@@ -221,7 +214,12 @@ class ObjectDetectorSSD(NeuralNetwork):
 
 
     def evaluate(self, classes_names, image_file=None, image=None):
-        """Evaluate image based on image (np tensor) or filename"""
+        """Evaluate image based on image (np tensor) or filename
+        Arguments:
+            classes_names (list): contains classes names asociated to classes index.
+            image_file (str): contains the path of an image_file to evaluate the inference.
+            image (tensor): contains an image converted in tensor to evalute  the inference.
+        """
         show = False
         if image is None:
             image = skimage.img_as_float(imread(image_file))
@@ -242,9 +240,14 @@ class ObjectDetectorSSD(NeuralNetwork):
 
 
     def evaluate_test(self, data_path, test_labels_csv, classes_names):
+        """ Apply evaluation in trained model.
+        Arguments:
+                data_path (str): folder that contains test files.
+                test_labels_csv (str):  contains the path of test labels csv.
+                classes_names (list): contains classes names asociated to classes index.
+        """
         # test labels csv path
-        path = os.path.join(data_path,
-                            test_labels_csv)
+        path = test_labels_csv
         # test dictionary
         dictionary, _ = build_label_dictionary(path)
         keys = np.array(list(dictionary.keys()))
