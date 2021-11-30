@@ -12,6 +12,14 @@ class Recognizer:
     def __init__(self, neural_network: NeuralNetwork):
         self.implementation = neural_network
 
+    def train(self, epochs=200,  loss_function="l1"):
+        """Train an ssd network.
+        Arguments:
+            epochs (int): Number of epochs to train.
+            loss (str): Use focal and smooth L1 loss functions "focal-smooth-l1" 
+            or smoth L1 "smooth-l1" even L1 "l1".
+        """
+        self.implementation.train(epochs, loss_function)
 
 
 
