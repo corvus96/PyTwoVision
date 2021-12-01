@@ -117,14 +117,14 @@ class V1(ResnetStrategy):
                 strides = 1
                 if stack > 0 and res_block == 0:  # first layer but not first stack
                     strides = 2  # downsample
-                conv_layer_A = Conv2dBNReluLayer("feature-layer-type-A-" + layer_counter, num_filters=num_filters, strides=strides)
+                conv_layer_A = Conv2dBNReluLayer("feature-layer-type-A-" + str(layer_counter), num_filters=num_filters, strides=strides)
                 y = conv_layer_A(x)
-                conv_layer_B = Conv2dBNReluLayer("feature-layer-type-B-" + layer_counter, num_filters=num_filters, activation=None)
+                conv_layer_B = Conv2dBNReluLayer("feature-layer-type-B-" + str(layer_counter), num_filters=num_filters, activation=None)
                 y = conv_layer_B(y)
                 if stack > 0 and res_block == 0:  # first layer but not first stack
                     # linear projection residual shortcut connection to match
                     # changed dims
-                    conv_layer_C = Conv2dBNReluLayer("feature-layer-type-C-" + layer_counter, num_filters=num_filters,
+                    conv_layer_C = Conv2dBNReluLayer("feature-layer-type-C-" + str(layer_counter), num_filters=num_filters,
                                     kernel_size=1,
                                     strides=strides,
                                     activation=None,
@@ -211,24 +211,24 @@ class V2(ResnetStrategy):
                         strides = 2    # downsample
 
                 # bottleneck residual unit
-                conv_layer_A = Conv2dBNReluLayer("feature-layer-type-A-" + layer_counter, num_filters=num_filters_in,
+                conv_layer_A = Conv2dBNReluLayer("feature-layer-type-A-" + str(layer_counter), num_filters=num_filters_in,
                                 kernel_size=1,
                                 strides=strides,
                                 activation=activation,
                                 batch_normalization=batch_normalization,
                                 conv_first=False)
                 y = conv_layer_A(x)
-                conv_layer_B = Conv2dBNReluLayer("feature-layer-type-B-" + layer_counter, num_filters=num_filters_in,
+                conv_layer_B = Conv2dBNReluLayer("feature-layer-type-B-" + str(layer_counter), num_filters=num_filters_in,
                                 conv_first=False)
                 y = conv_layer_B(y)
-                conv_layer_C = Conv2dBNReluLayer("feature-layer-type-C-" + layer_counter, num_filters=num_filters_out,
+                conv_layer_C = Conv2dBNReluLayer("feature-layer-type-C-" + str(layer_counter), num_filters=num_filters_out,
                                 kernel_size=1,
                                 conv_first=False)
                 y = conv_layer_C(y)
                 if res_block == 0:
                     # linear projection residual shortcut connection to match
                     # changed dims
-                    conv_layer_D = Conv2dBNReluLayer("feature-layer-type-D-" + layer_counter, num_filters=num_filters_out,
+                    conv_layer_D = Conv2dBNReluLayer("feature-layer-type-D-" + str(layer_counter), num_filters=num_filters_out,
                                     kernel_size=1,
                                     strides=strides,
                                     activation=None,
