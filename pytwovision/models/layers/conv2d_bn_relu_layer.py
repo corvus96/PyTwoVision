@@ -28,15 +28,16 @@ class Conv2dBNReluLayer(tf.keras.Model):
             self.activation = Activation(activation)
     
     def call(self, inputs, train_batch_norm=False):
+        x = inputs
         if self.conv_first is True:
-            x = self.conv2d(inputs)
+            x = self.conv2d(x)
             if hasattr(self, 'bn'):
                 x = self.bn(x, training=train_batch_norm)
             if hasattr(self, 'activation'):
                 x = self.activation(x)
         else:
             if hasattr(self, 'bn'):
-                x = self.bn(inputs, training=train_batch_norm)
+                x = self.bn(x, training=train_batch_norm)
             if hasattr(self, 'activation'):
                 x = self.activation(x)
             x = self.conv2d(x)
