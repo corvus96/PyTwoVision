@@ -228,7 +228,7 @@ class V2(ResnetStrategy):
                 if res_block == 0:
                     # linear projection residual shortcut connection to match
                     # changed dims
-                    conv_layer_D = Conv2dBNReluLayer("feature-layer-type-D", num_filters=num_filters_out,
+                    conv_layer_D = Conv2dBNReluLayer("feature-layer-type-D-" + layer_counter, num_filters=num_filters_out,
                                     kernel_size=1,
                                     strides=strides,
                                     activation=None,
