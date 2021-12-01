@@ -108,7 +108,7 @@ class V1(ResnetStrategy):
         num_res_blocks = int((depth - 2) / 6)
 
         inputs = Input(shape=input_shape)
-        conv_layer_initial = Conv2dBNReluLayer("Feature layer initial")
+        conv_layer_initial = Conv2dBNReluLayer("feature-layer-initial")
         x = conv_layer_initial(inputs)
         # Instantiate the stack of residual units
         for stack in range(3):
@@ -116,14 +116,14 @@ class V1(ResnetStrategy):
                 strides = 1
                 if stack > 0 and res_block == 0:  # first layer but not first stack
                     strides = 2  # downsample
-                conv_layer_A = Conv2dBNReluLayer("Feature layer type A", num_filters=num_filters, strides=strides)
+                conv_layer_A = Conv2dBNReluLayer("feature-layer-type-A", num_filters=num_filters, strides=strides)
                 y = conv_layer_A(x)
-                conv_layer_B = Conv2dBNReluLayer("Feature layer type B", num_filters=num_filters, activation=None)
+                conv_layer_B = Conv2dBNReluLayer("feature-layer-type-B", num_filters=num_filters, activation=None)
                 y = conv_layer_B(y)
                 if stack > 0 and res_block == 0:  # first layer but not first stack
                     # linear projection residual shortcut connection to match
                     # changed dims
-                    conv_layer_C = Conv2dBNReluLayer("Feature layer type C", num_filters=num_filters,
+                    conv_layer_C = Conv2dBNReluLayer("feature-layer-type-C", num_filters=num_filters,
                                     kernel_size=1,
                                     strides=strides,
                                     activation=None,
@@ -143,7 +143,7 @@ class V1(ResnetStrategy):
         # additional feature map layers
         for i in range(n_layers - 1):
             postfix = "_layer" + str(i+2)
-            conv = Conv2dBNEluLayer("Aditional Featured layer " + str(i + 1), n_filters, kernel_size=3, strides=2, use_maxpool=False, postfix=postfix)
+            conv = Conv2dBNEluLayer("aditional-featured-layer " + str(i + 1), n_filters, kernel_size=3, strides=2, use_maxpool=False, postfix=postfix)
             conv = conv(prev_conv)
             outputs.append(conv)
             prev_conv = conv
@@ -188,7 +188,7 @@ class V2(ResnetStrategy):
 
         inputs = Input(shape=input_shape)
         # v2 performs Conv2D with BN-ReLU on input before splitting into 2 paths
-        conv_layer_initial = Conv2dBNReluLayer("Feature layer initial", num_filters=num_filters_in,
+        conv_layer_initial = Conv2dBNReluLayer("feature-layer-initial", num_filters=num_filters_in,
                         conv_first=True)
         x = conv_layer_initial(inputs)
 
@@ -209,24 +209,24 @@ class V2(ResnetStrategy):
                         strides = 2    # downsample
 
                 # bottleneck residual unit
-                conv_layer_A = Conv2dBNReluLayer("Feature layer type A", num_filters=num_filters_in,
+                conv_layer_A = Conv2dBNReluLayer("feature-layer-type-A", num_filters=num_filters_in,
                                 kernel_size=1,
                                 strides=strides,
                                 activation=activation,
                                 batch_normalization=batch_normalization,
                                 conv_first=False)
                 y = conv_layer_A(x)
-                conv_layer_B = Conv2dBNReluLayer("Feature layer type B", num_filters=num_filters_in,
+                conv_layer_B = Conv2dBNReluLayer("feature-layer-type-B", num_filters=num_filters_in,
                                 conv_first=False)
                 y = conv_layer_B(y)
-                conv_layer_C = Conv2dBNReluLayer("Feature layer type C", num_filters=num_filters_out,
+                conv_layer_C = Conv2dBNReluLayer("feature-layer-type-C", num_filters=num_filters_out,
                                 kernel_size=1,
                                 conv_first=False)
                 y = conv_layer_C(y)
                 if res_block == 0:
                     # linear projection residual shortcut connection to match
                     # changed dims
-                    conv_layer_D = Conv2dBNReluLayer("Feature layer type D", num_filters=num_filters_out,
+                    conv_layer_D = Conv2dBNReluLayer("feature-layer-type-D", num_filters=num_filters_out,
                                     kernel_size=1,
                                     strides=strides,
                                     activation=None,
@@ -248,7 +248,7 @@ class V2(ResnetStrategy):
         # additional feature map layers
         for i in range(n_layers - 1):
             postfix = "_layer" + str(i+2)
-            conv = Conv2dBNEluLayer("Aditional Featured layer " + str(i + 1), n_filters, kernel_size=3, strides=2, use_maxpool=False, postfix=postfix)
+            conv = Conv2dBNEluLayer("aditional-Featured-layer" + str(i + 1), n_filters, kernel_size=3, strides=2, use_maxpool=False, postfix=postfix)
             conv = conv(prev_conv)
             outputs.append(conv)
             prev_conv = conv
