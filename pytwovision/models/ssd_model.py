@@ -12,7 +12,7 @@ from tensorflow.keras import backend as K
 
 
 class BuildSSD(tf.keras.Model):
-    def __init__(self, name, backbone: ResnetBlock, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
+    def __init__(self, name, backbone, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
         """Build SSD model given a backbone
         Arguments:
             input_shape (list): input image shape
@@ -42,7 +42,7 @@ class BuildSSD(tf.keras.Model):
     def call(self, input_shape):
         inputs = Input(shape=input_shape)
         # Backbone network
-        x = self.base_outputs.build_model(inputs)
+        x = self.base_outputs(inputs)
 
         for i in range(self.n_layers):
             # each conv layer from backbone is used

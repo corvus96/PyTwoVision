@@ -16,10 +16,9 @@ class ModelManager(ModelManagerInterface):
     """A selector of models that depends of which method is used."""
     def __init__(self):
         self.model1 = SSDModel()
-    def build_SSD(self, name, backbone: ResnetBlock, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
+    def build_SSD(self, name, backbone, n_layers=4, n_classes=4, aspect_ratios=(1, 2, 0.5)):
         """ Create the model to do SSD.
         Arguments:
-            input_shape (list): input image shape
             backbone (model): Keras backbone model
             n_layers (int): Number of layers of ssd head
             n_classes (int): Number of obj classes
