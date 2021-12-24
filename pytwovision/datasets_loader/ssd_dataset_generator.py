@@ -6,6 +6,8 @@ import os
 import skimage
 
 from compute.ssd_calculus import SSDCalculus
+from image_process.frame_decorator import Frame
+from image_process.resize import Resize
 
 from skimage.io import imread
 
@@ -84,6 +86,35 @@ class SSDDataGenerator(Sequence):
         for shape in self.feature_shapes:
             self.n_boxes += np.prod(shape) // self.n_anchors
         return self.n_boxes
+    
+    def resize_boxes(self, image, labels, input_dims):
+        """Generate a new image and bounding boxes 
+        with expected shape, which is compatible with the network
+        Arguments:
+            image (array): an image to resize.
+            labels (list): each element is an array [xmin, xmax, ymin, ymax, class].
+            input_dims (tuple): dimensions of input image (height, width).
+        Returns:
+            x (array): an image with expected dimensions.
+            labels (list): each element is an array [xmin, xmax, ymin, ymax, class], but 
+            all element in array has transformed to new image dimensions.
+        """
+        resized_image = Frame(image)
+        resized_image = Resize(image).apply(self.input_shape[1], self.input_shape[0])
+        # scale ratio is out_dim / input_dim in this case input 
+        # shape is expected by the net
+        scale_x_ratio = self.input_shape[1] / input_dims[1]
+        scale_y_ratio = self.input_shape[0] / input_dims[0] 
+        new_labels = []
+        # iter by all bounding boxes
+        for bbox in labels:
+            new_xmin = int(bbox[0] * scale_x_ratio)
+            new_xmax = int(bbox[1] * scale_x_ratio)
+            new_ymin = int(bbox[2] * scale_y_ratio)
+            new_ymax = int(bbox[3] * scale_y_ratio)
+            new_labels.append(np.array([ new_xmin, new_xmax, new_ymin, new_ymax, bbox[4]]).astype(np.float32))
+            
+        return resized_image, new_labels
 
     def __data_generation(self, keys):
         """Generate train data: images and 
@@ -111,12 +142,15 @@ class SSDDataGenerator(Sequence):
             # key is the image filename 
             image_path = os.path.join(self.data_path, key)
             image = skimage.img_as_float(imread(image_path))
-            # assign image to a batch index
-            x[i] = image
+            # assign image to a temporal variable
+            temp_x = image
+            in_height, in_width = temp_x.shape[0:2]
             # a label entry is made of 4-dim bounding box coords
             # and 1-dim class label
             labels = self.dictionary[key]
             labels = np.array(labels)
+            # adjust input image size like input shape and boxes size
+            x[i], labels = self.resize_boxes(temp_x, labels, (in_height, in_width))
             # 4 bounding box coords are 1st four items of labels
             # last item is object class label
             boxes = labels[:,0:-1]

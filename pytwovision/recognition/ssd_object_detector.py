@@ -111,7 +111,6 @@ class ObjectDetectorSSD(NeuralNetwork):
                               n_anchors=self.n_anchors,
                               shuffle=True)
 
-
     def train(self, epochs=200,  loss_function="l1"):
         """Train an ssd network.
         Arguments:
@@ -123,7 +122,7 @@ class ObjectDetectorSSD(NeuralNetwork):
         if self.train_generator is None:
             self.build_generator()
 
-        optimizer = Adam(lr=1e-3)
+        optimizer = Adam(learning_rate=1e-3)
         # choice of loss functions 
         if loss_function == "focal-smooth-l1":
             print("Focal loss and smooth L1")

@@ -20,6 +20,7 @@ class Recognizer:
             or smoth L1 "smooth-l1" even L1 "l1".
         """
         self.implementation.train(epochs, loss_function)
+    
 
 
 
