@@ -3,12 +3,10 @@ import numpy as np
 import skimage
 
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.callbacks import LearningRateScheduler
 from skimage.io import imread
 
-from recognition.selector import Recognizer
 from recognition.selector import NeuralNetwork
 from models.ssd_model import BuildSSD
 from models.hiperparameters_config.learning_rate_ssd_scheduler import lr_scheduler
@@ -17,7 +15,7 @@ from utils.label_utils import build_label_dictionary
 from utils.boxes import show_boxes
 from models.loss.detection_loss_utils import focal_loss_categorical, smooth_l1_loss, l1_loss
 from compute.ssd_calculus import SSDCalculus
-from models.blocks.resnet_block import ResnetBlock
+from models.blocks.backbone_block import ResnetBlock
 
 class ObjectDetectorSSD(NeuralNetwork):
     """Made of an ssd network model and a dataset generator.
@@ -98,8 +96,7 @@ class ObjectDetectorSSD(NeuralNetwork):
     def build_generator(self):
         """Build a multi-thread train data generator."""
 
-        self.train_generator = \
-                SSDDataGenerator(input_shape=self.input_shape, 
+        self.train_generator = SSDDataGenerator(input_shape=self.input_shape, 
                               batch_size=self.batch_size,
                               data_path=self.data_path,  
                               layers=self.layers,
@@ -111,7 +108,7 @@ class ObjectDetectorSSD(NeuralNetwork):
                               n_anchors=self.n_anchors,
                               shuffle=True)
 
-    def train(self, epochs=200,  loss_function="l1"):
+    def train(self, epochs=200,  loss_function="l1", workers=4):
         """Train an ssd network.
         Arguments:
             epochs (int): Number of epochs to train.
@@ -182,7 +179,9 @@ class ObjectDetectorSSD(NeuralNetwork):
         self.ssd.fit(self.train_generator,
                      use_multiprocessing=False,
                      callbacks=callbacks,
-                     epochs=epochs)
+                     epochs=epochs,
+                     workers=workers
+                     )
 
 
     def restore_weights(self, restore_weights):

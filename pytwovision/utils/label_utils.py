@@ -7,6 +7,7 @@ drawing label on an image
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
+import os
 
 from matplotlib.patches import Rectangle
 from random import randint
@@ -26,17 +27,55 @@ def get_box_rgbcolor(index=None):
         return colors[randint(0, len(colors) - 1)]
     return colors[index % len(colors)]
 
-
-def index2class(index=0, classes=['car', 'person', 'dog', 'chair', 'boat', 'sofa', 'tvmonitor', 'bird', 'aeroplane', 'cow', 'cat', 'pottedplant', 'bottle', 'horse', 'bicycle', 'motorbike', 'diningtable', 'bus', 'train', 'sheep']):
+def label_map(labels, dst_path=None, name='label_map'):
+    """
+    An easy way to convert classes names and ids to a 
+    .pbtxt file compatible with tensorflow models API.
+    Args:
+        labels (list): a list, which each element is a dictionary with two keys
+        'name' and 'id'.
+        dst_path (str): a path where the file will be saved.
+        name (str): the name of the file, with which it will save the .pbtxt
+    Returns:
+        a string where the file was saved.
+    Raises:
+        Exception: When someone element in internal dictionaries have another keys different 
+        of name and id.
+        TypeError: when labels aren't list type
+        ValueError: when labels are empty
+    """
+    if type(labels) != list: raise TypeError('labels should be a list of dictionaries!')
+    if not labels: raise ValueError('labels are empty')
+    if dst_path == None:
+        dst_path = os.getcwd()
+    file_path = dst_path +  '/{}.pbtxt'.format(name)
+    allowed_keys = ['name', 'id']
+    with open(file_path, 'w') as f:
+        for label in labels:
+            if allowed_keys == list(label.keys()):
+                f.write('item { \n')
+                f.write('\tname:\'{}\'\n'.format(label['name']))
+                f.write('\tid:{}\n'.format(label['id']))
+                f.write('}\n')
+            else: 
+                os.remove(file_path)
+                raise Exception("Your keys should be only 'name' and 'id'")
+        print('file saved in: {}'.format(file_path))
+    
+    return file_path
+            
+def index2class(index, classes: list):
     """Convert index (int) to class name (string)"""
     return classes[index]
 
 
-def class2index(class_="background", classes=['car', 'person', 'dog', 'chair', 'boat', 'sofa', 'tvmonitor', 'bird', 'aeroplane', 'cow', 'cat', 'pottedplant', 'bottle', 'horse', 'bicycle', 'motorbike', 'diningtable', 'bus', 'train', 'sheep']):
-    """Convert class_ name (string) to index (int)"""
-    return classes.index(class_)
+def class2index(class_name, classes: list):
+    """Convert class name (string) to index (int)"""
+    return classes.index(class_name)
 
-
+def class_text_to_int(row_label, label_map_dict: dict):
+    return label_map_dict[row_label]
+    
 def load_csv(path):
     """Load a csv file into an np array"""
     data = []

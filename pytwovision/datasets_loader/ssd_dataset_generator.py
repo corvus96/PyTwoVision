@@ -58,7 +58,6 @@ class SSDDataGenerator(Sequence):
         self.on_epoch_end()
         self.get_n_boxes()
 
-
     def __len__(self):
         """Number of batches per epoch"""
         blen = np.floor(len(self.dictionary) / self.batch_size)
@@ -113,7 +112,7 @@ class SSDDataGenerator(Sequence):
             new_ymin = int(bbox[2] * scale_y_ratio)
             new_ymax = int(bbox[3] * scale_y_ratio)
             new_labels.append(np.array([ new_xmin, new_xmax, new_ymin, new_ymax, bbox[4]]).astype(np.float32))
-            
+
         return resized_image, new_labels
 
     def __data_generation(self, keys):
@@ -148,16 +147,16 @@ class SSDDataGenerator(Sequence):
             # a label entry is made of 4-dim bounding box coords
             # and 1-dim class label
             labels = self.dictionary[key]
-            labels = np.array(labels)
             # adjust input image size like input shape and boxes size
             x[i], labels = self.resize_boxes(temp_x, labels, (in_height, in_width))
             # 4 bounding box coords are 1st four items of labels
             # last item is object class label
+            labels = np.array(labels)
             boxes = labels[:,0:-1]
             for index, feature_shape in enumerate(self.feature_shapes):
                 # generate anchor boxes
                 anchors = SSDCalculus().anchor_boxes(feature_shape,
-                                       image.shape,
+                                       self.input_shape,
                                        index=index,
                                        n_layers=self.layers)
                 # each feature layer has a row of anchor boxes
@@ -186,8 +185,10 @@ class SSDDataGenerator(Sequence):
             gt_class[i] = clss
             gt_offset[i] = off
             gt_mask[i] = msk
-
-
-        y = [gt_class, np.concatenate((gt_offset, gt_mask), axis=-1)]
-
+        # debug
+        self.gt_class = gt_class
+        self.gt_offset = gt_offset
+        self.gt_mask = gt_mask
+        gt_offset_mask = np.concatenate((gt_offset, gt_mask), axis=-1)
+        y = [gt_class, gt_offset_mask]
         return x, y

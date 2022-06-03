@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from compute.ssd_calculus import SSDCalculus
+from pytwovision.compute.ssd_calculus import SSDCalculus
 
 class TestSSDCalculus(unittest.TestCase):
     def setUp(self):
