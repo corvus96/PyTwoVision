@@ -8,7 +8,7 @@ from pytwovision.models.layers.upsample_layer import UpsampleLayer
 
 
 class BuildYoloV3Tiny(tf.keras.Model):
-    def __init__(self, name, backbone, num_class):
+    def __init__(self, backbone, num_class):
         """Build YoloV3 tiny model given a backbone
         Arguments:
             name: a string with the name of the model
@@ -18,7 +18,7 @@ class BuildYoloV3Tiny(tf.keras.Model):
             A list where the first one is used to predict large-sized objects, 
             the second one is used to predict medium-sized objects and the  last one is the input shape returned.
         """
-        super().__init__(name=name)
+        super().__init__()
         if not isinstance(num_class, int):
             raise ValueError('num_class has to be an integer')
         self.base_outputs = backbone
@@ -31,23 +31,21 @@ class BuildYoloV3Tiny(tf.keras.Model):
         except ValueError:
             raise Exception('Backbone output shape mismatch with yolov3 tiny input shape')
 
-        x = Conv2dBNLeakyReluLayer('conv_layer_yolo_tiny_', (1, 1, 1024, 256), postfix='0')(x)
+        x = Conv2dBNLeakyReluLayer((1, 1, 1024, 256))(x)
 
-        conv_lobj_branch = Conv2dBNLeakyReluLayer('conv_lobj_branch', (3, 3, 256, 512), postfix='')(x)
+        conv_lobj_branch = Conv2dBNLeakyReluLayer((3, 3, 256, 512))(x)
         # conv_lbbox is used to predict large-sized objects , Shape = [None, 13, 13, 255] (if num_class == 80 like coco dataset) 
-        conv_lbbox = Conv2dBNLeakyReluLayer('Convolutional_large_bounding_box_layer', (1, 1, 512, 3*(self.num_class + 5)), 
-                        activate=False, bn=False, postfix='')(conv_lobj_branch)
+        conv_lbbox = Conv2dBNLeakyReluLayer((1, 1, 512, 3*(self.num_class + 5)), activate=False, bn=False)(conv_lobj_branch)
                         
-        x = Conv2dBNLeakyReluLayer('intermediate_conv_layer_', (1, 1, 256, 128), postfix='A')(x)
+        x = Conv2dBNLeakyReluLayer((1, 1, 256, 128))(x)
         # upsample here uses the nearest neighbor interpolation method, which has the advantage that the
         # upsampling process does not need to learn, thereby reducing the network parameter  
         x = UpsampleLayer()(x)
         x = tf.concat([x, route_1], axis=-1)
 
-        conv_mobj_branch = Conv2dBNLeakyReluLayer('conv_mobj_branch', (3, 3, 128, 256), postfix='')(x)
+        conv_mobj_branch = Conv2dBNLeakyReluLayer((3, 3, 128, 256))(x)
         # conv_mbbox is used to predict medium size objects, shape = [None, 26, 26, 255] (if num_class == 80 like coco dataset) 
-        conv_mbbox = Conv2dBNLeakyReluLayer('Convolutional_medium_bounding_box_layer', (1, 1, 256, 3*(self.num_class + 5)),
-                         activate=False, bn=False, postfix='')(conv_mobj_branch)
+        conv_mbbox = Conv2dBNLeakyReluLayer((1, 1, 256, 3*(self.num_class + 5)), activate=False, bn=False)(conv_mobj_branch)
 
         return [conv_mbbox, conv_lbbox, input_shape]
 

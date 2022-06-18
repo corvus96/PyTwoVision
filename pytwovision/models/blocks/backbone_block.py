@@ -81,33 +81,33 @@ class darknet53(BackboneStrategy):
         Arguments: 
             x: an input tensor that can be an image
         """
-        x = Conv2dBNLeakyReluLayer('input_layer', (3, 3,  3,  32), postfix='1')(x)
-        x = Conv2dBNLeakyReluLayer('first_stack', (3, 3, 32,  64), down_sample=True, postfix='1')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3,  3,  32))(x)
+        x = Conv2dBNLeakyReluLayer((3, 3, 32,  64), down_sample=True)(x)
 
         for i in range(1):
-            x = ResidualLayer('second_stack', 64,  32, 64, str(i))(x)
+            x = ResidualLayer(64,  32, 64)(x)
 
-        x = Conv2dBNLeakyReluLayer('second_stack', (3, 3,  64, 128), down_sample=True, postfix='1')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3,  64, 128), down_sample=True)(x)
 
         for i in range(2):
-            x = ResidualLayer('third_stack', 128,  64, 128, str(i))(x)
+            x = ResidualLayer(128,  64, 128)(x)
 
-        x = Conv2dBNLeakyReluLayer('third_stack', (3, 3, 128, 256), down_sample=True, postfix='2')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3, 128, 256), down_sample=True)(x)
 
         for i in range(8):
-            x = ResidualLayer('fourth_stack', 256, 128, 256, postfix=str(i))(x)
+            x = ResidualLayer(256, 128, 256)(x)
 
         route_1 = x
-        x = Conv2dBNLeakyReluLayer('fourth_stack', (3, 3, 256, 512), down_sample=True, postfix='8')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3, 256, 512), down_sample=True)(x)
 
         for i in range(8):
-            x = ResidualLayer('fifth_stack', 512, 256, 512, postfix=str(i))(x)
+            x = ResidualLayer(512, 256, 512)(x)
 
         route_2 = x
-        x = Conv2dBNLeakyReluLayer('fifth_stack', (3, 3, 512, 1024), down_sample=True, postfix='8')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3, 512, 1024), down_sample=True)(x)
 
         for i in range(4):
-            x = ResidualLayer('sixth_stack', 1024, 512, 1024, postfix=str(i))(x)
+            x = ResidualLayer(1024, 512, 1024)(x)
 
         return route_1, route_2, x
 
@@ -119,16 +119,16 @@ class darknet19_tiny(BackboneStrategy):
         """
         filters_shapes = [(3, 3, 3, 16), (3, 3, 16, 32), (3, 3, 32, 64), (3, 3, 64, 128), (3, 3, 128, 256)]
         for i, filter_shape in enumerate(filters_shapes):
-            x = Conv2dBNLeakyReluLayer('stack_', filter_shape, postfix=str(i))(x)
+            x = Conv2dBNLeakyReluLayer(filter_shape)(x)
             if i < 4:
                 x = MaxPool2D(2, 2, 'same')(x)
         
         route_1 = x
 
         x = MaxPool2D(2, 2, 'same')(x)
-        x = Conv2dBNLeakyReluLayer('stack_', (3, 3, 256, 512), postfix='5')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3, 256, 512))(x)
         x = MaxPool2D(2, 1, 'same')(x)
-        x = Conv2dBNLeakyReluLayer('stack_', (3, 3, 512, 1024), postfix='6')(x)
+        x = Conv2dBNLeakyReluLayer((3, 3, 512, 1024))(x)
 
         return route_1, x
         

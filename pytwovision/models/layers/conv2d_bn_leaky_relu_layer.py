@@ -11,7 +11,6 @@ class Conv2dBNLeakyReluLayer(tf.keras.Model):
     """ A resnet block with depthwise separable convolutions to reduce the computational demand.
 
     Attributes: 
-        name: A string that assign model name.
         filters_shape: An array or list or tuple that contains the shape of 
         the filters which filters_shape[0] is kernel size for conv2d layer.
         down_sample: a boolean to know when apply zero padding layer.
@@ -19,12 +18,8 @@ class Conv2dBNLeakyReluLayer(tf.keras.Model):
         bn: a boolean to know when apply a batch normalization layer.
         postfix: an unique id to identifier each layer in a model
     """
-    def __init__(self, name, filters_shape, down_sample=False, activate=True, bn=True, postfix=None):
-        super().__init__(name=name)
-        if type(postfix) == int or type(postfix) == float:
-            postfix = str(postfix)
-        if type(postfix) is not str:
-            raise Exception('postfix has to be a string')
+    def __init__(self, filters_shape, down_sample=False, activate=True, bn=True):
+        super().__init__()
         if down_sample:
             self.down_sample_layer = ZeroPadding2D(((1, 0), (1, 0)))
             padding = 'valid'
@@ -33,7 +28,7 @@ class Conv2dBNLeakyReluLayer(tf.keras.Model):
             strides = 1
             padding = 'same'
 
-        self.conv2d = Conv2D(filters=filters_shape[-1], kernel_size = filters_shape[0], name= name + postfix, strides=strides,
+        self.conv2d = Conv2D(filters=filters_shape[-1], kernel_size = filters_shape[0], strides=strides,
                   padding=padding, use_bias=not bn, kernel_regularizer=l2(0.0005),
                   kernel_initializer=tf.random_normal_initializer(stddev=0.01),
                   bias_initializer=tf.constant_initializer(0.))
@@ -41,7 +36,7 @@ class Conv2dBNLeakyReluLayer(tf.keras.Model):
             self.bn = BatchNormalization()
         
         if activate == True:
-            self.activation = LeakyReLU(alpha=0.1, name='LeakyRelu' + postfix)
+            self.activation = LeakyReLU(alpha=0.1)
 
     
     def call(self, inputs):

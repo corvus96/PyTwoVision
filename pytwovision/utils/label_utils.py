@@ -75,7 +75,15 @@ def class2index(class_name, classes: list):
 
 def class_text_to_int(row_label, label_map_dict: dict):
     return label_map_dict[row_label]
-    
+
+def read_class_names(class_file_name):
+    # loads class name from a file
+    names = {}
+    with open(class_file_name, 'r') as data:
+        for ID, name in enumerate(data):
+            names[ID] = name.strip('\n')
+    return names
+        
 def load_csv(path):
     """Load a csv file into an np array"""
     data = []

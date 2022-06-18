@@ -81,83 +81,6 @@ class YoloV3Calculus:
         centroid[..., 2] = boxes[..., 1] - boxes[..., 0]
         centroid[..., 3] = boxes[..., 3] - boxes[..., 2]
         return centroid
-
-    def intersection(self, boxes1, boxes2):
-        """Compute intersection of batch of boxes1 and boxes2
-        
-        Arguments:
-            boxes1 (tensor): Boxes coordinates in pixels
-            boxes2 (tensor): Boxes coordinates in pixels
-        Returns:
-            intersection_areas (tensor): intersection of areas of
-                boxes1 and boxes2
-        """
-        m = boxes1.shape[0] # The number of boxes in `boxes1`
-        n = boxes2.shape[0] # The number of boxes in `boxes2`
-
-        xmin = 0
-        xmax = 1
-        ymin = 2
-        ymax = 3
-
-        boxes1_min = np.expand_dims(boxes1[:, [xmin, ymin]], axis=1)
-        boxes1_min = np.tile(boxes1_min, reps=(1, n, 1))
-        boxes2_min = np.expand_dims(boxes2[:, [xmin, ymin]], axis=0)
-        boxes2_min = np.tile(boxes2_min, reps=(m, 1, 1))
-        min_xy = np.maximum(boxes1_min, boxes2_min)
-
-        boxes1_max = np.expand_dims(boxes1[:, [xmax, ymax]], axis=1)
-        boxes1_max = np.tile(boxes1_max, reps=(1, n, 1))
-        boxes2_max = np.expand_dims(boxes2[:, [xmax, ymax]], axis=0)
-        boxes2_max = np.tile(boxes2_max, reps=(m, 1, 1))
-        max_xy = np.minimum(boxes1_max, boxes2_max)
-
-        side_lengths = np.maximum(0, max_xy - min_xy)
-
-        intersection_areas = side_lengths[:, :, 0] * side_lengths[:, :, 1]
-        return intersection_areas
-
-    def union(self, boxes1, boxes2, intersection_areas):
-        """Compute union of batch of boxes1 and boxes2
-        Arguments:
-            boxes1 (tensor): Boxes coordinates in pixels
-            boxes2 (tensor): Boxes coordinates in pixels
-        Returns:
-            union_areas (tensor): union of areas of
-                boxes1 and boxes2
-        """
-        m = boxes1.shape[0] # number of boxes in boxes1
-        n = boxes2.shape[0] # number of boxes in boxes2
-
-        xmin = 0
-        xmax = 1
-        ymin = 2
-        ymax = 3
-
-        width = (boxes1[:, xmax] - boxes1[:, xmin])
-        height = (boxes1[:, ymax] - boxes1[:, ymin])
-        areas = width * height
-        boxes1_areas = np.tile(np.expand_dims(areas, axis=1), reps=(1,n))
-        width = (boxes2[:,xmax] - boxes2[:,xmin])
-        height = (boxes2[:,ymax] - boxes2[:,ymin])
-        areas = width * height
-        boxes2_areas = np.tile(np.expand_dims(areas, axis=0), reps=(m,1))
-
-        union_areas = boxes1_areas + boxes2_areas - intersection_areas
-        return union_areas
-
-    def iou(self, boxes1, boxes2):
-        """Compute IoU of batch boxes1 and boxes2
-        Arguments:
-            boxes1 (tensor): Boxes coordinates in pixels
-            boxes2 (tensor): Boxes coordinates in pixels
-        Returns:
-            iou (tensor): intersectiin of union of areas of
-                boxes1 and boxes2
-        """
-        intersection_areas = self.intersection(boxes1, boxes2)
-        union_areas = self.union(boxes1, boxes2, intersection_areas)
-        return intersection_areas / union_areas
     
     def bbox_iou(self, boxes1, boxes2):
         boxes1_area = boxes1[..., 2] * boxes1[..., 3]
@@ -177,165 +100,211 @@ class YoloV3Calculus:
 
         return 1.0 * inter_area / union_area
 
-    def get_gt_data(self, iou,
-                n_classes=4,
-                anchors=None,
-                labels=None,
-                normalize=False,
-                threshold=0.6):
-        """Retrieve ground truth class, bbox offset, and mask
-        
-        Arguments:
-            iou (tensor): IoU of each bounding box wrt each anchor box
-            n_classes (int): Number of object classes
-            anchors (tensor): Anchor boxes per feature layer
-            labels (list): Ground truth labels
-            normalize (bool): If normalization should be applied
-            threshold (float): If less than 1.0, anchor boxes>threshold
-                are also part of positive anchor boxes
-        Returns:
-            gt_class, gt_offset, gt_mask (tensor): Ground truth classes,
-                offsets, and masks
+    def bbox_giou(self, boxes1, boxes2):
+        boxes1 = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
+                            boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
+        boxes2 = tf.concat([boxes2[..., :2] - boxes2[..., 2:] * 0.5,
+                            boxes2[..., :2] + boxes2[..., 2:] * 0.5], axis=-1)
+
+        boxes1 = tf.concat([tf.minimum(boxes1[..., :2], boxes1[..., 2:]),
+                            tf.maximum(boxes1[..., :2], boxes1[..., 2:])], axis=-1)
+        boxes2 = tf.concat([tf.minimum(boxes2[..., :2], boxes2[..., 2:]),
+                            tf.maximum(boxes2[..., :2], boxes2[..., 2:])], axis=-1)
+
+        boxes1_area = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
+        boxes2_area = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
+
+        left_up = tf.maximum(boxes1[..., :2], boxes2[..., :2])
+        right_down = tf.minimum(boxes1[..., 2:], boxes2[..., 2:])
+
+        inter_section = tf.maximum(right_down - left_up, 0.0)
+        inter_area = inter_section[..., 0] * inter_section[..., 1]
+        union_area = boxes1_area + boxes2_area - inter_area
+
+        # Calculate the iou value between the two bounding boxes
+        iou = inter_area / union_area
+
+        # Calculate the coordinates of the upper left corner and the lower right corner of the smallest closed convex surface
+        enclose_left_up = tf.minimum(boxes1[..., :2], boxes2[..., :2])
+        enclose_right_down = tf.maximum(boxes1[..., 2:], boxes2[..., 2:])
+        enclose = tf.maximum(enclose_right_down - enclose_left_up, 0.0)
+
+        # Calculate the area of the smallest closed convex surface C
+        enclose_area = enclose[..., 0] * enclose[..., 1]
+
+        # Calculate the GIoU value according to the GioU formula  
+        giou = iou - 1.0 * (enclose_area - union_area) / enclose_area
+
+        return giou
+
+    def bbox_ciou(self, boxes1, boxes2):
+        boxes1_coor = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
+                            boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
+        boxes2_coor = tf.concat([boxes2[..., :2] - boxes2[..., 2:] * 0.5,
+                            boxes2[..., :2] + boxes2[..., 2:] * 0.5], axis=-1)
+
+        left = tf.maximum(boxes1_coor[..., 0], boxes2_coor[..., 0])
+        up = tf.maximum(boxes1_coor[..., 1], boxes2_coor[..., 1])
+        right = tf.maximum(boxes1_coor[..., 2], boxes2_coor[..., 2])
+        down = tf.maximum(boxes1_coor[..., 3], boxes2_coor[..., 3])
+
+        c = (right - left) * (right - left) + (up - down) * (up - down)
+        iou = self.bbox_iou(boxes1, boxes2)
+
+        u = (boxes1[..., 0] - boxes2[..., 0]) * (boxes1[..., 0] - boxes2[..., 0]) + (boxes1[..., 1] - boxes2[..., 1]) * (boxes1[..., 1] - boxes2[..., 1])
+        d = u / c
+
+        ar_gt = boxes2[..., 2] / boxes2[..., 3]
+        ar_pred = boxes1[..., 2] / boxes1[..., 3]
+
+        ar_loss = 4 / (np.pi * np.pi) * (tf.atan(ar_gt) - tf.atan(ar_pred)) * (tf.atan(ar_gt) - tf.atan(ar_pred))
+        alpha = ar_loss / (1 - iou + ar_loss + 0.000001)
+        ciou_term = d + alpha * ar_loss
+
+        return iou - ciou_term
+    
+    def loss(self, pred, conv, label, bboxes, num_class, i=0, strides=[8, 16, 32], loss_thresh=0.5):
+        strides = np.array(strides)
+
+        conv_shape  = tf.shape(conv)
+        batch_size  = conv_shape[0]
+        output_size = conv_shape[1]
+        input_size  = strides[i] * output_size
+        conv = tf.reshape(conv, (batch_size, output_size, output_size, 3, 5 + num_class))
+
+        conv_raw_conf = conv[:, :, :, :, 4:5]
+        conv_raw_prob = conv[:, :, :, :, 5:]
+
+        pred_xywh     = pred[:, :, :, :, 0:4]
+        pred_conf     = pred[:, :, :, :, 4:5]
+
+        label_xywh    = label[:, :, :, :, 0:4]
+        respond_bbox  = label[:, :, :, :, 4:5]
+        label_prob    = label[:, :, :, :, 5:]
+
+        giou = tf.expand_dims(self.bbox_giou(pred_xywh, label_xywh), axis=-1)
+        input_size = tf.cast(input_size, tf.float32)
+
+        bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
+        giou_loss = respond_bbox * bbox_loss_scale * (1 - giou)
+
+        iou = self.bbox_iou(pred_xywh[:, :, :, :, np.newaxis, :], bboxes[:, np.newaxis, np.newaxis, np.newaxis, :, :])
+        # Find the value of IoU with the real box The largest prediction box
+        max_iou = tf.expand_dims(tf.reduce_max(iou, axis=-1), axis=-1)
+
+        # If the largest iou is less than the threshold, it is considered that the prediction box contains no objects, then the background box
+        respond_bgd = (1.0 - respond_bbox) * tf.cast( max_iou < loss_thresh, tf.float32 )
+
+        conf_focal = tf.pow(respond_bbox - pred_conf, 2)
+
+        # Calculate the loss of confidence
+        # we hope that if the grid contains objects, then the network output prediction box has a confidence of 1 and 0 when there is no object.
+        conf_loss = conf_focal * (
+                respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=respond_bbox, logits=conv_raw_conf)
+                +
+                respond_bgd * tf.nn.sigmoid_cross_entropy_with_logits(labels=respond_bbox, logits=conv_raw_conf)
+        )
+
+        prob_loss = respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=label_prob, logits=conv_raw_prob)
+
+        giou_loss = tf.reduce_mean(tf.reduce_sum(giou_loss, axis=[1,2,3,4]))
+        conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1,2,3,4]))
+        prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1,2,3,4]))
+
+        return giou_loss, conf_loss, prob_loss
+    
+    def best_bboxes_iou(self, boxes1, boxes2):
+        boxes1 = np.array(boxes1)
+        boxes2 = np.array(boxes2)
+
+        boxes1_area = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
+        boxes2_area = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
+
+        left_up       = np.maximum(boxes1[..., :2], boxes2[..., :2])
+        right_down    = np.minimum(boxes1[..., 2:], boxes2[..., 2:])
+
+        inter_section = np.maximum(right_down - left_up, 0.0)
+        inter_area    = inter_section[..., 0] * inter_section[..., 1]
+        union_area    = boxes1_area + boxes2_area - inter_area
+        ious          = np.maximum(1.0 * inter_area / union_area, np.finfo(np.float32).eps)
+
+        return ious
+
+    def nms(self, bboxes, iou_threshold, sigma=0.3, method='nms'):
         """
-        # each maxiou_per_get is index of anchor w/ max iou
-        # for the given ground truth bounding box
-        maxiou_per_gt = np.argmax(iou, axis=0)
-        
-        # get extra anchor boxes based on IoU
-        if threshold < 1.0:
-            iou_gt_thresh = np.argwhere(iou>threshold)
-            if iou_gt_thresh.size > 0:
-                extra_anchors = iou_gt_thresh[:,0]
-                extra_classes = iou_gt_thresh[:,1]
-                #extra_labels = labels[:,:][extra_classes]
-                extra_labels = labels[extra_classes]
-                indexes = [maxiou_per_gt, extra_anchors]
-                maxiou_per_gt = np.concatenate(indexes,
-                                            axis=0)
-                labels = np.concatenate([labels, extra_labels],
-                                        axis=0)
-
-        # mask generation
-        gt_mask = np.zeros((iou.shape[0], 4))
-        # only indexes maxiou_per_gt are valid bounding boxes
-        gt_mask[maxiou_per_gt] = 1.0
-
-        # class generation
-        gt_class = np.zeros((iou.shape[0], n_classes))
-        # by default all are background (index 0)
-        gt_class[:, 0] = 1
-        # but those that belong to maxiou_per_gt are not
-        gt_class[maxiou_per_gt, 0] = 0
-        # we have to find those column indexes (classes)
-        maxiou_col = np.reshape(maxiou_per_gt,
-                                (maxiou_per_gt.shape[0], 1))
-        label_col = np.reshape(labels[:,4],
-                            (labels.shape[0], 1)).astype(int)
-        row_col = np.append(maxiou_col, label_col, axis=1)
-        # the label of object in maxio_per_gt
-        gt_class[row_col[:,0], row_col[:,1]]  = 1.0
-        
-        # offsets generation
-        gt_offset = np.zeros((iou.shape[0], 4))
-
-        #(cx, cy, w, h) format
-        if normalize:
-            anchors = self.minmax2centroid(anchors)
-            labels = self.minmax2centroid(labels)
-            # bbox = bounding box
-            # ((bbox xcenter - anchor box xcenter)/anchor box width)/.1
-            # ((bbox ycenter - anchor box ycenter)/anchor box height)/.1
-            # Equation 11.4.8
-            offsets1 = labels[:, 0:2] - anchors[maxiou_per_gt, 0:2]
-            offsets1 /= anchors[maxiou_per_gt, 2:4]
-            offsets1 /= 0.1
-
-            # log(bbox width / anchor box width) / 0.2
-            # log(bbox height / anchor box height) / 0.2
-            # Equation 11.4.8 
-            offsets2 = np.log(labels[:, 2:4]/anchors[maxiou_per_gt, 2:4])
-            offsets2 /= 0.2  
-
-            offsets = np.concatenate([offsets1, offsets2], axis=-1)
-
-        # (xmin, xmax, ymin, ymax) format
-        else:
-            offsets = labels[:, 0:4] - anchors[maxiou_per_gt]
-
-        gt_offset[maxiou_per_gt] = offsets
-
-        return gt_class, gt_offset, gt_mask
-
-    def nms(self, classes, offsets, anchors, class_threshold=0.5, soft_nms=False, iou_threshold=0.2):
-        """Perform NMS (Algorithm 11.12.1).
-        Arguments:
-            args : User-defined configurations
-            classes (tensor): Predicted classes
-            offsets (tensor): Predicted offsets
-            
-        Returns:
-            objects (tensor): class predictions per anchor
-            indexes (tensor): indexes of detected objects
-                filtered by NMS
-            scores (tensor): array of detected objects scores
-                filtered by NMS
+        :param bboxes: (xmin, ymin, xmax, ymax, score, class)
+        Note: soft-nms, https://arxiv.org/pdf/1704.04503.pdf
+            https://github.com/bharatsingh430/soft-nms
         """
+        classes_in_img = list(set(bboxes[:, 5]))
+        best_bboxes = []
 
-        # get all non-zero (non-background) objects
-        objects = np.argmax(classes, axis=1)
-        # non-zero indexes are not background
-        nonbg = np.nonzero(objects)[0]
+        for cls in classes_in_img:
+            cls_mask = (bboxes[:, 5] == cls)
+            cls_bboxes = bboxes[cls_mask]
+            # Process 1: Determine whether the number of bounding boxes is greater than 0 
+            while len(cls_bboxes) > 0:
+                # Process 2: Select the bounding box with the highest score according to socre order A
+                max_ind = np.argmax(cls_bboxes[:, 4])
+                best_bbox = cls_bboxes[max_ind]
+                best_bboxes.append(best_bbox)
+                cls_bboxes = np.concatenate([cls_bboxes[: max_ind], cls_bboxes[max_ind + 1:]])
+                # Process 3: Calculate this bounding box A and
+                # Remain all iou of the bounding box and remove those bounding boxes whose iou value is higher than the threshold 
+                iou = self.best_bboxes_iou(best_bbox[np.newaxis, :4], cls_bboxes[:, :4])
+                weight = np.ones((len(iou),), dtype=np.float32)
 
-        indexes = []
-        while True:
-            # list of zero probability values
-            scores = np.zeros((classes.shape[0],))
-            # set probability values of non-background
-            scores[nonbg] = np.amax(classes[nonbg], axis=1)
+                assert method in ['nms', 'soft-nms']
 
-            # max probability given the list
-            score_idx = np.argmax(scores, axis=0)
-            score_max = scores[score_idx]
-            
-            # get all non max probability & set it as new nonbg
-            nonbg = nonbg[nonbg != score_idx]
+                if method == 'nms':
+                    iou_mask = iou > iou_threshold
+                    weight[iou_mask] = 0.0
 
-            # if max obj probability is less than threshold
-            if score_max < class_threshold:
-                # we are done
-                break
+                if method == 'soft-nms':
+                    weight = np.exp(-(1.0 * iou ** 2 / sigma))
 
-            indexes.append(score_idx)
-            score_anc = anchors[score_idx]
-            score_off = offsets[score_idx][0:4]
-            score_box = score_anc + score_off
-            score_box = np.expand_dims(score_box, axis=0)
-            nonbg_copy = np.copy(nonbg)
+                cls_bboxes[:, 4] = cls_bboxes[:, 4] * weight
+                score_mask = cls_bboxes[:, 4] > 0.
+                cls_bboxes = cls_bboxes[score_mask]
 
-            # perform Non-Max Suppression (NMS)
-            for idx in nonbg_copy:
-                anchor = anchors[idx]
-                offset = offsets[idx][0:4]
-                box = anchor + offset
-                box = np.expand_dims(box, axis=0)
-                iou = self.iou(box, score_box)[0][0]
-                # if soft NMS is chosen
-                if soft_nms:
-                    # adjust score
-                    iou = -2 * iou * iou
-                    classes[idx] *= math.exp(iou)
-                # else NMS (iou threshold def 0.2)
-                elif iou >= iou_threshold:
-                    # remove overlapping predictions with iou>threshold
-                    nonbg = nonbg[nonbg != idx]
+        return best_bboxes
 
-            # nothing else to process
-            if nonbg.size == 0:
-                break
+    def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
+        valid_scale=[0, np.inf]
+        pred_bbox = np.array(pred_bbox)
 
+        pred_xywh = pred_bbox[:, 0:4]
+        pred_conf = pred_bbox[:, 4]
+        pred_prob = pred_bbox[:, 5:]
 
-        # get the array of object scores
-        scores = np.zeros((classes.shape[0],))
-        scores[indexes] = np.amax(classes[indexes], axis=1)
+        # 1. (x, y, w, h) --> (xmin, ymin, xmax, ymax)
+        pred_coor = np.concatenate([pred_xywh[:, :2] - pred_xywh[:, 2:] * 0.5,
+                                    pred_xywh[:, :2] + pred_xywh[:, 2:] * 0.5], axis=-1)
+        # 2. (xmin, ymin, xmax, ymax) -> (xmin_org, ymin_org, xmax_org, ymax_org)
+        org_h, org_w = original_image.shape[:2]
+        resize_ratio = min(input_size / org_w, input_size / org_h)
 
-        return objects, indexes, scores
+        dw = (input_size - resize_ratio * org_w) / 2
+        dh = (input_size - resize_ratio * org_h) / 2
+
+        pred_coor[:, 0::2] = 1.0 * (pred_coor[:, 0::2] - dw) / resize_ratio
+        pred_coor[:, 1::2] = 1.0 * (pred_coor[:, 1::2] - dh) / resize_ratio
+
+        # 3. clip some boxes those are out of range
+        pred_coor = np.concatenate([np.maximum(pred_coor[:, :2], [0, 0]),
+                                    np.minimum(pred_coor[:, 2:], [org_w - 1, org_h - 1])], axis=-1)
+        invalid_mask = np.logical_or((pred_coor[:, 0] > pred_coor[:, 2]), (pred_coor[:, 1] > pred_coor[:, 3]))
+        pred_coor[invalid_mask] = 0
+
+        # 4. discard some invalid boxes
+        bboxes_scale = np.sqrt(np.multiply.reduce(pred_coor[:, 2:4] - pred_coor[:, 0:2], axis=-1))
+        scale_mask = np.logical_and((valid_scale[0] < bboxes_scale), (bboxes_scale < valid_scale[1]))
+
+        # 5. discard boxes with low scores
+        classes = np.argmax(pred_prob, axis=-1)
+        scores = pred_conf * pred_prob[np.arange(len(pred_coor)), classes]
+        score_mask = scores > score_threshold
+        mask = np.logical_and(scale_mask, score_mask)
+        coors, scores, classes = pred_coor[mask], scores[mask], classes[mask]
+
+        return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
