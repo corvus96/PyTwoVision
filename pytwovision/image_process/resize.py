@@ -1,6 +1,6 @@
 import cv2 as cv
 
-from image_process.frame_decorator import FrameDecorator
+from pytwovision.image_process.frame_decorator import FrameDecorator
 
 class Resize(FrameDecorator):
     """

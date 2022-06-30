@@ -4,10 +4,9 @@ import tensorflow as tf
 import shutil
 import json
 import time
+import cv2 as cv
 
-from tensorflow.keras.utils import plot_model
-
-from recognition.selector import NeuralNetwork
+from pytwovision.recognition.selector import NeuralNetwork
 from pytwovision.models.models_manager import ModelManager
 from pytwovision.models.blocks.backbone_block import BackboneBlock
 from pytwovision.models.blocks.backbone_block import darknet53, darknet19_tiny
@@ -16,6 +15,7 @@ from pytwovision.utils.label_utils import read_class_names
 from pytwovision.image_process.frame_decorator import Frame
 from pytwovision.image_process.resize_with_bbox import ResizeWithBBox
 from pytwovision.datasets_loader.yolov3_dataset_generator import YoloV3DatasetGenerator
+from pytwovision.recognition.detection_mode import DetectionMode
 
 class ObjectDetectorYoloV3(NeuralNetwork):
     """Made of an Yolo network model and a dataset generator.
@@ -23,7 +23,6 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         backbone (class): Contains resnet network which can be version 1 or 2
         data_path (str): beginning by project root this is the path 
                          where is save your dataset; example: "dataset/drinks".
-        train_labels_csv (str): contains the path of train labels csv.
         input_shape: A tuple with dims shape (height, weight, channels). 
         layers (int): Number of feature extraction layers of SSD head after backbone.
         threshold (float): Labels IoU threshold.
@@ -39,22 +38,14 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         ssd (model): SSD network model
         train_generator: Multi-threaded data generator for training
     """
-    def __init__(self, model_name, num_class, data_path, train_labels_csv, input_shape=(416, 416, 3), version="yolov3", training=False, save_dir_path="weights", batch_size=4, threshold=0.6, normalize=False, class_threshold=0.5, iou_threshold=0.2, soft_nms=False, gpu_name=None) -> None:
+    def __init__(self, model_name, num_class, input_shape=[416, 416, 3], version="yolov3", training=False, gpu_name=None):
         super().__init__()
-        self.data_path = data_path
-        self.train_labels_csv = train_labels_csv
-        self.batch_size = batch_size
-        self.normalize = normalize
-        self.threshold = threshold
-        self.save_dir = save_dir_path
-        self.class_threshold = class_threshold
-        self.soft_nms = soft_nms
-        self.iou_threshold = iou_threshold
         self.model = None
-        self.train_generator = None
         self.num_class = num_class
         self.version = version
-        
+        self.model_name = model_name
+        self.input_shape = input_shape
+
         if gpu_name == None:
             self.gpus = tf.config.experimental.list_physical_devices('GPU')
             if len(self.gpus) > 0:
@@ -65,16 +56,14 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         if self.version == "yolov3":
             backbone_net = BackboneBlock(darknet53())
             model_manager = ModelManager()
-            self.conv_tensors = model_manager.build_yolov3(model_name, backbone_net, self.num_class)(input_shape)
-        
-        if self.version == "yolov3_tiny":
+            self.conv_tensors = model_manager.build_yolov3(backbone_net, self.num_class)(np.asarray(self.input_shape))
+        elif self.version == "yolov3_tiny":
             backbone_net = BackboneBlock(darknet19_tiny())
             model_manager = ModelManager()
-            self.conv_tensors = model_manager.build_yolov3_tiny(model_name, backbone_net, self.num_class)(input_shape)
-        
+            self.conv_tensors = model_manager.build_yolov3_tiny(backbone_net, self.num_class)(np.asarray(self.input_shape))
         else: 
             versions = ["yolov3", "yolov3_tiny"]
-            raise ValueError("yolo_version only can be: {}".format(", ".join(versions)))
+            raise ValueError("yolo_version just can be: {}".format(", ".join(versions)))
         
         self.model = self.build_model(self.conv_tensors, training)
     
@@ -89,11 +78,11 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             if self.training: output_tensors.append(conv_tensor)
             output_tensors.append(pred_tensor)
 
-        return tf.keras.Model(input_layer, output_tensors)
-
+        return tf.keras.Model(input_layer, output_tensors, name=self.model_name)
+        
     def train(self, train_annotations_path, test_annotations_path, class_file_name, 
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4):
         """Train an ssd network.
         Arguments:
             epochs (int): Number of epochs to train.
@@ -106,8 +95,8 @@ class ObjectDetectorYoloV3(NeuralNetwork):
 
         if os.path.exists(log_dir): shutil.rmtree(log_dir)
         self.writer = tf.summary.create_file_writer(log_dir)
-        train_set = YoloV3DatasetGenerator(train_annotations_path, class_file_name)
-        test_set = YoloV3DatasetGenerator(test_annotations_path, class_file_name)
+        train_set = YoloV3DatasetGenerator(train_annotations_path, class_file_name, batch_size=batch_size)
+        test_set = YoloV3DatasetGenerator(test_annotations_path, class_file_name, batch_size=batch_size)
 
         steps_per_epoch = len(train_set)
         self.global_steps = tf.Variable(1, trainable=False, dtype=tf.int64)
@@ -193,7 +182,8 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             grid = 3 if not (self.version == "yolov3_tiny") else 2
             for i in range(grid):
                 conv, pred = pred_result[i*2], pred_result[i*2+1]
-                loss_items = compute.loss(pred, conv, *target[i], i, self.num_class)
+                compute.loss(pred, conv, *target[i], i)
+                loss_items = compute.loss(pred, conv, *target[i], i=i, num_class=self.num_class)
                 giou_loss += loss_items[0]
                 conf_loss += loss_items[1]
                 prob_loss += loss_items[2]
@@ -233,7 +223,7 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             grid = 3 if not (self.version == "yolov3_tiny") else 2
             for i in range(grid):
                 conv, pred = pred_result[i*2], pred_result[i*2+1]
-                loss_items = compute.loss(pred, conv, *target[i], i, self.num_class)
+                loss_items = compute.loss(pred, conv, *target[i], i=i, num_class=self.num_class)
                 giou_loss += loss_items[0]
                 conf_loss += loss_items[1]
                 prob_loss += loss_items[2]
@@ -298,17 +288,32 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             assert len(wf.read()) == 0, 'failed to read all data'
 
 
-    def inference(self, image):
+    def inference(self, image_path, input_size=416, score_threshold=0.3, iou_threshold=0.45, nms_method="nms"):
         """ Apply inference with trained model
         Arguments:
-            image (tensor): contains an image converted in tensor.
+            image_path: a path to an image.
+            input_size: integer to resize an input image from their original dimensions to an square image.
+            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
+            iou_threshold: a parameter between (0, 1) which is used for nms algorithm
+            nms_method: a string that can be  'nms' or 'soft-nms'.
+        Returns:
+            An array with bounding boxes
         """
-        image = np.expand_dims(image, axis=0)
-        classes, offsets = self.ssd.predict(image)
-        image = np.squeeze(image, axis=0)
-        classes = np.squeeze(classes)
-        offsets = np.squeeze(offsets)
-        return image, classes, offsets
+        original_image = cv.imread(image_path)
+        original_image = cv.cvtColor(original_image, cv.COLOR_BGR2RGB)
+        original_image = cv.cvtColor(original_image, cv.COLOR_BGR2RGB)
+        frame = Frame(np.copy(original_image))
+        image_data = ResizeWithBBox(frame).apply([input_size, input_size])
+        image_data = image_data[np.newaxis, ...].astype(np.float32)
+        pred_bbox = self.model.predict(image_data)
+
+        pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+        pred_bbox = tf.concat(pred_bbox, axis=0)
+        compute = YoloV3Calculus()
+        bboxes = compute.postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
+        bboxes = compute.nms(bboxes, iou_threshold, method=nms_method)
+
+        return bboxes
 
 
     def evaluate(self, model, dataset, classes_file, score_threshold=0.05, iou_threshold=0.50, test_input_size=416):
@@ -359,6 +364,7 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         gt_classes = sorted(gt_classes)
         n_classes = len(gt_classes)
 
+        compute = YoloV3Calculus()
         times = []
         json_pred = [[] for i in range(n_classes)]
         for index in range(dataset.num_samples):
@@ -379,8 +385,8 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             
             pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
             pred_bbox = tf.concat(pred_bbox, axis=0)
-            bboxes = YoloV3Calculus().postprocess_boxes(pred_bbox, original_image, test_input_size, score_threshold)
-            bboxes = YoloV3Calculus().nms(bboxes, iou_threshold, method='nms')
+            bboxes = compute.postprocess_boxes(pred_bbox, original_image, test_input_size, score_threshold)
+            bboxes = compute.nms(bboxes, iou_threshold, method='nms')
 
             for bbox in bboxes:
                 coor = np.array(bbox[:4], dtype=np.int32)
@@ -549,6 +555,8 @@ class ObjectDetectorYoloV3(NeuralNetwork):
 
     def print_summary(self):
         """Print network summary for debugging purposes."""
+        from tensorflow.keras.utils import plot_model
+        
         self.backbone.summary()
         self.model.summary()
         plot_model(self.backbone,

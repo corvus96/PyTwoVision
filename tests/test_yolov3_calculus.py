@@ -1,25 +1,31 @@
+
 import unittest
 import numpy as np
+import tensorflow as tf
 
 from pytwovision.compute.yolov3_calculus import YoloV3Calculus
+from pytwovision.models.models_manager import ModelManager
+from pytwovision.models.blocks.backbone_block import BackboneBlock
+from pytwovision.models.blocks.backbone_block import darknet53
 
 class TestYoloV3Calculus(unittest.TestCase):
     def setUp(self):
         self.compute = YoloV3Calculus()
-    
-    def test_anchor_sizes_returned_type_is_list(self):
+        self.input_data = np.random.randint(0, 255, size=(416, 416, 3))
+        self.box1 = np.array([[15, 66, 122, 70]])
+        self.box2 = np.array([[20, 60, 22, 78]])
 
-        self.assertEqual(type(self.compute.anchor_sizes()), list)
-
-    def test_anchor_sizes_dimensions(self):
-        # test case n_layers = 10
-        anchors = self.compute.anchor_sizes(10)
-        anchors = np.array(anchors)
-        self.assertEqual(anchors.shape, (10, 2))
-        # test case n_layers = 4
-        anchors = self.compute.anchor_sizes()
-        anchors = np.array(anchors)
-        self.assertEqual(anchors.shape, (4, 2))
+    def test_decode_minimal_output_size(self):
+        training = True
+        backbone_net = BackboneBlock(darknet53())
+        model_manager = ModelManager()
+        conv_tensors = model_manager.build_yolov3(backbone_net, 20)(self.input_data.shape)
+        input_layer = conv_tensors[-1]
+        output_tensors = []
+        for i, conv_tensor in enumerate(conv_tensors[:-1]):
+            pred_tensor = self.compute.decode(conv_tensor, 20, i)
+        
+        self.assertEqual((pred_tensor.shape[0], pred_tensor.shape[1], pred_tensor.shape[2], pred_tensor.shape[3], pred_tensor.shape[4]), (None, 13, 13, 3, 25))
     
     def test_centroid2minmax_and_minmax2centroid(self):
         # create random boxes (cx, cy, w, h)
@@ -27,82 +33,55 @@ class TestYoloV3Calculus(unittest.TestCase):
         np.random.seed(2021)
         boxes = np.random.rand(2, 2, 1, 4)*scaling_factor
         boxes = boxes.astype(int)
-        # convert boxes from (cx, cy, w, h) format to (xmin, xmax, ymin, ymax) format and reverse
+        # convert boxes from (cx, cy, w, h) format to (xmin, ymin, xmax, ymax) format and reverse
         minmax = self.compute.centroid2minmax(boxes)
-        expected_minmax =   np.array([[16, 20, 17.5, 26.5], 
-                            [26.5, 31.5, -8, 14], 
-                            [18, 20, 22.5, 23.5], 
-                            [27, 29, 10, 26]])
+        expected_minmax =   np.array([[16, 17.5, 20, 26.5], 
+                            [26.5, -8, 31.5, 14], 
+                            [18, 22.5, 20, 23.5], 
+                            [27, 10, 29, 26]])
         # Reshape values equal to input array
         expected_minmax = expected_minmax.reshape(boxes.shape)
         self.assertEqual(np.alltrue(expected_minmax == minmax), True)
         centroid = self.compute.minmax2centroid(minmax)
         self.assertEqual(np.alltrue(boxes == centroid), True)
     
-    def test_not_intersection(self):
-        scaling_factor = 30
-        np.random.seed(2021)
-        box1 = np.random.rand(1,4)*scaling_factor
-        np.random.seed(2022)
-        box2 = np.random.rand(1,4)*scaling_factor
-        intersection_area = self.compute.intersection(box1, box2)
-        self.assertEqual(intersection_area[0][0], 0)
+    def test_best_bbox_iou(self):
+        xmin = 0
+        ymin = 1
+        xmax = 2
+        ymax = 3
+
+        box1_area = (self.box1[0, xmax] - self.box1[0, xmin]) * (self.box1[0, ymax] - self.box1[0, ymin])
+        box2_area = (self.box2[0, xmax] - self.box2[0, xmin]) * (self.box2[0, ymax] - self.box2[0, ymin])
+
+        left_up = np.maximum(self.box1[0, :2], self.box2[0, :2])
+        right_down = np.minimum(self.box1[0, 2:], self.box2[0, 2:])
+        
+        inter_section = np.maximum(right_down - left_up, 0.0)
+        inter_area = inter_section[..., 0] * inter_section[..., 1]
+        union_area = box1_area + box2_area - inter_area
+
+        iou = 1.0 * inter_area / union_area
+
+        self.assertEqual(self.compute.best_bboxes_iou(self.box1, self.box2),  tf.constant([iou]))
     
-    def test_bbox_iuo_vs_iuo(self):
+    def test_giou_vs_ciou_vs_iou(self):
         # scaling_factor = 30
         # np.random.seed(2021)
         # box1 = np.random.rand(1,4)*scaling_factor
         # np.random.seed(1)
         # box2 = np.random.rand(1,4)*scaling_factor
-        box1 = np.array([[15, 18, 10, 70]])
-        box2 = np.array([[20, 60, 10, 70]])
-        iou = self.compute.iou(box1, box2)
-        self.assertEqual(iou, np.array(self.compute.bbox_iou(box1, box2)))
-    
-    def test_intersection_area(self):
-        box1 = np.array([[20, 60, 10, 70]])
-        box2 = np.array([[10, 30, 40, 100]])
-        intersection_area = self.compute.intersection(box1, box2)
-        self.assertEqual(intersection_area[0][0], 300)
-    
-    def test_union_without_intersection(self):
-        scaling_factor = 30
-        np.random.seed(2021)
-        xmin = 0
-        xmax = 1
-        ymin = 2
-        ymax = 3
-        box1 = np.random.rand(1,4)*scaling_factor
-        box1_area = (box1[:, xmax] - box1[:, xmin]) * (box1[:, ymax] - box1[:, ymin])
-        np.random.seed(2010)
-        box2 = np.random.rand(1,4)*scaling_factor
-        box2_area = (box2[:, xmax] - box2[:, xmin]) * (box2[:, ymax] - box2[:, ymin])
-        intersection_area = self.compute.intersection(box1, box2)
-        union_area = self.compute.union(box1, box2, intersection_area)
-        self.assertEqual(union_area, box1_area + box2_area)
-    
-    def test_union_with_intersection(self):
-        xmin = 0
-        xmax = 1
-        ymin = 2
-        ymax = 3
-        box1 = np.array([[20, 60, 10, 70]])
-        box1_area = (box1[:, xmax] - box1[:, xmin]) * (box1[:, ymax] - box1[:, ymin])
-        box2 = np.array([[10, 30, 40, 100]])
-        box2_area = (box2[:, xmax] - box2[:, xmin]) * (box2[:, ymax] - box2[:, ymin])
-        intersection_area = self.compute.intersection(box1, box2)
-        union_area = self.compute.union(box1, box2, intersection_area)
-        self.assertEqual(union_area, box1_area + box2_area - intersection_area)
-    
-    def test_iou_better_choice(self):
-        box1 = np.array([[20, 60, 10, 70]])
-        box2 = np.array([[10, 30, 40, 100]])
-        iou_a = self.compute.iou(box1, box2)
-        # Better choice
-        iou_b = self.compute.iou(box1, box1)
-        self.assertGreater(iou_b, iou_a)
-
+        giou = self.compute.bbox_giou(self.box1, self.box2)
+        ciou = self.compute.bbox_ciou(self.box1, self.box2)
+        iou = self.compute.bbox_iou(self.box1, self.box2)
+        best_iou = self.compute.best_bboxes_iou(self.box1, self.box2)
         
-
+        #test giou vs ciou
+        self.assertGreater(tf.abs(best_iou - ciou), tf.abs(best_iou - giou))
+        #test giou vs iou
+        self.assertGreater(tf.abs(best_iou - iou), tf.abs(best_iou - giou))
+        #test ciou vs iou
+        self.assertGreater(tf.abs(best_iou - iou), tf.abs(best_iou - ciou))
+        
 if __name__ == '__main__':
     unittest.main()

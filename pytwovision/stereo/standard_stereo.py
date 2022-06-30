@@ -11,7 +11,7 @@ from stereo.stereo_builder import StereoController
 from stereo.match_method import Matcher
 from stereo.match_method import StereoSGBM
 from input_output.camera import Camera
-from utils.draw import drawlines
+from utils.draw import draw_lines
 from compute.error_compute import re_projection_error
 from image_process.frame_decorator import Frame
 from image_process.resize import Resize
@@ -398,12 +398,12 @@ class StandardStereoBuilder(StereoSystemBuilder):
         # drawing its lines on left image
         lines1 = cv.computeCorrespondEpilines(pts2.reshape(-1,1,2), 2,F)
         lines1 = lines1.reshape(-1,3)
-        img5, _ = drawlines(frameL, frameR,lines1,pts1,pts2)
+        img5, _ = draw_lines(frameL, frameR,lines1,pts1,pts2)
         # Find epilines corresponding to points in left image (first image) and
         # drawing its lines on right image
         lines2 = cv.computeCorrespondEpilines(pts1.reshape(-1,1,2), 1,F)
         lines2 = lines2.reshape(-1,3)
-        img3, _ = drawlines(frameR, frameL,lines2,pts2,pts1)
+        img3, _ = draw_lines(frameR, frameL,lines2,pts2,pts1)
         return img5, img3
 
     def match(self, frameL, frameR, matcher: Matcher, metrics=True):

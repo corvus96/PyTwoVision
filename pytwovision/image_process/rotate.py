@@ -1,5 +1,5 @@
-import cv2 as cv
-from image_process.frame_decorator import FrameDecorator, Frame
+import  as cv
+from pytwovision.image_process.frame_decorator import FrameDecorator, Frame
 class Rotate(FrameDecorator):
     """
     Concrete Decorators call the wrapped object and alter its result in some

@@ -23,7 +23,7 @@ class XmlParser(Parser):
     that it calls the annotationsFormat's method corresponding to the Parser's class.
     """
 
-    def parse(self, anno: AnnotationsFormat, xml_path, annotations_output_name, classes_output_name, work_dir=None):
+    def parse(self, anno: AnnotationsFormat, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None):
         """
         This method convert annotations  from COCO or PASCAL VOC dataset in xml format
          to be compatible with an especific network model. Exporting a 
@@ -32,11 +32,12 @@ class XmlParser(Parser):
             xml_path: a string with the full path of xml annotations.
             annotations_output_name: a string with the name of annotations file that will be generated.
             classes_output_name: a string with the name of classes file that will be generated.
+            image_path: a full path where the images are saved.
             work_dir: a path where the annotations and classes files will be saved, if is None these will be 
             saved in current directory.
         """
 
-        anno.visit_xml_parser(self, xml_path, annotations_output_name, classes_output_name, work_dir)
+        anno.visit_xml_parser(self, xml_path, annotations_output_name, classes_output_name, image_path, work_dir)
 
 class AnnotationsFormat(ABC):
     """
@@ -46,11 +47,12 @@ class AnnotationsFormat(ABC):
     """
 
     @abstractmethod
-    def visit_xml_parser(self, element: XmlParser, xml_path, annotations_output_name, classes_output_name, work_dir=None):
+    def visit_xml_parser(self, element: XmlParser, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None):
         pass
 
 class YoloV3AnnotationsFormat(AnnotationsFormat):
-    def visit_xml_parser(self, element ,xml_path, annotations_output_name, classes_output_name, work_dir=None):
+    """Get a group of xml annotations to transform in a .txt file compatible with YoloV3 dataset"""
+    def visit_xml_parser(self, element ,xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None):
         xmls = glob.glob(xml_path+'/*.xml')
         if len(xmls) == 0:
             raise FileNotFoundError("There isn't annotations in {}".format(xml_path))
@@ -68,7 +70,7 @@ class YoloV3AnnotationsFormat(AnnotationsFormat):
                 tree = ET.parse(open(xml_file))
                 root = tree.getroot()
                 image_name = root.find('filename').text
-                img_path = xml_path + '/' + image_name
+                img_path = image_path + '/' + image_name
                 for i, obj in enumerate(root.iter('object')):
                     cls = obj.find('name').text
                     if cls not in classes_names:

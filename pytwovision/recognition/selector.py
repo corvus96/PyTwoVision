@@ -4,13 +4,16 @@ from abc import ABC, abstractmethod
 
 class Recognizer:
     """
-    The Abstraction defines the interface for the "control" part of the two
-    class hierarchies. It maintains a reference to an object of the
-    Implementation hierarchy and delegates all of the real work to this object.
+    An Abstraction that expects an implementation of a detector like:
+    'ObjectDetectorYoloV3'.
     """
 
     def __init__(self, neural_network: NeuralNetwork):
         self.implementation = neural_network
+
+    def get_model(self):
+        """Returns a tensorflow model with an implemented network"""
+        return self.implementation.model
 
     def train(self, epochs=200,  loss_function="l1"):
         """Train an ssd network.

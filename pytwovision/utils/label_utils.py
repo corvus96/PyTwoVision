@@ -77,7 +77,7 @@ def class_text_to_int(row_label, label_map_dict: dict):
     return label_map_dict[row_label]
 
 def read_class_names(class_file_name):
-    # loads class name from a file
+    """loads class name from a file to a dict"""
     names = {}
     with open(class_file_name, 'r') as data:
         for ID, name in enumerate(data):

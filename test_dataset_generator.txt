@@ -1,0 +1,4 @@
+aeroplane
+tvmonitor
+person
+train

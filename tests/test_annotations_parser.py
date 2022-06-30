@@ -10,14 +10,14 @@ class TestAnnotationsParser(unittest.TestCase):
         self.xml_path = "tests/test_dataset/annotations"
         self.classes_out_file = "test_classes"
         self.work_dir = "tests"
-
+        self.images_path = "tests/test_dataset/images"
     def test_no_xml_annotations(self):
         parser = XmlParser()
         anno_format = YoloV3AnnotationsFormat()
         xml_path = "bad_path"
         no_file_check = False
         try:
-            parser.parse(anno_format, xml_path, self.anno_out_file, self.classes_out_file, self.work_dir)
+            parser.parse(anno_format, xml_path, self.anno_out_file, self.classes_out_file, self.images_path, self.work_dir)
         except FileNotFoundError:
             no_file_check = True
         
@@ -27,7 +27,7 @@ class TestAnnotationsParser(unittest.TestCase):
     def test_xml_parser_output_files(self):
         parser = XmlParser()
         anno_format = YoloV3AnnotationsFormat()
-        parser.parse(anno_format, self.xml_path, self.anno_out_file, self.classes_out_file, self.work_dir)
+        parser.parse(anno_format, self.xml_path, self.anno_out_file, self.classes_out_file, self.images_path, self.work_dir)
         
         cls_file = os.path.exists(os.path.join(self.work_dir, self.classes_out_file + ".txt"))
         anno_file = os.path.exists(os.path.join(self.work_dir, self.anno_out_file + ".txt"))

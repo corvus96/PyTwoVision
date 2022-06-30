@@ -93,7 +93,7 @@ class YoloV3DatasetGenerator(object):
     
     def __next__(self):
         with tf.device('/cpu:0'):
-            self.train_input_size = random.choice([self.train_input_sizes])
+            self.train_input_size = random.choice([self.input_sizes])
             self.train_output_sizes = self.train_input_size // self.strides
 
             batch_image = np.zeros((self.batch_size, self.train_input_size, self.train_input_size, 3), dtype=np.float32)
@@ -224,7 +224,7 @@ class YoloV3DatasetGenerator(object):
                            5 + self.num_classes)) for i in range(3)]
         bboxes_xywh = [np.zeros((self.max_bbox_per_scale, 4)) for _ in range(3)]
         bbox_count = np.zeros((3,))
-
+        compute = YoloV3Calculus()
         for bbox in bboxes:
             bbox_coor = bbox[:4]
             bbox_class_ind = bbox[4]
@@ -245,7 +245,7 @@ class YoloV3DatasetGenerator(object):
                 anchors_xywh[:, 0:2] = np.floor(bbox_xywh_scaled[i, 0:2]).astype(np.int32) + 0.5
                 anchors_xywh[:, 2:4] = self.anchors[i]
                 
-                compute = YoloV3Calculus()
+                
                 iou_scale = compute.bbox_iou(bbox_xywh_scaled[i][np.newaxis, :], anchors_xywh)
                 iou.append(iou_scale)
                 iou_mask = iou_scale > 0.3

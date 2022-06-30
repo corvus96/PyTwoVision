@@ -30,7 +30,8 @@ class BuildYoloV3(tf.keras.Model):
                                     (3, 3, 128, 256), (1, 1, 256, 128)]
         
     def call(self, input_shape):
-        input_shape = Input([input_shape.shape[0], input_shape.shape[1], input_shape.shape[2]])
+        if len(input_shape) != 3: raise ValueError("input shape should have a len == 3")
+        input_shape = Input([input_shape[0], input_shape[1], input_shape[2]])
         try:
             route_1, route_2, x = self.base_outputs.build_model(input_shape)
         except ValueError:
