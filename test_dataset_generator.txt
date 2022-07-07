@@ -1,4 +1,0 @@
-aeroplane
-tvmonitor
-person
-train

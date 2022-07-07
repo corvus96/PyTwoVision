@@ -337,7 +337,7 @@ class YoloV3Calculus:
 
         return best_bboxes
 
-    def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
+    def postprocess_boxes(self, pred_bbox, original_image, input_size, score_threshold):
         """
         Improve predicted bounding boxes
         Arguments:

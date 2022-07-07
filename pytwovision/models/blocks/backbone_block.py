@@ -15,8 +15,8 @@ from tensorflow.keras.layers import Add
 from tensorflow.keras.layers import MaxPool2D
 from tensorflow.keras.models import Model
 
-from pytwovision.models.layers.conv2d_bn_leaky_relu_layer import Conv2dBNLeakyReluLayer
-from pytwovision.models.layers.residual_layer import ResidualLayer
+from pytwovision.models.layers.conv2d_bn_leaky_relu_layer import conv2d_bn_leaky_relu_layer
+from pytwovision.models.layers.residual_layer import residual_layer
 
 class BackboneStrategy(ABC):
     """
@@ -81,33 +81,33 @@ class darknet53(BackboneStrategy):
         Arguments: 
             x: an input tensor that can be an image
         """
-        x = Conv2dBNLeakyReluLayer((3, 3,  3,  32))(x)
-        x = Conv2dBNLeakyReluLayer((3, 3, 32,  64), down_sample=True)(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3,  3,  32))
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3, 32,  64), downsample=True)
 
         for i in range(1):
-            x = ResidualLayer(64,  32, 64)(x)
+            x = residual_layer(x, 64,  32, 64)
 
-        x = Conv2dBNLeakyReluLayer((3, 3,  64, 128), down_sample=True)(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3,  64, 128), downsample=True)
 
         for i in range(2):
-            x = ResidualLayer(128,  64, 128)(x)
+            x = residual_layer(x, 128,  64, 128)
 
-        x = Conv2dBNLeakyReluLayer((3, 3, 128, 256), down_sample=True)(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3, 128, 256), downsample=True)
 
         for i in range(8):
-            x = ResidualLayer(256, 128, 256)(x)
+            x = residual_layer(x, 256, 128, 256)
 
         route_1 = x
-        x = Conv2dBNLeakyReluLayer((3, 3, 256, 512), down_sample=True)(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3, 256, 512), downsample=True)
 
         for i in range(8):
-            x = ResidualLayer(512, 256, 512)(x)
+            x = residual_layer(x, 512, 256, 512)
 
         route_2 = x
-        x = Conv2dBNLeakyReluLayer((3, 3, 512, 1024), down_sample=True)(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3, 512, 1024), downsample=True)
 
         for i in range(4):
-            x = ResidualLayer(1024, 512, 1024)(x)
+            x = residual_layer(x, 1024, 512, 1024)
 
         return route_1, route_2, x
 
@@ -119,16 +119,16 @@ class darknet19_tiny(BackboneStrategy):
         """
         filters_shapes = [(3, 3, 3, 16), (3, 3, 16, 32), (3, 3, 32, 64), (3, 3, 64, 128), (3, 3, 128, 256)]
         for i, filter_shape in enumerate(filters_shapes):
-            x = Conv2dBNLeakyReluLayer(filter_shape)(x)
+            x = conv2d_bn_leaky_relu_layer(x, filter_shape)
             if i < 4:
                 x = MaxPool2D(2, 2, 'same')(x)
         
         route_1 = x
 
         x = MaxPool2D(2, 2, 'same')(x)
-        x = Conv2dBNLeakyReluLayer((3, 3, 256, 512))(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3, 256, 512))
         x = MaxPool2D(2, 1, 'same')(x)
-        x = Conv2dBNLeakyReluLayer((3, 3, 512, 1024))(x)
+        x = conv2d_bn_leaky_relu_layer(x, (3, 3, 512, 1024))
 
         return route_1, x
         

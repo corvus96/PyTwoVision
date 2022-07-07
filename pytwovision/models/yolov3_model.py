@@ -2,7 +2,7 @@ import tensorflow as tf
 
 from tensorflow.keras import Input 
 
-from pytwovision.models.layers.conv2d_bn_leaky_relu_layer import Conv2dBNLeakyReluLayer
+from pytwovision.models.layers.conv2d_bn_leaky_relu_layer import conv2d_bn_leaky_relu_layer
 from pytwovision.models.layers.upsample_layer import UpsampleLayer
 
 
@@ -38,35 +38,35 @@ class BuildYoloV3(tf.keras.Model):
             raise Exception('Backbone output shape mismatch with yolov3 input shape')
 
         for n, filters in enumerate(self.first_stack_filters):
-            x = Conv2dBNLeakyReluLayer(filters)(x)
+            x = conv2d_bn_leaky_relu_layer(x, filters)
         
-        conv_lobj_branch = Conv2dBNLeakyReluLayer((3, 3, 512, 1024))(x)
+        conv_lobj_branch = conv2d_bn_leaky_relu_layer(x, (3, 3, 512, 1024))
         # conv_lbbox is used to predict large-sized objects , Shape = [None, 13, 13, 255] (if num_class == 80 like coco dataset) 
-        conv_lbbox = Conv2dBNLeakyReluLayer((1, 1, 1024, 3*(self.num_class + 5)), activate=False, bn=False)(conv_lobj_branch)
+        conv_lbbox = conv2d_bn_leaky_relu_layer(conv_lobj_branch, (1, 1, 1024, 3*(self.num_class + 5)), activate=False, bn=False)
         
-        x = Conv2dBNLeakyReluLayer((1, 1,  512,  256))(x)
+        x = conv2d_bn_leaky_relu_layer(x, (1, 1,  512,  256))
         # upsample here uses the nearest neighbor interpolation method, which has the advantage that the
         # upsampling process does not need to learn, thereby reducing the network parameter  
         x = UpsampleLayer()(x)
         x = tf.concat([x, route_2], axis=-1)
 
         for n, filters in enumerate(self.second_stack_filters):
-            x = Conv2dBNLeakyReluLayer(filters)(x)
+            x = conv2d_bn_leaky_relu_layer(x, filters)
 
-        conv_mobj_branch = Conv2dBNLeakyReluLayer((3, 3, 256, 512))(x)
+        conv_mobj_branch = conv2d_bn_leaky_relu_layer(x, (3, 3, 256, 512))
         # conv_mbbox is used to predict medium-sized objects, shape = [None, 26, 26, 255] (if num_class == 80 like coco dataset) 
-        conv_mbbox = Conv2dBNLeakyReluLayer((1, 1, 512, 3*(self.num_class + 5)), activate=False, bn=False)(conv_mobj_branch)
+        conv_mbbox = conv2d_bn_leaky_relu_layer(conv_mobj_branch, (1, 1, 512, 3*(self.num_class + 5)), activate=False, bn=False)
         
-        x = Conv2dBNLeakyReluLayer((1, 1, 256, 128))(x)
+        x = conv2d_bn_leaky_relu_layer(x, (1, 1, 256, 128))
         x = UpsampleLayer()(x)
         x = tf.concat([x, route_1], axis=-1)
 
         for n, filters in enumerate(self.third_stack_filters):
-            x = Conv2dBNLeakyReluLayer(filters)(x)
+            x = conv2d_bn_leaky_relu_layer(x, filters)
         
-        conv_sobj_branch = Conv2dBNLeakyReluLayer((3, 3, 128, 256))(x)
+        conv_sobj_branch = conv2d_bn_leaky_relu_layer(x, (3, 3, 128, 256))
         # conv_sbbox is used to predict small size objects, shape = [None, 52, 52, 255] (if num_class == 80 like coco dataset) 
-        conv_sbbox = Conv2dBNLeakyReluLayer((1, 1, 256, 3*(self.num_class +5)), activate=False, bn=False)(conv_sobj_branch)
+        conv_sbbox = conv2d_bn_leaky_relu_layer(conv_sobj_branch, (1, 1, 256, 3*(self.num_class +5)), activate=False, bn=False)
 
         return [conv_sbbox, conv_mbbox, conv_lbbox, input_shape]
 

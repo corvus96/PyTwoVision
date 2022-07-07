@@ -2,15 +2,14 @@ import unittest
 import numpy as np
 import tensorflow as tf
 
-from pytwovision.models.layers.residual_layer import ResidualLayer
+from pytwovision.models.layers.residual_layer import residual_layer
 
 class TestResidualLayer(unittest.TestCase):
         def test_layer_output(self):
             output_depth = 48
-            layer = ResidualLayer(32, 24, output_depth)
             np.random.seed(2021)
             test_array = np.random.rand(1, 4, 4, 1)
-            output = layer(test_array)
+            output = residual_layer(test_array, 32, 24, output_depth)
 
             self.assertEqual(output.shape, (1, 4, 4, output_depth))
 
