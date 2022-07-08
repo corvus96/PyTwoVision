@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 
-from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat, annotations
+from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
 from pytwovision.utils.annotations_helper import AnnotationsHelper
 
 class TestAnnotationsParser(unittest.TestCase):
@@ -30,7 +30,9 @@ class TestAnnotationsParser(unittest.TestCase):
         anno_helper = AnnotationsHelper(anno_out_full_path)
 
         for training_pe in training_percentages:
-            train, test = anno_helper.split(self.work_dir, training_pe)
+            train, test = anno_helper.split(training_pe)
+            anno_helper.export(train, os.path.join(self.work_dir, "train.txt"))
+            anno_helper.export(test, os.path.join(self.work_dir, "test.txt"))
             self.assertEqual(len(train), int(len(anno_helper.annotations)*training_pe))
 
             

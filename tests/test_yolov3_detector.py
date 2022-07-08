@@ -41,9 +41,11 @@ class TestObjectDetectorYoloV3(unittest.TestCase):
     def test_train_yolov3(self):
         yolov3 = ObjectDetectorYoloV3("test", len(read_class_names(self.classes_full_path)), training=True)
         anno_helper = AnnotationsHelper(self.anno_out_full_path)
-        anno_helper.split(self.work_dir, 0.5)
+        train_set, test_set = anno_helper.split(0.5)
         train_dataset_path = os.path.join(self.work_dir, "train.txt")
         test_dataset_path = os.path.join(self.work_dir, "test.txt")
+        anno_helper.export(train_set, train_dataset_path)
+        anno_helper.export(test_set, test_dataset_path)
         could_train = True
         try:
             yolov3.train(train_dataset_path, test_dataset_path, self.classes_full_path, epochs=1, batch_size=1, checkpoint_path=os.path.join(self.work_dir, "checkpoints"), log_dir=os.path.join(self.work_dir, "logs"))
@@ -54,9 +56,11 @@ class TestObjectDetectorYoloV3(unittest.TestCase):
     def test_train_yolov3_tiny(self):
         yolov3_tiny = ObjectDetectorYoloV3("test", len(read_class_names(self.classes_full_path)), training=True)
         anno_helper = AnnotationsHelper(self.anno_out_full_path)
-        anno_helper.split(self.work_dir, 0.5)
+        train_set, test_set =anno_helper.split(0.5)
         train_dataset_path = os.path.join(self.work_dir, "train.txt")
         test_dataset_path = os.path.join(self.work_dir, "test.txt")
+        anno_helper.export(train_set, train_dataset_path)
+        anno_helper.export(test_set, test_dataset_path)
         could_train = True
         try:
             yolov3_tiny.train(train_dataset_path, test_dataset_path, self.classes_full_path, epochs=1, batch_size=1, checkpoint_path=os.path.join(self.work_dir, "checkpoints"), log_dir=os.path.join(self.work_dir, "logs"))
@@ -131,8 +135,9 @@ class TestObjectDetectorYoloV3(unittest.TestCase):
     def test_evaluate(self):
         yolov3 = ObjectDetectorYoloV3("test", len(read_class_names(self.classes_full_path)))
         anno_helper = AnnotationsHelper(self.anno_out_full_path)
-        anno_helper.split(self.work_dir, 0.2)
+        _, test_set = anno_helper.split(0.2)
         test_dataset_path = os.path.join(self.work_dir, "test.txt")
+        anno_helper.export(test_set, test_dataset_path)
         test_set = YoloV3DatasetGenerator(test_dataset_path, self.classes_full_path)
         evaluation = yolov3.evaluate(yolov3.model, test_set, self.classes_full_path)
         self.assertTrue(True if evaluation >= 0 and evaluation <= 100 else False)
