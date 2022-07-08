@@ -1,9 +1,10 @@
+from __future__ import annotations
+from abc import ABC, abstractmethod
+
 import re
 import wget
 import os
 
-from __future__ import annotations
-from abc import ABC, abstractmethod
 
 
 class Recognizer:

@@ -1,7 +1,7 @@
-import cv2 as cv
-
 from __future__ import annotations
 from abc import ABC, abstractmethod
+
+import cv2 as cv
 
 
 class Matcher():

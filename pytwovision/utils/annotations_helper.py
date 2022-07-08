@@ -15,7 +15,7 @@ class AnnotationsHelper:
         self.annotations = temp_data.sample(frac=1)
         self.annotations = self.annotations.values.tolist()
     
-    def split(self, work_dir, train_percentage=0.8, random_state=25, export=True):
+    def split(self, work_dir, train_percentage=0.8, random_state=25, export=True, train_name="train", test_name="test"):
         """
         Arguments:
             train_percentage: a float between (0, 1) that corresponds with train data proportion.
@@ -28,11 +28,11 @@ class AnnotationsHelper:
         test_data = data.drop(train_data.index)
         if export:
             if train_data.shape[0] != 0:
-                train_data.to_csv(os.path.join(work_dir, "train.txt"), header=None, index=None, sep='\t')
+                train_data.to_csv(os.path.join(work_dir, "{}.txt".format(train_name)), header=None, index=None, sep='\t')
             else:
                 print("train data len is 0")
             if test_data.shape[0] != 0:
-                test_data.to_csv(os.path.join(work_dir, "test.txt"), header=None, index=None, sep='\t')
+                test_data.to_csv(os.path.join(work_dir, "{}.txt".format(test_name)), header=None, index=None, sep='\t')
             else:
                 print("test data len is 0")
 
