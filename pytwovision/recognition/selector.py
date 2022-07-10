@@ -47,7 +47,7 @@ class Recognizer:
 
     def train_using_weights(self, train_annotations_path, test_annotations_path, class_file_name, weights_path,
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6):
         """Train with transfer learning
         Arguments:
             Arguments:
@@ -69,6 +69,8 @@ class Recognizer:
             will be saved always.
             save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
             batch_size: an integer with the size of batches in test and train datasets.
+            lr_init: a float which is initial learning rate.
+            lr_end: a float which is final learning rate.
         """
         regex = '((http|https)://)(www.)?' + '[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]' + '{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)'
         regular_exp = re.compile(regex)
@@ -78,11 +80,11 @@ class Recognizer:
         # restore weights
         self.implementation.restore_weights(weights_path)
         # train with a pre-trained net
-        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size)
+        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size, lr_init, lr_end)
 
     def train(self, train_annotations_path, test_annotations_path, class_file_name, 
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6):
         """Train an ssd network.
         Arguments:
             train_annotations_path: a string corresponding to the folder where train annotations are located.
@@ -99,8 +101,10 @@ class Recognizer:
             will be saved always.
             save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
             batch_size: an integer with the size of batches in test and train datasets.
+            lr_init: a float which is initial learning rate.
+            lr_end: a float which is final learning rate.
         """
-        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size)
+        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size, lr_init, lr_end)
     
     def evaluate(self, model, dataset, classes_file, score_threshold=0.05, iou_threshold=0.50, test_input_size=416):
         """Apply evaluation using mAP

@@ -89,7 +89,7 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         
     def train(self, train_annotations_path, test_annotations_path, class_file_name, 
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6):
         """Train an yolov3 network or yolov3 tiny.
         Arguments:
             train_annotations_path: a string corresponding to the folder where train annotations are located.
@@ -106,6 +106,8 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             will be saved always.
             save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
             batch_size: an integer with the size of batches in test and train datasets.
+            lr_init: a float which is initial learning rate
+            lr_end: a float which is final learning rate
         """
         training = True
         if self.training == False:
@@ -145,7 +147,7 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         best_val_loss = 1000 # should be large at start
         for epoch in range(epochs):
             for image_data, target in train_set:
-                results = self.train_step(image_data, target, optimizer)
+                results = self.train_step(image_data, target, optimizer, lr_init, lr_end)
                 cur_step = results[0]%steps_per_epoch
                 print("epoch:{:2.0f} step:{:5.0f}/{}, lr:{:.6f}, giou_loss:{:7.2f}, conf_loss:{:7.2f}, prob_loss:{:7.2f}, total_loss:{:7.2f}"
                     .format(epoch, cur_step, steps_per_epoch, results[1], results[2], results[3], results[4], results[5]))
@@ -175,7 +177,7 @@ class ObjectDetectorYoloV3(NeuralNetwork):
                 format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
 
             if save_all_checkpoints and not save_only_best_model:
-                save_directory = os.path.join(checkpoint_folder, self.model._name+"_val_loss_{:7.2f}".format(total_val/count))
+                save_directory = os.path.join(checkpoint_folder, self.model._name+"_val_loss_{:7.2f}_epoch_{}.ckpt".format(total_val/count, epoch))
                 self.model.save_weights(save_directory)
             if save_only_best_model and best_val_loss>total_val/count:
                 save_directory = os.path.join(checkpoint_folder, self.model._name)

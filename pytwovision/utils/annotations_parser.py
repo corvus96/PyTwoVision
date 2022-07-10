@@ -52,7 +52,7 @@ class AnnotationsFormat(ABC):
 
 class YoloV3AnnotationsFormat(AnnotationsFormat):
     """Get a group of xml annotations to transform in a .txt file compatible with YoloV3 dataset"""
-    def visit_xml_parser(self, element ,xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None):
+    def visit_xml_parser(self, element ,xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None, print_output=False):
         xmls = glob.glob(xml_path+'/*.xml')
         if len(xmls) == 0:
             raise FileNotFoundError("There isn't annotations in {}".format(xml_path))
@@ -83,7 +83,8 @@ class YoloV3AnnotationsFormat(AnnotationsFormat):
                             +str(int(float(xmlbox.find('ymax').text)))+','
                             +str(cls_id))
                     img_path += ' '+object_params
-                print(img_path)
+                if print_output:
+                    print(img_path)
                 file.write(img_path+'\n')
         
         with open('{}.txt'.format(classes_file), 'w') as file:

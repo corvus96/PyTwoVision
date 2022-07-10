@@ -4,3 +4,5 @@ opencv-contrib-python == 4.5.5.64
 wget == 3.2
 pandas
 wget
+pyyaml 
+h5py
