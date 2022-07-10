@@ -180,11 +180,11 @@ class ObjectDetectorYoloV3(NeuralNetwork):
                 save_directory = os.path.join(checkpoint_folder, self.model._name+"_val_loss_{:7.2f}_epoch_{}.ckpt".format(total_val/count, epoch))
                 self.model.save_weights(save_directory)
             if save_only_best_model and best_val_loss>total_val/count:
-                save_directory = os.path.join(checkpoint_folder, self.model._name)
+                save_directory = os.path.join(checkpoint_folder, self.model._name+"best_val_loss_{:7.2f}_epoch_{}.ckpt".format(total_val/count, epoch))
                 self.model.save_weights(save_directory)
                 best_val_loss = total_val/count
             if not save_only_best_model and not save_all_checkpoints:
-                save_directory = os.path.join(checkpoint_folder, self.model._name)
+                save_directory = os.path.join(checkpoint_folder, self.model._name+"_val_loss_{:7.2f}_epoch_{}.ckpt".format(total_val/count, epoch))
                 self.model.save_weights(save_directory)
         
         # measure mAP of trained custom model
