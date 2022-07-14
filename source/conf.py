@@ -19,14 +19,14 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'pytwovision'
-copyright = '2021, Guillermo Jose Raven Lusinche'
-author = 'Guillermo Jose Raven Lusinche'
+project = 'Pytwovision'
+copyright = '2022, Guillermo Raven'
+author = 'Guillermo Raven'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,12 +40,14 @@ release = '0.0.1'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.coverage', 
-    'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.githubpages',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -81,7 +83,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'bizstyle'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -108,7 +110,7 @@ html_static_path = ['doc_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pytwovisiondoc'
+htmlhelp_basename = 'Pytwovisiondoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -135,8 +137,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pytwovision.tex', 'pytwovision Documentation',
-     'Guillermo Jose Raven Lusinche', 'manual'),
+    (master_doc, 'Pytwovision.tex', 'Pytwovision Documentation',
+     'Guillermo Raven', 'manual'),
 ]
 
 
@@ -145,7 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pytwovision', 'pytwovision Documentation',
+    (master_doc, 'pytwovision', 'Pytwovision Documentation',
      [author], 1)
 ]
 
@@ -156,8 +158,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pytwovision', 'pytwovision Documentation',
-     author, 'pytwovision', 'One line description of project.',
+    (master_doc, 'Pytwovision', 'Pytwovision Documentation',
+     author, 'Pytwovision', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -181,3 +183,8 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+
+# -- Options for todo extension ----------------------------------------------
+
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_include_todos = True

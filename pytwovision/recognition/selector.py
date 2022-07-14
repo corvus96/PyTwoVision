@@ -37,13 +37,14 @@ class Recognizer:
         """
         return self.implementation.inference(image_path, input_size, score_threshold, iou_threshold, nms_method)
 
-    def restore_weights(self, weights_file):
+    def restore_weights(self, weights_file, use_checkpoint=False):
         """Load previously trained model weights
         Arguments: 
             weights_file: beginning by project root this is the path 
-                                   where is save your weights; example: "weights/weights_01.h5"
+            where is save your weights; example: "weights/weights_01.h5"
+            use_checkpoint: if you wanna use a .ckpt file this variable should be True
         """
-        self.implementation.restore_weights(weights_file)
+        self.implementation.restore_weights(weights_file, use_checkpoint)
 
     def train_using_weights(self, train_annotations_path, test_annotations_path, class_file_name, weights_path,
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 

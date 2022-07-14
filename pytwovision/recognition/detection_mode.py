@@ -1,11 +1,13 @@
+from abc import ABC, abstractmethod
+
 import cv2 as cv
 import numpy as np
 import tensorflow as tf
 import time
 import requests
+import os 
 
-from multiprocessing import Process, Queue, Pipe
-from abc import ABC, abstractmethod
+from multiprocessing import Process, Queue
 from pytwovision.image_process.frame_decorator import Frame
 from pytwovision.image_process.resize_with_bbox import ResizeWithBBox
 from pytwovision.compute.yolov3_calculus import YoloV3Calculus
@@ -107,14 +109,14 @@ class DetectionMode(ABC):
             return frame
 
 class DetectRealTime(DetectionMode):
-    def detect(self, model, camera: Camera, output_path, class_file_name, input_size=416, 
+    def detect(self, model, camera: Camera, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
-        """Apply detection pipeline in realtime
+        """Apply detection pipeline in realtime, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
             camera: An instance of camera object.
-            output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             class_file_name: it's the path of classes .txt file
+            output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
@@ -124,7 +126,7 @@ class DetectRealTime(DetectionMode):
         """
         times = []
         self.camera_input(camera)
-
+        
         if hasattr(self, "vid"):
             out, vid, fps = self.prepare_input(self.vid, output_path)
         
@@ -156,7 +158,7 @@ class DetectRealTime(DetectionMode):
             cv.putText(frame, "Time: {:.1f}FPS".format(fps), (0, 30),
                           cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
             if output_path != '': out.write(frame)
-            self.show(frame)
+            self.show(frame, camera)
             if cv.waitKey(25) & 0xFF == ord("q"):
                 cv.destroyAllWindows()
                 break
@@ -172,6 +174,8 @@ class DetectRealTime(DetectionMode):
             the second element is an instance to read frames,
             and the last element is the frames per second
         """
+        if os.path.splitext(output_path)[1] != ".mp4":
+                raise ValueError("output_path has to be an .mp4 file")
         # by default VideoCapture returns float instead of int
         width = int(vid.get(cv.CAP_PROP_FRAME_WIDTH))
         height = int(vid.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -181,22 +185,23 @@ class DetectRealTime(DetectionMode):
 
         return out, vid, fps 
     
-    def show(self, image):
+    def show(self, image, camera: Camera):
         """Show an image
         Arguments: 
             image: an image array.
+            camera: An instance of camera object.
         """
-        cv.imshow('output', image)
+        cv.imshow(camera.id, image)
 
 class DetectRealTimeMP(DetectionMode):
-    def detect(self, model, camera: Camera, output_path, class_file_name, input_size=416, 
+    def detect(self, model, camera: Camera, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
-        """Apply detection pipeline using multiprocessing
+        """Apply detection pipeline using multiprocessing, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
             camera: An instance of camera object.
-            output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             class_file_name: it's the path of classes .txt file
+            output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
@@ -253,6 +258,8 @@ class DetectRealTimeMP(DetectionMode):
             the second element is an instance to read frames,
             and the last element is the frames per second
         """
+        if os.path.splitext(output_path)[1] != ".mp4":
+            raise ValueError("output_path has to be an .mp4 file")
         # by default VideoCapture returns float instead of int
         width = int(vid.get(cv.CAP_PROP_FRAME_WIDTH))
         height = int(vid.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -328,7 +335,7 @@ class DetectRealTimeMP(DetectionMode):
             if processed_frames.qsize()>0:
                 image = processed_frames.get()
                 final_frames.put(image)
-                cv.imshow('output', image)
+                cv.imshow('Detection output', image)
                 if cv.waitKey(25) & 0xFF == ord("q"):
                     cv.destroyAllWindows()
                     break
@@ -360,14 +367,14 @@ class DetectRealTimeMP(DetectionMode):
 
 
 class DetectVideo(DetectionMode):
-    def detect(self, model, input_path, output_path, class_file_name, input_size=416, 
+    def detect(self, model, input_path, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
-        """Apply detection pipeline in a saved video
+        """Apply detection pipeline in a saved video, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
             input_path: a video path.
-            output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             class_file_name: it's the path of classes .txt file
+            output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
@@ -426,6 +433,8 @@ class DetectVideo(DetectionMode):
             the second element is an instance to read frames,
             and the last element is the frames per second
         """
+        if os.path.splitext(output_path)[1] != ".mp4":
+            raise ValueError("output_path has to be an .mp4 file")
         vid = cv.VideoCapture(input_path)
         # by default VideoCapture returns float instead of int
         width = int(vid.get(cv.CAP_PROP_FRAME_WIDTH))
@@ -441,19 +450,19 @@ class DetectVideo(DetectionMode):
         Arguments: 
             image: an image array.
         """
-        cv.imshow('output', image)
+        cv.imshow('Detection output', image)
         
 
 
 class DetectImage(DetectionMode):
-    def detect(self, model, input_path, output_path, class_file_name, input_size=416,
+    def detect(self, model, input_path, class_file_name, output_path="", input_size=416,
                  score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
-        """Apply detection pipeline
+        """Apply detection pipeline in an image, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
             input_path: an image path
-            output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
             class_file_name: it's the path of classes .txt file
+            output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
@@ -461,6 +470,9 @@ class DetectImage(DetectionMode):
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
         """
+        compatible_outputs = [".bmp", ".dib", ".jpg", ".jpeg", ".jpe", ".png", ".webp"]
+        if not os.path.splitext(output_path)[1] in compatible_outputs: 
+            raise ValueError("output_path only can be one of this: {}".format(compatible_outputs))
         original_image = self.prepare_input(input_path)
         image_data = self.pre_process(original_image, input_size)
         pred_bbox = self.predict(model, image_data)

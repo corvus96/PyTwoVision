@@ -1,4 +1,4 @@
-import  as cv
+import cv2 as cv
 from pytwovision.image_process.frame_decorator import FrameDecorator, Frame
 class Rotate(FrameDecorator):
     """

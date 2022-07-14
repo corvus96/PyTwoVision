@@ -6,10 +6,10 @@ import requests
 import re
 import errno
 
-from image_process.frame_decorator import Frame
-from image_process.resize import Resize
-from image_process.rotate import Rotate
-from compute.error_compute import re_projection_error
+from pytwovision.image_process.frame_decorator import Frame
+from pytwovision.image_process.resize import Resize
+from pytwovision.image_process.rotate import Rotate
+from pytwovision.compute.error_compute import re_projection_error
 
 class Camera():
     """An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters. 
@@ -200,17 +200,3 @@ class Camera():
         self.ret = int(cv_file.getNode('returnal_value').real())
 
         cv_file.release()
-
-# cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.104:8080/shot.jpg')
-# cam1.take_photos(save_dir="left_camera_xiaomi_redmi_note_8_pro")
-# cam1.calibrate(images_path="left_camera_xiaomi_redmi_note_8_pro", pattern_size=(8, 5))
-
-# cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.100:8080/shot.jpg')
-# cam2.take_photos(save_dir="right_camera_xiaomi_redmi_9T")
-# cam2.calibrate(images_path="right_camera_xiaomi_redmi_9T", pattern_size=(8, 5))
-
-# cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.104:8080/shot.jpg')
-# cam1.take_photos(1, save_dir="left_one_photo")
-
-# cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.100:8080/shot.jpg')
-# cam2.take_photos(1, save_dir="right_one_photo")

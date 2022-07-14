@@ -1,13 +1,14 @@
-.. pytwovision documentation master file, created by
-   sphinx-quickstart on Wed Feb 17 21:22:27 2021.
+.. Pytwovision documentation master file, created by
+   sphinx-quickstart on Mon Jul 11 02:45:03 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pytwovision's documentation!
+Welcome to Pytwovision's documentation!
 =======================================
-
-.. automodule:: pytwovision.models.layers.Resnet
-    :members:
+.. automodule:: pytwovision.recognition.yolov3_detector
+   :members:
+.. automodule:: pytwovision.recognition.selector
+   :members:
 
 .. toctree::
    :maxdepth: 2

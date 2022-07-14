@@ -146,6 +146,7 @@ class TestObjectDetectorYoloV3(unittest.TestCase):
         try:
             shutil.rmtree(self.work_dir)
             tf.keras.backend.clear_session()
+            if os.path.exists("mAP/ground-truth"): shutil.rmtree("mAP")
         except:
             pass
         
