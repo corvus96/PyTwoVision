@@ -4,10 +4,6 @@ import numpy as np
 from pytwovision.image_process.frame_decorator import FrameDecorator
 
 class ResizeWithBBox(FrameDecorator):
-    """
-    Concrete Decorators call the wrapped object and alter its result in some
-    way.
-    """
     def apply(self, target_size, gt_boxes=None):
         """Apply resizing on an image and their bounding boxes
         Arguments:

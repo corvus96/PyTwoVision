@@ -17,17 +17,21 @@ class YoloV3DatasetGenerator(object):
                         [[116, 90], [156, 198], [373, 326]]],
                 anchor_per_scale=3, max_bbox_per_scale=100, images_to_ram=True):
         """
-        
+        A generator compatible with YOLO V3 network.
         Arguments:
             annotations_path: a path where the annotations are saved.
             class_file_name: a path with a .txt file where the classes are saved.
-            data_augmentation: a boolean that controls data augmentation.
+            batch_size: an integer that corresponds with the number of image which
+            we introduce in a network per iteration.
+            data_augmentation: a boolean that controls data augmentation which 
+            change original images in new ways.
             input_shape: a tuple with the input images dimensions.
             strides: a list with the strides in a yolo model.
             anchors: these are the yolo anchors sizes.
             anchor_per_scale: an integer with the number of anchor boxes per scale. 
             max_bbox_per_scale: nan integer with the number of bounding boxes per scale. 
-            images_to_ram: a boolean to control when save images in ram which allow a faster training, but need more RAM 
+            images_to_ram: a boolean to control when save images in ram which allow a 
+            faster training, but it needs more RAM. 
         """
         self.annot_path  = annotations_path
         self.input_sizes = input_shape[0]
@@ -49,6 +53,7 @@ class YoloV3DatasetGenerator(object):
 
 
     def load_annotations(self):
+        """Returns annotations in array shape"""
         final_annotations = []
         with open(self.annot_path, 'r') as f:
             txt = f.readlines()
@@ -76,9 +81,14 @@ class YoloV3DatasetGenerator(object):
         return final_annotations
 
     def __iter__(self):
+        """Returns its own instance"""
         return self
 
     def delete_bad_annotation(self, bad_annotation):
+        """Delete an annotation from annotations file .txt
+        Arguments:
+            bad_annotation: a string with the path of an image
+        """
         print(f'Deleting {bad_annotation} annotation line')
         bad_image_name = bad_annotation[0].split('/')[-1] # can be used to delete bad image
 
@@ -92,6 +102,10 @@ class YoloV3DatasetGenerator(object):
             f.truncate()
     
     def __next__(self):
+        """This method will be executed when you iterate this class
+        Returns: 
+            a batch of images when their bounding boxes
+        """
         with tf.device('/cpu:0'):
             self.train_input_size = random.choice([self.input_sizes])
             self.train_output_sizes = self.train_input_size // self.strides
@@ -148,6 +162,13 @@ class YoloV3DatasetGenerator(object):
                 raise StopIteration
 
     def random_horizontal_flip(self, image, bboxes):
+        """There is a probability of 0.5 to make an horizontal flip
+        Arguments:  
+            image: it can be an image or a batch of images.
+            bboxes: this are corresponding bounding boxes.
+        Returns
+            images and their bounding boxes.
+        """
         if random.random() < 0.5:
             _, w, _ = image.shape
             image = image[:, ::-1, :]
@@ -156,6 +177,13 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def random_crop(self, image, bboxes):
+        """There is a probability of 0.5 to make a crop
+        Arguments:  
+            image: it can be an image or a batch of images.
+            bboxes: this are corresponding bounding boxes.
+        Returns
+            images and their bounding boxes.
+        """
         if random.random() < 0.5:
             h, w, _ = image.shape
             max_bbox = np.concatenate([np.min(bboxes[:, 0:2], axis=0), np.max(bboxes[:, 2:4], axis=0)], axis=-1)
@@ -178,6 +206,13 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def random_translate(self, image, bboxes):
+        """There is a probability of 0.5 to shift in x and y images
+        Arguments:  
+            image: it can be an image or a batch of images.
+            bboxes: this are corresponding bounding boxes.
+        Returns
+            images and their bounding boxes.
+        """
         if random.random() < 0.5:
             h, w, _ = image.shape
             max_bbox = np.concatenate([np.min(bboxes[:, 0:2], axis=0), np.max(bboxes[:, 2:4], axis=0)], axis=-1)
@@ -198,7 +233,16 @@ class YoloV3DatasetGenerator(object):
 
         return image, bboxes
 
-    def parse_annotation(self, annotation, mAP = 'False'):
+    def parse_annotation(self, annotation, mAP=False):
+        """Convert an annotation in an image with their bounding boxes
+        Arguments:  
+            annotation: an annotation line 
+            (path bounding box 1, class bounding box 2, class, ...)
+            mAP: when it's true this method won't 
+            resize images and bounding boxes, otherwise it will do
+        Returns
+            images and their bounding boxes.
+        """
         if self.images_to_ram:
             image_path = annotation[0]
             image = annotation[2]
@@ -220,6 +264,12 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def preprocess_true_boxes(self, bboxes):
+        """To prepare labels (true_boxes)
+        Arguments:
+            bboxes: a bounding boxes array
+        Returns:
+            Ground true bounding boxes
+        """
         label = [np.zeros((self.train_output_sizes[i], self.train_output_sizes[i], self.anchor_per_scale,
                            5 + self.num_classes)) for i in range(3)]
         bboxes_xywh = [np.zeros((self.max_bbox_per_scale, 4)) for _ in range(3)]
@@ -283,4 +333,5 @@ class YoloV3DatasetGenerator(object):
         return label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes
 
     def __len__(self):
+        """Get num of batches it will be num_samples / batch_size"""
         return self.num_batchs

@@ -34,7 +34,7 @@ class DetectionMode(ABC):
         return tf.concat(pred_bbox, axis=0)
     
     def postprocess_boxes(self, original_image, pred_bbox, input_size=416, score_threshold=0.3, iou_threshold=0.45, nms_method="nms"):
-        """Apply a postprocess and non maximum supression step.
+        """Apply a postprocess and non maximum supression step and resize bboxes.
         Arguments:
             original_image: expects a tensorflow model trained.
             pred_bbox: a tensor of predicted bounding boxes.
@@ -63,7 +63,7 @@ class DetectionMode(ABC):
 
         return image_data[np.newaxis, ...].astype(np.float32)
     
-    def draw(self, original_image, bboxes, class_file_name, rectangle_colors):
+    def draw(self, original_image, bboxes, class_file_name, rectangle_colors, homogeneous_points=None):
         """Draw bounding boxes on images
         Arguments:
             original_image: an array which correspond with an image
@@ -71,10 +71,13 @@ class DetectionMode(ABC):
             class_file_name: a path with a .txt file where the classes are saved.
             rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W).
+            However if is None it won't be drawed.
         Returns:
-            An image with bounding boxes.
+            An image with bounding boxes and homogeneous coordinates.
         """
-        return draw_bbox(original_image, bboxes, class_file_name=class_file_name, rectangle_colors=rectangle_colors)
+        return draw_bbox(original_image, bboxes, class_file_name=class_file_name, 
+                rectangle_colors=rectangle_colors, homogeneous_points=homogeneous_points)
     
     @abstractmethod
     def detect(self):
@@ -103,7 +106,7 @@ class DetectionMode(ABC):
                 print("Cannot open camera")
                 exit()
         if camera.type_source == "stream":
-            img_resp = requests.get(self.camera.source)
+            img_resp = requests.get(camera.source)
             img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
             frame = cv.imdecode(img_arr, -1)
             return frame
@@ -167,7 +170,7 @@ class DetectRealTime(DetectionMode):
     def prepare_input(self, vid, output_path):
         """Initialization for writing and reading videos
         Arguments: 
-            input_path: an video path.
+            vid: a cv.VideoCapture instance.
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
         Returns: 
             a tuple where its first argument is an instance to Opencv video writes,
@@ -251,7 +254,7 @@ class DetectRealTimeMP(DetectionMode):
     def prepare_input(self, vid, output_path) -> None:
         """Initialization for writing and reading videos
         Arguments: 
-            input_path: an video path.
+            vid: cv.VideoCapture instance
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
         Returns: 
             a tuple where its first argument is an instance to Opencv video writes,
@@ -295,7 +298,7 @@ class DetectRealTimeMP(DetectionMode):
     def postprocess_mp(self, predicted_data, original_frames, processed_frames, processing_times, input_size, class_file_name, score_threshold, iou_threshold, rectangle_colors, nms_method):
         """ Improve bounding boxes using multiprocessing. It needs to be initialized
         Arguments: 
-            model: expects a tensorflow model trained.
+            predicted_data: a queue from multiprocessing package, that corresponds with predictions.
             original_frames: a queue from multiprocessing package, that corresponds with frames. 
             processed_frames: a queue from multiprocessing package, that corresponds with processed frames. 
             processing times: a queue from multiprocessing package, that corresponds with times.
@@ -469,6 +472,8 @@ class DetectImage(DetectionMode):
             rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
+        Returns:
+            an image with prediction drawed
         """
         compatible_outputs = [".bmp", ".dib", ".jpg", ".jpeg", ".jpe", ".png", ".webp"]
         if not os.path.splitext(output_path)[1] in compatible_outputs: 

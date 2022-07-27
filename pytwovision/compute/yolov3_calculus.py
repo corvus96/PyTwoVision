@@ -4,7 +4,8 @@ import tensorflow as tf
 
 class YoloV3Calculus:
     """
-    Utility methods for computing IOU, decode output of network when train, nms, yolov3 loss
+    Utility methods for computing IOU, decode 
+    output of network when train, nms, yolov3 loss
     and bounding box offsets
     """
 
@@ -13,7 +14,8 @@ class YoloV3Calculus:
                         [[30,  61], [62,   45], [59,  119]],
                         [[116, 90], [156, 198], [373, 326]]]):
         """
-        A piece of code that receive yolo convolutional layers and return prediction layers
+        A piece of code that receive yolo convolutional
+        layers and return prediction layers
         Arguments:
             conv_output: output of Yolo model
             num_class: an intenger that represent how many classes has the model.
@@ -339,7 +341,7 @@ class YoloV3Calculus:
 
     def postprocess_boxes(self, pred_bbox, original_image, input_size, score_threshold):
         """
-        Improve predicted bounding boxes
+        Improve predicted bounding boxes and resize them.
         Arguments:
             pred_bbox: a predicted bonding box.
             original_image: an image before resizing.

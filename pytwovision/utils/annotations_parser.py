@@ -23,7 +23,7 @@ class XmlParser(Parser):
     that it calls the annotationsFormat's method corresponding to the Parser's class.
     """
 
-    def parse(self, anno: AnnotationsFormat, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None):
+    def parse(self, anno: AnnotationsFormat, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None, print_output=False):
         """
         This method convert annotations  from COCO or PASCAL VOC dataset in xml format
          to be compatible with an especific network model. Exporting a 
@@ -37,7 +37,7 @@ class XmlParser(Parser):
             saved in current directory.
         """
 
-        anno.visit_xml_parser(self, xml_path, annotations_output_name, classes_output_name, image_path, work_dir)
+        anno.visit_xml_parser(self, xml_path, annotations_output_name, classes_output_name, image_path, work_dir, print_output)
 
 class AnnotationsFormat(ABC):
     """
@@ -47,7 +47,7 @@ class AnnotationsFormat(ABC):
     """
 
     @abstractmethod
-    def visit_xml_parser(self, element: XmlParser, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None):
+    def visit_xml_parser(self, element: XmlParser, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None, print_output=False):
         pass
 
 class YoloV3AnnotationsFormat(AnnotationsFormat):

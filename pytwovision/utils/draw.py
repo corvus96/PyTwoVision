@@ -22,7 +22,7 @@ def draw_lines(img1,img2,lines,pts1,pts2):
         img2 = cv.circle(img2,tuple(pt2),5,color,-1)
     return img1,img2
 
-def draw_bbox(image, bboxes, class_file_name, show_label=True, show_confidence = True, text_colors=(255,255,0), rectangle_colors='', tracking=False):   
+def draw_bbox(image, bboxes, class_file_name, show_label=True, show_confidence = True, text_colors=(255,255,0), rectangle_colors='', tracking=False, homogeneous_points=None):   
     """Draw bounding boxes on images
     Arguments:
         image: an array which correspond with an image
@@ -33,8 +33,10 @@ def draw_bbox(image, bboxes, class_file_name, show_label=True, show_confidence =
         text_colors: a tuple that represents (R, G, B) colors.
         rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
         however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+        homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W).
+        However if is None it won't be drawed.
     Returns:
-        An image with bounding boxes.
+        An image with bounding boxes and homogeneous coordinates.
     """
     classes = read_class_names(class_file_name)
     num_classes = len(classes)
@@ -78,5 +80,10 @@ def draw_bbox(image, bboxes, class_file_name, show_label=True, show_confidence =
             # put text above rectangle
             cv.putText(image, label, (x1, y1-4), cv.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale, text_colors, bbox_thick, lineType=cv.LINE_AA)
+
+        if homogeneous_points != None:
+            cv.putText(image, "{}".format(",".join(homogeneous_points[i])), (x1, y2+6), cv.FONT_HERSHEY_COMPLEX_SMALL,
+                    fontScale, text_colors, bbox_thick, lineType=cv.LINE_AA)
+
 
     return image

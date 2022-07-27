@@ -57,13 +57,6 @@ class MatcherStrategy(ABC):
     def match(self):
         pass
 
-
-"""
-Concrete Strategies implement the algorithm while following the base Strategy
-interface. The interface makes them interchangeable in the Context.
-"""
-
-
 class StereoSGBM(MatcherStrategy):
     def __init__(self, min_disp=0, max_disp=160, window_size=3, p1=24*3*3, p2=96*3*3, pre_filter_cap=63, mode=cv.StereoSGBM_MODE_HH, speckle_window_size=1100, speckle_range=1, uniqueness_ratio=5, disp_12_max_diff=-1):
         """ To create an instance of stereo SGBM algorithm

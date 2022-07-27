@@ -279,7 +279,11 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         """
         tf.keras.backend.clear_session() # used to reset layer names
         # load Darknet original weights to TensorFlow model
-        if use_checkpoint: self.model.load_weights(weights_file)
+        if use_checkpoint: 
+            try:
+                self.model.load_weights(weights_file)
+            except ValueError:
+                assert Exception("Shapes are incompatible between model and weights")
         else:
             range1 = 75 if self.version == "yolov3" else 13
             range2 = [58, 66, 74] if self.version == "yolov3" else [9, 12]
