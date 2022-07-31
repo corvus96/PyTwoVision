@@ -101,10 +101,12 @@ class DetectionMode(ABC):
             camera: is an instance of Camera Object
         """
         if camera.type_source == "other" or camera.type_source == "webcam":
-            self.vid = cv.VideoCapture(camera.source)
-            if not self.vid.isOpened():
+            vid = cv.VideoCapture(camera.source)
+            if not vid.isOpened():
                 print("Cannot open camera")
                 exit()
+            return vid
+
         if camera.type_source == "stream":
             img_resp = requests.get(camera.source)
             img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
@@ -128,13 +130,13 @@ class DetectRealTime(DetectionMode):
             nms_method: a string that can be  'nms' or 'soft-nms'.
         """
         times = []
-        self.camera_input(camera)
+        vid = self.camera_input(camera)
         
-        if hasattr(self, "vid"):
-            out, vid, fps = self.prepare_input(self.vid, output_path)
+        if isinstance(vid, cv.VideoCapture):
+            out, vid, fps = self.prepare_input(vid, output_path)
         
         while True:
-            if hasattr(self, "vid"):
+            if isinstance(vid, cv.VideoCapture):
                 ret, img = vid.read()
                 if not ret: break
             else: 
@@ -212,10 +214,10 @@ class DetectRealTimeMP(DetectionMode):
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
         """
-        self.camera_input(camera)
+        vid = self.camera_input(camera)
 
-        if hasattr(self, "vid"):
-            out, vid, fps = self.prepare_input(self.vid, output_path)
+        if isinstance(vid, cv.VideoCapture):
+            out, vid, fps = self.prepare_input(vid, output_path)
         original_frames = Queue()
         frames_data = Queue()
         predicted_data = Queue()
@@ -227,7 +229,7 @@ class DetectRealTimeMP(DetectionMode):
         p2.start()
         p3.start()
         while True:
-            if hasattr(self, "vid"):
+            if isinstance(vid, cv.VideoCapture):
                 ret, img = vid.read()
                 if not ret: break
             else: 

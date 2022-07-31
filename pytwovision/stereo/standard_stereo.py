@@ -6,15 +6,15 @@ import requests
 import time
 import stereo_tuner
 
-from stereo.stereo_builder import StereoSystemBuilder
-from stereo.stereo_builder import StereoController 
-from stereo.match_method import Matcher
-from stereo.match_method import StereoSGBM
-from input_output.camera import Camera
-from utils.draw import draw_lines
-from compute.error_compute import re_projection_error
-from image_process.frame_decorator import Frame
-from image_process.resize import Resize
+from pytwovision.stereo.stereo_builder import StereoSystemBuilder
+from pytwovision.stereo.stereo_builder import StereoController 
+from pytwovision.stereo.match_method import Matcher
+from pytwovision.stereo.match_method import StereoSGBM
+from pytwovision.input_output.camera import Camera
+from pytwovision.utils.draw import draw_lines
+from pytwovision.compute.error_compute import re_projection_error
+from pytwovision.image_process.frame_decorator import Frame
+from pytwovision.image_process.resize import Resize
 
 
 class StandardStereo:
@@ -340,23 +340,23 @@ class StandardStereoBuilder(StereoSystemBuilder):
         """
         return self._product
 
-    def pre_process(self, frameL, frameR, downsample=2):
+    def pre_process(self, frameL, frameR, downsample=4):
         """ First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.
         Arguments: 
             frameL: it's the left frame
             frameR: it's the right frame
             downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 2, 4, 8, 16, 32 or 64. If downsample factor is 1 or None or False won't apply downsampling.
+            just can be 4, 16, 64, 256, 1024, 4096. If downsample factor is 1 or None or False won't apply downsampling.
         Returns:
             Both frames to apply stereo correspondence or apply more processing to the images.
         """
-        if downsample not in (2**p for p in range(1, 7)):
+        if downsample not in (4**p for p in range(1, 7)):
             if downsample in [1, None, False]:
                 n_downsamples = 0
             else:
-                raise ValueError("downsample only can be 2, 4, 8, 16, 32 or 64")
+                raise ValueError("downsample only can be 4, 16, 64, 256, 1024, 4096")
         else:
-            n_downsamples = [2**p for p in range(1, 7)].index(downsample)
+            n_downsamples = [4**p for p in range(1, 7)].index(downsample)
         
         img_left_gray = cv.cvtColor(frameL,cv.COLOR_BGR2GRAY)
         img_right_gray = cv.cvtColor(frameR,cv.COLOR_BGR2GRAY)
