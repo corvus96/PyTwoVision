@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import os
 
 class AnnotationsHelper:
     def __init__(self, annotations_path):

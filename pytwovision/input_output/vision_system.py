@@ -42,7 +42,7 @@ class VisionSystem:
 
     def realtime_or_video_pipeline(self, model, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", 
-                post_process_match=True, lmbda=128.0, sigma=1.5, downsample_for_match=4, show_window=True):
+                post_process_match=True, lmbda=128.0, sigma=1.5, downsample_for_match=2, show_window=True):
         """ Implement a stereo recognition system for video or streaming 
         Arguments:
             model: expects a tensorflow model trained.
@@ -59,7 +59,7 @@ class VisionSystem:
             lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
             sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.
             downsample_for_match: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 4, 16, 64, 256, 1024, 4096. If downsample factor is 1 or None or False won't apply downsampling.
+            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
             show_window: show a window with implementation.
         """
         times, times_2 = [], []
@@ -101,9 +101,10 @@ class VisionSystem:
             if downsample_for_match in [1, None, False]:
                     n_upsamples = 0
             else:
-                n_upsamples = [4**p for p in range(1, 7)].index(downsample_for_match)
+                n_upsamples = [2**p for p in range(1, 7)].index(downsample_for_match)
+                n_upsamples += 1
             if n_upsamples > 0:
-                for i in range(n_upsamples + 1):
+                for i in range(n_upsamples):
                     disparity = cv.pyrUp(disparity)
             # resize bboxes
             bboxes = detector.postprocess_boxes(disparity, pred_bbox, input_size,
@@ -144,7 +145,7 @@ class VisionSystem:
 
     def image_pipeline(self, model, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", 
-                post_process_match=True, lmbda=128.0, sigma=1.5, downsample_for_match=4, show_window=True):
+                post_process_match=True, lmbda=128.0, sigma=1.5, downsample_for_match=2, show_window=True):
         """ Implement a stereo recognition system for images.
         Arguments:
             model: expects a tensorflow model trained.
@@ -161,7 +162,7 @@ class VisionSystem:
             lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
             sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.
             downsample_for_match: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 4, 16, 64, 256, 1024, 4096. If downsample factor is 1 or None or False won't apply downsampling.
+            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
             show_window: show a window with implementation.
         Returns:
             an image processed, bounding boxes and 3D points
@@ -188,9 +189,10 @@ class VisionSystem:
         if downsample_for_match in [1, None, False]:
                 n_upsamples = 0
         else:
-            n_upsamples = [4**p for p in range(1, 7)].index(downsample_for_match)
+            n_upsamples = [2**p for p in range(1, 7)].index(downsample_for_match)
+            n_upsamples += 1
         if n_upsamples > 0:
-            for i in range(n_upsamples + 1):
+            for i in range(n_upsamples):
                 disparity = cv.pyrUp(disparity)
         # resize bboxes
         bboxes = detector.postprocess_boxes(disparity, pred_bbox, input_size,

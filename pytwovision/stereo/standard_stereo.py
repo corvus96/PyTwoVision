@@ -4,7 +4,6 @@ import numpy as np
 import cv2 as cv 
 import requests
 import time
-import stereo_tuner
 
 from pytwovision.stereo.stereo_builder import StereoSystemBuilder
 from pytwovision.stereo.stereo_builder import StereoController 
@@ -13,8 +12,6 @@ from pytwovision.stereo.match_method import StereoSGBM
 from pytwovision.input_output.camera import Camera
 from pytwovision.utils.draw import draw_lines
 from pytwovision.compute.error_compute import re_projection_error
-from pytwovision.image_process.frame_decorator import Frame
-from pytwovision.image_process.resize import Resize
 
 
 class StandardStereo:
@@ -23,11 +20,15 @@ class StandardStereo:
     Attributes:
         camL: left camera instance.
         camR: right camera instance.
+        fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it'll
+        use normal calibration, fish eye is recomended when cameras has an field of view > 160.
     """
-    def __init__(self, cam_left: Camera, cam_right: Camera) -> None:
-
+    def __init__(self, cam_left: Camera, cam_right: Camera, fish_eye=True):
+        if type(fish_eye) != bool:
+            raise ValueError("fish_eye has to be a boolean") 
         self.camL = cam_left
         self.camR = cam_right
+        self.fish_eye = fish_eye
     
     def take_dual_photos(self, num_photos=15, save_dir_left="images_left", save_dir_right="images_right", prefix_name="photo"):
         """ A simple way to take photos in console and save in a folder
@@ -124,9 +125,12 @@ class StandardStereo:
         # restore to initial directory
         os.chdir(cwd)
 
-    def calibrate(self, images_left_path, images_right_path, pattern_type='chessboard', pattern_size=(7,6)):
-        """ Compute stereo parameters like a fundamental matrix, 
-        rotation and traslation matrix and esential matrix.
+    def calibrate(self, images_left_path, images_right_path, pattern_type='chessboard', pattern_size=(8,5), show=True):
+        """ Compute intrinsics and extrinsics parameters for two cameras at once.
+        Note:
+        if you want a good calibration your images in 'images_left_path' and 'images_right_path'
+        have to follow a format for example: example/left_images/photo_1.jpg and example/right_images/photo_1.jpg 
+        the number is important because calibrate method order the pair of images with sorted method.
         Arguments:
             images_left_path: folder where is saved left calibration pattern photos.
             images_right_path: folder where is saved right calibration pattern photos.
@@ -134,9 +138,16 @@ class StandardStereo:
             pattern_size: If pattern_type is "chessboard"  this the Number of inner corners
             per a chessboard row and column. But If pattern_type is "circles" this will be
             the number of circles per row and column. 
+            show: if is true it show corners or centers found by calibration algorithm  at each iteration.
+        Returns: 
+            Three floats, The first is the reprojection error in left side,  the another one is right side
+            and the third one is rms error (these have to be less than 1)
         Raises:
             OSError: If didn't find photos on images_left_path or images_right_path folders.
         """
+        valid_patterns = ["chessboard", "circles"]
+        if pattern_type not in valid_patterns:
+            raise ValueError("pattern_type only can be 'chessboard' or 'circles'") 
         # adjust image path
         images_left, _ = os.path.splitext(images_left_path)
         images_right, _ = os.path.splitext(images_right_path)
@@ -148,12 +159,21 @@ class StandardStereo:
         # flatting files list
         imagesL = [item for sublist in filesL for item in sublist]
         imagesR = [item for sublist in filesR for item in sublist]
+        imagesL = sorted(imagesL)
+        imagesR = sorted(imagesR)
         # termination criteria
-        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        if self.fish_eye == False:
+            criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        else:
+            criteria = (cv.TERM_CRITERIA_EPS+cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
         
         # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-        objp = np.zeros((pattern_size[1]*pattern_size[0],3), np.float32)
-        objp[:,:2] = np.mgrid[0:pattern_size[0],0:pattern_size[1]].T.reshape(-1,2)
+        if self.fish_eye == False:
+            objp = np.zeros((pattern_size[1]*pattern_size[0],3), np.float32)
+            objp[:,:2] = np.mgrid[0:pattern_size[0],0:pattern_size[1]].T.reshape(-1,2)
+        else:
+            objp = np.zeros((pattern_size[1]*pattern_size[0], 1, 3), np.float32)
+            objp[:,0, :2] = np.mgrid[0:pattern_size[0],0:pattern_size[1]].T.reshape(-1,2)
         # Arrays to store object points and image points from all the images.
         objpoints = [] # 3d point in real world space
         imgpointsL = [] # 2d points in image plane.
@@ -168,93 +188,136 @@ class StandardStereo:
                 grayR = cv.cvtColor(imgR, cv.COLOR_BGR2GRAY)
 
                 # Find the chess board corners
-                if pattern_type == 'chessboard':
+                if pattern_type == 'chessboard' and self.fish_eye == False:
                     retL, cornersL = cv.findChessboardCorners(grayL, pattern_size, None)
                     retR, cornersR = cv.findChessboardCorners(grayR, pattern_size, None)
-                elif pattern_type == 'circles':
+                elif pattern_type == 'circles' and self.fish_eye == False:
                     retL, cornersL = cv.findCirclesGrid(grayL, pattern_size, None)
                     retR, cornersR = cv.findCirclesGrid(grayR, pattern_size, None)
+                elif pattern_type == 'chessboard' and self.fish_eye == True:
+                    retL, cornersL = cv.findChessboardCorners(grayL, pattern_size, flags=cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_FAST_CHECK+cv.CALIB_CB_NORMALIZE_IMAGE)
+                    retR, cornersR = cv.findChessboardCorners(grayR, pattern_size, flags=cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_FAST_CHECK+cv.CALIB_CB_NORMALIZE_IMAGE)
+                elif pattern_type == 'circles' and self.fish_eye == True:
+                    retL, cornersL = cv.findCirclesGrid(grayL, pattern_size, cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_FAST_CHECK+cv.CALIB_CB_NORMALIZE_IMAGE)
+                    retR, cornersR = cv.findCirclesGrid(grayR, pattern_size, cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_FAST_CHECK+cv.CALIB_CB_NORMALIZE_IMAGE)
 
                 # If found, add object points, image points (after refining them)
                 if retL and retR == True:
 
                     objpoints.append(objp)
 
-                    cornersL = cv.cornerSubPix(grayL, cornersL, (11,11), (-1,-1), criteria)
+                    if self.fish_eye == False:   
+                        cornersL = cv.cornerSubPix(grayL, cornersL, (11,11), (-1,-1), criteria)
+                        cornersR = cv.cornerSubPix(grayR, cornersR, (11,11), (-1,-1), criteria)
+                    else:
+                        cornersL = cv.cornerSubPix(grayL, cornersL, (3,3), (-1,-1), criteria)
+                        cornersR = cv.cornerSubPix(grayR, cornersR, (3,3), (-1,-1), criteria)
                     imgpointsL.append(cornersL)
-
-                    cornersR = cv.cornerSubPix(grayR, cornersR, (11,11), (-1,-1), criteria)
                     imgpointsR.append(cornersR)
 
+                if show:
                     # Draw and display the corners
-                    # cv.drawChessboardCorners(imgL, pattern_size, cornersL, retL)
-                    # cv.namedWindow('img left', cv.WINDOW_NORMAL)
-                    # cv.imshow('img left', imgL)
-                    # cv.drawChessboardCorners(imgR, pattern_size, cornersR, retR)
-                    # cv.namedWindow('img right', cv.WINDOW_NORMAL)
-                    # cv.imshow('img right', imgR)
-                    # cv.waitKey(1000)
+                    cv.drawChessboardCorners(imgL, pattern_size, cornersL, retL)
+                    cv.namedWindow(imgLeft, cv.WINDOW_NORMAL)
+                    cv.imshow(imgLeft, imgL)
+                    cv.drawChessboardCorners(imgR, pattern_size, cornersR, retR)
+                    cv.namedWindow(imgRight, cv.WINDOW_NORMAL)
+                    cv.imshow(imgRight, imgR)
+                    cv.waitKey(6000)
+                    cv.destroyAllWindows()
             
-            flags = 0
-            flags |= cv.CALIB_FIX_INTRINSIC
-            # Here we fix the intrinsic camara matrixes so that only Rot, Trns, Emat and Fmat are calculated.
-            # Hence intrinsic parameters are the same 
+            if self.fish_eye == False:
+                flags = 0
+                flags |= cv.CALIB_FIX_INTRINSIC
+                # Here we fix the intrinsic camara matrixes so that only Rot, Trns, Emat and Fmat are calculated.
+                # Hence intrinsic parameters are the same 
 
-            criteria_stereo= (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+                criteria_stereo = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+            else:
+                flags = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_FIX_SKEW
+                criteria_stereo = (cv.TERM_CRITERIA_EPS+cv.TERM_CRITERIA_MAX_ITER, 30, 0.01)
+                k = np.zeros((3, 3))
+                d = np.zeros((4, 1))
+                rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(len(objpoints))]
+                tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(len(objpoints))]
             
             try:
-                # This step is performed to transformation between the two cameras and calculate Essential and Fundamenatl matrix
+                # This step is performed to transformation between the two cameras and calculate Essential and Fundamental matrix
                 print("Calibrating estereo...")
-                self.ret_stereo, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, self.e_matrix, self.f_matrix = cv.stereoCalibrate(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], criteria_stereo, flags)
+                if self.fish_eye == False:
+                    rms_error, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, self.e_matrix, self.f_matrix, _ = cv.stereoCalibrateExtended(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], criteria_stereo, flags)
+                else:
+                    rms_error, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, = cv.fisheye.stereoCalibrate(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], None, None, cv.CALIB_FIX_INTRINSIC, criteria_stereo)
+                errorL = re_projection_error(objpoints, self.camL.rvecs, self.camL.tvecs, self.camL.matrix, imgpointsL, self.camL.dist_coeffs)
+                print("Left camera error {}".format(errorL))
+                errorR = re_projection_error(objpoints, self.camR.rvecs, self.camR.tvecs, self.camR.matrix, imgpointsR, self.camR.dist_coeffs)
+                print("Right camera error {}".format(errorR))
                 print("system calibrated")
+                
             except AttributeError:
                 print("Camera parameters hasn't fixed")
                 print("Fixing left camera...")
-                self.camL.ret, self.camL.matrix, self.camL.dist_coeffs, self.camL.rvecs, self.camL.tvecs = cv.calibrateCamera(objpoints, imgpointsL, grayL.shape[::-1], None, None)
-                heightL, widthL = imgL.shape[:2]
-                self.camL.matrix, self.camL.roi = cv.getOptimalNewCameraMatrix(self.camL.matrix, self.camL.dist_coeffs, (widthL, heightL), 1, (widthL, heightL))
-                errorL = re_projection_error(objpoints, self.camL.rvecs, self.camL.tvecs, self.camL.matrix, imgpointsL, self.camL.dist_coeffs)
+                if self.fish_eye == False:
+                    errorL, self.camL.matrix, self.camL.dist_coeffs, self.camL.rvecs, self.camL.tvecs = cv.calibrateCamera(objpoints, imgpointsL, grayL.shape[::-1], None, None)
+                    heightL, widthL = imgL.shape[:2]
+                    self.camL.matrix, self.camL.roi = cv.getOptimalNewCameraMatrix(self.camL.matrix, self.camL.dist_coeffs, (widthL, heightL), 1, (widthL, heightL))
+                else:
+                    errorL, self.camL.matrix, self.camL.dist_coeffs, self.camL.rvecs, self.camL.tvecs = cv.fisheye.calibrate(objpoints, imgpointsL, grayL.shape[::-1], k, d, rvecs, tvecs, flags, (cv.TERM_CRITERIA_EPS+cv.TERM_CRITERIA_MAX_ITER, 30, 1e-6))
                 print("Left camera error {}".format(errorL))
                 print("Fixing Right camera...")
-                self.camR.ret, self.camR.matrix, self.camR.dist_coeffs, self.camR.rvecs, self.camR.tvecs = cv.calibrateCamera(objpoints, imgpointsR, grayR.shape[::-1], None, None)
-                heightR, widthR = imgL.shape[:2]
-                self.camR.matrix, self.camR.roi = cv.getOptimalNewCameraMatrix(self.camR.matrix, self.camR.dist_coeffs, (widthR, heightR), 1, (widthR, heightR))
-                errorR = re_projection_error(objpoints, self.camR.rvecs, self.camR.tvecs, self.camR.matrix, imgpointsR, self.camR.dist_coeffs)
+                if  self.fish_eye == False:
+                    errorR, self.camR.matrix, self.camR.dist_coeffs, self.camR.rvecs, self.camR.tvecs = cv.calibrateCamera(objpoints, imgpointsR, grayR.shape[::-1], None, None)
+                    heightR, widthR = imgL.shape[:2]
+                    self.camR.matrix, self.camR.roi = cv.getOptimalNewCameraMatrix(self.camR.matrix, self.camR.dist_coeffs, (widthR, heightR), 1, (widthR, heightR))
+                else:
+                    errorR, self.camR.matrix, self.camR.dist_coeffs, self.camR.rvecs, self.camR.tvecs = cv.fisheye.calibrate(objpoints, imgpointsR, grayR.shape[::-1], k, d, rvecs, tvecs, flags, (cv.TERM_CRITERIA_EPS+cv.TERM_CRITERIA_MAX_ITER, 30, 1e-6))
                 print("Right camera error {}".format(errorR))
                 print("Calibrating estereo...")
                 # This step is performed to transformation between the two cameras and calculate Essential and Fundamenatl matrix
-                self.ret_stereo, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, self.e_matrix, self.f_matrix = cv.stereoCalibrate(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], criteria_stereo, flags)
+                if self.fish_eye == False:
+                    self.ret_stereo, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, self.e_matrix, self.f_matrix, rms_error = cv.stereoCalibrateExtended(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], criteria_stereo, flags)
+                else:
+                    rms_error, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, self.rot, self.trans, = cv.fisheye.stereoCalibrate(objpoints, imgpointsL, imgpointsR, self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], None, None, cv.CALIB_FIX_INTRINSIC, criteria_stereo)
                 print("system calibrated")
-            
         except OSError:
             if len(imagesL) == 0:
                 print("Could not find any image in {}".format(images_left_path))
             if len(imagesR) == 0:
                 print("Could not find any image in {}".format(images_right_path))
 
-    def rectify(self, image_left_path, image_right_path, export_file_name="stereoMap", alpha=1, output_size=(0,0), export_file=True):
+        return errorL, errorR, rms_error
+
+    def rectify(self, image_left__dims, image_right_dims, export_file_name="stereoMap", alpha=1, output_size=(0,0), export_file=True):
         """ Compute stereo rectification maps and export left and right stereo maps in xml format.
             Note: you will need to calibrate first
         Arguments: 
-            image_left_path: the path of an example calibration left image to get his dimensions.
-            image_right_path: the path of an example calibration right image to get his dimensions.
+            image_left__dims: a tuple or list with left image (width, height).
+            image_right_dims: a tuple or list with right image (width, height).
             export_file_name: personalize the name of output file.
-            alpha: free scaling parameter. If it is -1 or absent, the function performs the default scaling. Otherwise, the parameter should be between 0 and 1. alpha=0 means that the rectified images are zoomed and shifted so that only valid pixels are visible (no black areas after rectification). alpha=1 (default) means that the rectified image is decimated and shifted so that all the pixels from the original images from the cameras are retained in the rectified images (no source image pixels are lost). Any intermediate value yields an intermediate result between those two extreme cases.
+            alpha: free scaling parameter. If it is -1 or absent, the function performs the default scaling. Otherwise, the parameter should be between 0 and 1. alpha=0 means that the rectified images are zoomed and shifted so that only valid pixels are visible (no black areas after rectification). alpha=1 (default) means that the rectified image is decimated and shifted so that all the pixels from the original images from the cameras are retained in the rectified images (no source image pixels are lost). Any intermediate value yields an intermediate result between those two extreme cases (Only apply for no fish eye cameras). 
             output_size: New image resolution after rectification. When (0,0) is passed (default), it is set to the original image Size . Setting it to a larger value can help you preserve details in the original image, especially when there is a big radial distortion.
+            export_file: if is true this method will save the parameters in an xml with the name in export_file_name. 
         Raises: 
             AttributeError: If haven't calibrated before, you need all parameters of calibrate() method.
          """
-        imgL = cv.imread(image_left_path)
-        grayL = cv.cvtColor(imgL, cv.COLOR_BGR2GRAY)
-        imgR = cv.imread(image_right_path)
-        grayR = cv.cvtColor(imgR, cv.COLOR_BGR2GRAY)
-
+        if len(image_left__dims) != 2 or len(image_right_dims) != 2:
+            raise ValueError("image_left_dims and image_right_dims must have a length of 2")
+        if self.fish_eye:
+            r2 = np.zeros([3,3])
+            p1 = np.zeros([3,4])
+            p2 = np.zeros([3,4])
+            q = np.zeros([4,4])
         try:
-            rectL, rectR, projMatrixL, projMatrixR, self.Q, self.camL.roi, self.camR.roi = cv.stereoRectify(self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, grayL.shape[::-1], self.rot, self.trans, alpha, output_size, flags=cv.CALIB_ZERO_DISPARITY)
+            if self.fish_eye == False:
+                rectL, rectR, projMatrixL, projMatrixR, self.Q, self.camL.roi, self.camR.roi = cv.stereoRectify(self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, image_left__dims, self.rot, self.trans, alpha, output_size, flags=cv.CALIB_ZERO_DISPARITY)
 
-            self.stereoMapL = cv.initUndistortRectifyMap(self.camL.matrix, self.camL.dist_coeffs, rectL, projMatrixL, grayL.shape[::-1], cv.CV_16SC2)
-            self.stereoMapR = cv.initUndistortRectifyMap(self.camR.matrix, self.camR.dist_coeffs, rectR, projMatrixR, grayR.shape[::-1], cv.CV_16SC2)
-            
+                self.stereoMapL = cv.initUndistortRectifyMap(self.camL.matrix, self.camL.dist_coeffs, rectL, projMatrixL, image_left__dims, cv.CV_16SC2)
+                self.stereoMapR = cv.initUndistortRectifyMap(self.camR.matrix, self.camR.dist_coeffs, rectR, projMatrixR, image_right_dims, cv.CV_16SC2)
+            else:
+                rectL, rectR, projMatrixL, projMatrixR, self.Q = cv.fisheye.stereoRectify(self.camL.matrix, self.camL.dist_coeffs, self.camR.matrix, self.camR.dist_coeffs, image_left__dims, self.rot, self.trans, 0, r2, p1, p2, q, cv.CALIB_ZERO_DISPARITY, output_size, 0, 0)
+
+                self.stereoMapL = cv.fisheye.initUndistortRectifyMap(self.camL.matrix, self.camL.dist_coeffs, rectL, projMatrixL, image_left__dims, cv.CV_16SC2)
+                self.stereoMapR = cv.fisheye.initUndistortRectifyMap(self.camR.matrix, self.camR.dist_coeffs, rectR, projMatrixR, image_right_dims, cv.CV_16SC2)
             if export_file:
                 print("Saving parameters!")
                 cv_file = cv.FileStorage('{}.xml'.format(export_file_name), cv.FILE_STORAGE_WRITE)
@@ -277,6 +340,8 @@ class StandardStereo:
          """
         # file storage read
         cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
+        if not cv_file.isOpened():
+            raise OSError("Looks like {} doesn't exist!".format(path))
         temp_stereoMapL = []
         temp_stereoMapR = []
         temp_stereoMapL.append(cv_file.getNode('stereoMapL_x').mat())
@@ -288,7 +353,7 @@ class StandardStereo:
         self.stereoMapR = temp_stereoMapR
         cv_file.release()
     
-    def print_parameters(self, one_camera_parameters=['matrix', 'dist_coeffs', 'roi'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']):
+    def print_parameters(self, one_camera_parameters=['matrix', 'dist_coeffs'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']):
         """ Print required individual camera parameters and stereo parameters already defined
         Arguments: 
             one_camera_parameters: All elements in list  will be printed, 
@@ -316,8 +381,11 @@ class StandardStereo:
 
 class StandardStereoBuilder(StereoSystemBuilder):
     """
-    The Concrete Builder classes follow the Builder interface and provide
-    specific implementations of the building steps.
+    Implement methods to get depth using OpenCV matchers like SGBM or BM.
+    Attributes:
+        camL: left camera instance.
+        camR: right camera instance.
+        stereo_maps_path: an xml with Stereo rectification maps
     """
 
     def __init__(self, cam_left: Camera, cam_right: Camera, stereo_maps_path) -> None:
@@ -340,23 +408,24 @@ class StandardStereoBuilder(StereoSystemBuilder):
         """
         return self._product
 
-    def pre_process(self, frameL, frameR, downsample=4):
+    def pre_process(self, frameL, frameR, downsample=2):
         """ First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.
         Arguments: 
             frameL: it's the left frame
             frameR: it's the right frame
             downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 4, 16, 64, 256, 1024, 4096. If downsample factor is 1 or None or False won't apply downsampling.
+            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
         Returns:
             Both frames to apply stereo correspondence or apply more processing to the images.
         """
-        if downsample not in (4**p for p in range(1, 7)):
+        if downsample not in (2**p for p in range(1, 7)):
             if downsample in [1, None, False]:
                 n_downsamples = 0
             else:
-                raise ValueError("downsample only can be 4, 16, 64, 256, 1024, 4096")
+                raise ValueError("downsample only can be 2, 4, 8, 16, 32, 64")
         else:
-            n_downsamples = [4**p for p in range(1, 7)].index(downsample)
+            n_downsamples = [2**p for p in range(1, 7)].index(downsample)
+            n_downsamples += 1
         
         img_left_gray = cv.cvtColor(frameL,cv.COLOR_BGR2GRAY)
         img_right_gray = cv.cvtColor(frameR,cv.COLOR_BGR2GRAY)
@@ -366,7 +435,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
         # Applying stereo image rectification on the right image
         rectified_right = cv.remap(img_right_gray, self._product.stereoMapR[0], self._product.stereoMapR[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
         if n_downsamples > 0:
-            for i in range(n_downsamples + 1):
+            for i in range(n_downsamples):
                 rectified_left = cv.pyrDown(rectified_left)
                 rectified_right = cv.pyrDown(rectified_right)
         
@@ -437,7 +506,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
         return left_disp, right_disp, left_matcher
          
     
-    def post_process(self, frameL, left_disp, right_disp, matcher, lmbda=128.0, sigma=1.5, metrics=True):
+    def post_process(self, frameL, left_disp, right_disp, matcher, lmbda=8000, sigma=1.5, metrics=True):
         """ Apply wls filter in disparity maps to smooth contours
         Arguments: 
             frameL: it's the left frame
@@ -522,54 +591,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
         disparity = np.array(disparity)
         homogeneous_3D_points = []
         for point in points:
-            point_xy_disp = np.append(point, [disparity[point[0]][point[1]], 1], axis=0)
+            point_xy_disp = np.append(point, [disparity[point[1]][point[0]], 1], axis=0)
             projected_point = np.matmul(Q, point_xy_disp)
             homogeneous_3D_points.append(projected_point)
         return homogeneous_3D_points
-
-if __name__ == "__main__":
-    """
-    The client code creates a builder object, passes it to the director and then
-    initiates the construction process. The end result is retrieved from the
-    builder object.
-    """
-    # Test without previous calibration
-    cam1 = Camera("xiaomi_redmi_note_8_pro", 'http://192.168.0.105:8080/shot.jpg')
-    cam2 = Camera("xiaomi_redmi_9T", 'http://192.168.0.101:8080/shot.jpg')
-    stereo = StandardStereo(cam1, cam2)
-    # stereo.take_dual_photos(15, "left_camera_xiaomi_redmi_note_8_pro", "right_camera_xiaomi_redmi_9T")
-    stereo.calibrate("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro", "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T", pattern_size=(8, 5))
-    stereo.rectify("/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/left_camera_xiaomi_redmi_note_8_pro/photo_1.png",  "/home/corvus96/Documentos/github/PyTwoVision/pytwovision/stereo/right_camera_xiaomi_redmi_9T/photo_1.png", "test_12_oct")
-    stereo.print_parameters()
-    stereo_builder = StandardStereoBuilder(cam1, cam2, 'test_12_oct.xml')
-    stereo_controller = StereoController()
-    stereo_controller.stereo_builder = stereo_builder
-    matcherSGBM = Matcher(StereoSGBM())
-    cv.namedWindow("disp", cv.WINDOW_NORMAL)
-    trackbars = stereo_tuner.StereoSGBMTrackBars("disp")
-    trackbars.attach(stereo_tuner.UniquenessRatioTrackBarUpdater(), 5, 15)
-    trackbars.attach(stereo_tuner.SpeckleRangeTrackBarUpdater(), 0, 100)
-    trackbars.attach(stereo_tuner.SpeckleWindowSizeTrackBarUpdater(), 50, 1200)
-    trackbars.attach(stereo_tuner.MinDisparityTrackBarUpdater(), 0, 128)
-    trackbars.attach(stereo_tuner.Disp12MaxDiffTrackBarUpdater(), 0, 512)
-    trackbars.attach(stereo_tuner.BlockSizeTrackBarUpdater(), 3, 51)
-    trackbars.attach(stereo_tuner.NumDisparitiesTrackBarUpdater(), 80, 256)
-    trackbars.attach(stereo_tuner.P1TrackBarUpdater(), 216, 432)
-    trackbars.attach(stereo_tuner.P2TrackBarUpdater(), 864, 1728)
-    trackbars.attach(stereo_tuner.PreFilterCapTrackBarUpdater(), 1, 63)
-    while True:
-        img_respL = requests.get(cam1.source)
-        img_arrL = np.array(bytearray(img_respL.content), dtype=np.uint8)
-        frameL = cv.imdecode(img_arrL, -1)
-        img_respR = requests.get(cam2.source)
-        img_arrR = np.array(bytearray(img_respR.content), dtype=np.uint8)
-        frameR = cv.imdecode(img_arrR, -1)
-        disp, matcher = stereo_controller.compute_disparity_color_map(frameL, frameR, matcherSGBM)
-        trackbars.tune_matcher(matcher)
-        cv.imshow('disp', disp)
-        if cv.waitKey(1) == 27:
-            #esc pressed
-            print("Escape hit, closing...")
-            break
-    
-    cv.destroyAllWindows()
