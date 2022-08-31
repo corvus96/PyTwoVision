@@ -1,10 +1,9 @@
 import unittest
 import os
 import shutil
-import wget
 import tensorflow as tf
 
-from pytwovision.recognition.detection_mode import DetectImage, DetectRealTime, DetectRealTimeMP, DetectVideo
+from pytwovision.recognition.detection_mode import DetectImage, DetectRealTime, DetectRealTimeMP
 from pytwovision.recognition.selector import Recognizer
 from pytwovision.recognition.yolov3_detector import ObjectDetectorYoloV3
 from pytwovision.utils.label_utils import read_class_names
@@ -14,6 +13,7 @@ class TestDetectionMode(unittest.TestCase):
     def setUp(self):
         self.images_path = "tests/test_dataset/images"
         self.classes_path = "tests/test_dataset/classes/coco.names"
+        self.voc_classes_path = "tests/test_dataset/classes/VOC_classes.txt"
         self.work_dir = "tests/test_dataset/outputs"
         try:
             os.mkdir(self.work_dir)
@@ -53,7 +53,7 @@ class TestDetectionMode(unittest.TestCase):
         detector =  DetectImage()
         not_is_compatible = False
         try:
-            detector.detect(model, "tests/test_dataset/images/2007_000027.jpg", self.classes_path, os.path.join(self.work_dir, "test_out.jpag"))
+            detector.detect(model, "tests/test_dataset/images/2007_000027.jpg", self.classes_path, os.path.join(self.work_dir, "test_out.jpag"), show=False)
         except ValueError:
             not_is_compatible = True
         self.assertTrue(not_is_compatible)

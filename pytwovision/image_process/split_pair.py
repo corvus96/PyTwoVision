@@ -6,11 +6,13 @@ class SplitPair(FrameDecorator):
     way.
     """
     def apply(self, mode="sbs"):
-        """Apply split in an image pair from stereo cameras
-        Arguments:
-            mode: if it is "sbs" (side-by-side) it will do a vertical slice,
-            if it is "tb" (top-bottom) it will do a a horizontal slice.
-        Returns: left image and right image
+        """Apply split in an image pair from stereo cameras.
+
+        Args:
+            mode: if it is "sbs" (side-by-side) it will do a vertical slice, if it is "tb" (top-bottom) it will do a a horizontal slice.
+            
+        Returns: 
+            left image and right image.
         """
         # dividing height and width by 2
         height, width = self._frame.apply().shape[:2]

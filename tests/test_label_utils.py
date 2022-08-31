@@ -1,6 +1,6 @@
 import unittest
-import numpy as np
 import os 
+
 from pytwovision.utils.label_utils import label_map, index2class, class2index
 
 class TestLabelUtils(unittest.TestCase):

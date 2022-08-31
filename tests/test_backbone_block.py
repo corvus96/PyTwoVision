@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import tensorflow as tf
 
 from pytwovision.models.blocks.backbone_block import BackboneBlock
 from pytwovision.models.blocks.backbone_block import darknet53, darknet19_tiny

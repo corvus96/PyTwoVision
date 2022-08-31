@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import tensorflow as tf
 
 from pytwovision.models.layers.residual_layer import residual_layer
 

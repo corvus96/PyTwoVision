@@ -82,8 +82,12 @@ def draw_bbox(image, bboxes, class_file_name, show_label=True, show_confidence =
                         fontScale, text_colors, bbox_thick, lineType=cv.LINE_AA)
 
         if homogeneous_points != None:
-            cv.putText(image, "{}".format(",".join(homogeneous_points[i])), (x1, y2+6), cv.FONT_HERSHEY_COMPLEX_SMALL,
-                    fontScale, text_colors, bbox_thick, lineType=cv.LINE_AA)
+            y_position = y1 + 14
+            coordinates = ["X", "Y:", "Z", "W"]
+            for num, string_coor in enumerate(coordinates):
+                coor_label = "{}: {:.2f}".format(string_coor, homogeneous_points[i][num])
+                cv.putText(image, coor_label, (x1 + 3, y_position), cv.FONT_HERSHEY_COMPLEX_SMALL, fontScale, text_colors, bbox_thick, lineType=cv.LINE_AA)
+                y_position += 14
 
 
     return image

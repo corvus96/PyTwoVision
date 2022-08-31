@@ -6,7 +6,14 @@ class Rotate(FrameDecorator):
     way.
     """
     def apply(self, angle):
-        """Apply rotation on an image"""
+        """Apply rotation on an image.
+
+        Args: 
+            angle: an integer that represents rotation angle.
+
+        Returns: 
+            an image rotated.
+        """
         # dividing height and width by 2 to get the center of the image
         height, width = self._frame.apply().shape[:2]
         # get the center coordinates of the image to create the 2D rotation matrix

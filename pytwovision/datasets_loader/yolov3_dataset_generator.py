@@ -10,29 +10,27 @@ from pytwovision.image_process.resize_with_bbox import ResizeWithBBox
 from pytwovision.compute.yolov3_calculus import YoloV3Calculus
 
 class YoloV3DatasetGenerator(object):
+    """
+        A generator compatible with YOLO V3 network.
+        
+        Args:
+            annotations_path: a path where the annotations are saved.
+            class_file_name: a path with a .txt file where the classes are saved.
+            batch_size: an integer that corresponds with the number of image which we introduce in a network per iteration.
+            data_augmentation: a boolean that controls data augmentation which change original images in new ways.
+            input_shape: a tuple with the input images dimensions.
+            strides: a list with the strides in a yolo model.
+            anchors: these are the yolo anchors sizes.
+            anchor_per_scale: an integer with the number of anchor boxes per scale. 
+            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. 
+            images_to_ram: a boolean to control when save images in ram which allow a faster training, but it needs more RAM. 
+    """
     def __init__(self, annotations_path, class_file_name, batch_size=4, data_augmentation=True, 
                 input_shape=(416, 416, 3), strides=[8, 16, 32],
                 anchors=[[[10,  13], [16,   30], [33,   23]],
                         [[30,  61], [62,   45], [59,  119]],
                         [[116, 90], [156, 198], [373, 326]]],
                 anchor_per_scale=3, max_bbox_per_scale=100, images_to_ram=True):
-        """
-        A generator compatible with YOLO V3 network.
-        Arguments:
-            annotations_path: a path where the annotations are saved.
-            class_file_name: a path with a .txt file where the classes are saved.
-            batch_size: an integer that corresponds with the number of image which
-            we introduce in a network per iteration.
-            data_augmentation: a boolean that controls data augmentation which 
-            change original images in new ways.
-            input_shape: a tuple with the input images dimensions.
-            strides: a list with the strides in a yolo model.
-            anchors: these are the yolo anchors sizes.
-            anchor_per_scale: an integer with the number of anchor boxes per scale. 
-            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. 
-            images_to_ram: a boolean to control when save images in ram which allow a 
-            faster training, but it needs more RAM. 
-        """
         self.annot_path  = annotations_path
         self.input_sizes = input_shape[0]
         self.batch_size  = batch_size
@@ -85,8 +83,9 @@ class YoloV3DatasetGenerator(object):
         return self
 
     def delete_bad_annotation(self, bad_annotation):
-        """Delete an annotation from annotations file .txt
-        Arguments:
+        """Delete an annotation from annotations file .txt.
+
+        Args:
             bad_annotation: a string with the path of an image
         """
         print(f'Deleting {bad_annotation} annotation line')
@@ -103,6 +102,7 @@ class YoloV3DatasetGenerator(object):
     
     def __next__(self):
         """This method will be executed when you iterate this class
+
         Returns: 
             a batch of images when their bounding boxes
         """
@@ -163,9 +163,11 @@ class YoloV3DatasetGenerator(object):
 
     def random_horizontal_flip(self, image, bboxes):
         """There is a probability of 0.5 to make an horizontal flip
-        Arguments:  
+
+        Args:  
             image: it can be an image or a batch of images.
             bboxes: this are corresponding bounding boxes.
+
         Returns
             images and their bounding boxes.
         """
@@ -177,10 +179,12 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def random_crop(self, image, bboxes):
-        """There is a probability of 0.5 to make a crop
-        Arguments:  
+        """There is a probability of 0.5 to make a crop.
+
+        Args:  
             image: it can be an image or a batch of images.
             bboxes: this are corresponding bounding boxes.
+
         Returns
             images and their bounding boxes.
         """
@@ -206,10 +210,12 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def random_translate(self, image, bboxes):
-        """There is a probability of 0.5 to shift in x and y images
-        Arguments:  
+        """There is a probability of 0.5 to shift in x and y images.
+
+        Args:  
             image: it can be an image or a batch of images.
             bboxes: this are corresponding bounding boxes.
+
         Returns
             images and their bounding boxes.
         """
@@ -234,12 +240,12 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def parse_annotation(self, annotation, mAP=False):
-        """Convert an annotation in an image with their bounding boxes
-        Arguments:  
-            annotation: an annotation line 
-            (path bounding box 1, class bounding box 2, class, ...)
-            mAP: when it's true this method won't 
-            resize images and bounding boxes, otherwise it will do
+        """Convert an annotation in an image with their bounding boxes.
+
+        Args:  
+            annotation: an annotation line (path bounding box 1, class bounding box 2, class, ...)
+            mAP: when it's true this method won't resize images and bounding boxes, otherwise it will do.
+
         Returns
             images and their bounding boxes.
         """
@@ -264,9 +270,11 @@ class YoloV3DatasetGenerator(object):
         return image, bboxes
 
     def preprocess_true_boxes(self, bboxes):
-        """To prepare labels (true_boxes)
-        Arguments:
-            bboxes: a bounding boxes array
+        """To prepare labels (true_boxes).
+
+        Args:
+            bboxes: a bounding boxes array.
+
         Returns:
             Ground true bounding boxes
         """

@@ -1,12 +1,11 @@
 import numpy as np
-import math
 import tensorflow as tf
 
 class YoloV3Calculus:
     """
-    Utility methods for computing IOU, decode 
-    output of network when train, nms, yolov3 loss
-    and bounding box offsets
+    Useful methods for calculating the IOU, decode 
+    network output when training, nms, yolov3 loss, and bounding box offsets.
+    and bounding box offsets.
     """
 
     def decode(self, conv_output, num_class, i=0, strides=[8, 16, 32], 
@@ -14,16 +13,17 @@ class YoloV3Calculus:
                         [[30,  61], [62,   45], [59,  119]],
                         [[116, 90], [156, 198], [373, 326]]]):
         """
-        A piece of code that receive yolo convolutional
-        layers and return prediction layers
-        Arguments:
-            conv_output: output of Yolo model
-            num_class: an intenger that represent how many classes has the model.
-            i: an integer which can be 0, 1, or 2 to correspond to the three grid scales.
-            strides: a list with a len of 3 that correspond with the strides between each prediction.
-            anchors: a 3 dimensional list with anchors sizes.
+        A piece of code that receives convolutional layers and returns the prediction layers.
+        
+        Args:
+            conv_output: output of the Yolo model.
+            num_class: an integer representing how many classes the model has.
+            i: an integer that can be 0, 1 or 2 to correspond to the three scales of the grid.
+            strides: a list with a length of 3 corresponding to the strides of the prediction layer.
+            anchors: a 3-dimensional list of anchor sizes.
+        
         Returns:
-            the predicted probability category box object
+            the predicted probability category box object.
         """
         strides = np.array(strides)
         anchors = (np.array(anchors).T/strides).T
@@ -64,10 +64,11 @@ class YoloV3Calculus:
         return tf.concat([pred_xywh, pred_conf, pred_prob], axis=-1)
 
     def centroid2minmax(self, boxes):
-        """Centroid to minmax format 
-        (cx, cy, w, h) to (xmin, ymin, xmax, ymax)
-        Arguments:
-            boxes: Batch of boxes in centroid format
+        """Centroid to minmax format (cx, cy, w, h) to (xmin, ymin, xmax, ymax).
+
+        Args:
+            boxes: Batch of  bounding boxes in centroid format.
+
         Returns:
             minmax: Batch of boxes in minmax format
         """
@@ -79,12 +80,13 @@ class YoloV3Calculus:
         return minmax
 
     def minmax2centroid(self, boxes):
-        """Minmax to centroid format
-        (xmin, ymin, xmax, ymax) to (cx, cy, w, h)
+        """Minmax to centroid format (xmin, ymin, xmax, ymax) to (cx, cy, w, h).
+        
         Arguments:
-            boxes (tensor): Batch of boxes in minmax format
+            boxes: Batch of bounding boxes in minmax format.
+
         Returns:
-            centroid (tensor): Batch of boxes in centroid format
+            A Batch of boxes in centroid format
         """
         centroid = np.copy(boxes).astype(np.float)
         centroid[..., 0] = 0.5 * (boxes[..., 2] - boxes[..., 0])
@@ -96,13 +98,14 @@ class YoloV3Calculus:
         return centroid
     
     def bbox_iou(self, boxes1, boxes2):
-        """
-        Compute Intersection Over Union between anchor boxes and bounding boxes
-        Arguments:
-            boxes1: an array or tensor with a shape (n, 4)
-            boxes2: an array or tensor with a shape (n, 4)
+        """Compute Intersection Over Union between anchor boxes and bounding boxes.
+        
+        Args:
+            boxes1: an array or tensor with a shape (n, 4).
+            boxes2: an array or tensor with a shape (n, 4).
+        
         Returns:
-            A value between (0, 1) that correspond with IoU
+            A value between (0, 1) that correspond with IoU.
         """
         boxes1_area = boxes1[..., 2] * boxes1[..., 3]
         boxes2_area = boxes2[..., 2] * boxes2[..., 3]
@@ -123,12 +126,14 @@ class YoloV3Calculus:
 
     def bbox_giou(self, boxes1, boxes2):
         """
-        Compute Generalized Intersection Over Union between bounding boxes
-        Arguments:
-            boxes1: an array or tensor with a shape (n, 4)
-            boxes2: an array or tensor with a shape (n, 4)
+        Compute Generalized Intersection Over Union between bounding boxes.
+        
+        Args:
+            boxes1: an array or tensor with a shape (n, 4).
+            boxes2: an array or tensor with a shape (n, 4).
+        
         Returns:
-            A value between (0, 1) that correspond with GIoU
+            A value between (0, 1) that correspond with GIoU.
         """
         boxes1 = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
                             boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
@@ -167,13 +172,14 @@ class YoloV3Calculus:
         return giou
 
     def bbox_ciou(self, boxes1, boxes2):
-        """
-        Compute Complete Intersection Over Union between bounding boxes
-        Arguments:
-            boxes1: an array or tensor with a shape (n, 4)
-            boxes2: an array or tensor with a shape (n, 4)
+        """Compute Complete Intersection Over Union between bounding boxes.
+        
+        Args:
+            boxes1: an array or tensor with a shape (n, 4).
+            boxes2: an array or tensor with a shape (n, 4).
+        
         Returns:
-            A value between (0, 1) that correspond with CIoU
+            A value between (0, 1) that correspond with CIoU.
         """
         boxes1_coor = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
                             boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
@@ -201,22 +207,21 @@ class YoloV3Calculus:
         return iou - ciou_term
     
     def loss(self, pred, conv, label, bboxes, num_class, i=0, strides=[8, 16, 32], loss_thresh=0.5):
-        """pred, conv, *target[i], i, CLASSES=TRAIN_CLASSES
-        pred, conv, label, bboxes, i=0, CLASSES=YOLO_COCO_CLASSES
-        Compute a loss vector to train a yolo network using GIoU
-        Arguments:
-            pred: the prediction of the model
-            conv: the last convolutional layer of a yolo model
-            label: expected label
-            bboxes: ground truth
-            num_class: an integer with the number of classes to detect
+        """Calculate a loss vector to train a yolo network using GIoU, confidence and probability losses.
+        
+        Args:
+            pred: the prediction of the model.
+            conv: the last convolutional layer of a yolo model.
+            label: expected label.
+            bboxes: ground truth.
+            num_class: an integer with the number of classes to detect.
             i: an integer which can be 0, 1, or 2 to correspond to the three grid scales.
             strides: a list with a len of 3 that correspond with the strides between each prediction.
-            loss_thresh: a number between (0, 1) which if IoU is less than it, it is considered 
-            that the prediction box contains no objects, then the background box.
+            loss_thresh: a number between (0, 1) which if IoU is less than it, it is considered that the prediction box contains no objects.
+        
         Returns:
-            A tuple with a len of 3 where the first argument is the GIoU_loss, next
-            Confidence loss and the last one the probability loss
+            A tuple with a len of 3 where the first argument is the GIoU loss, next
+            Confidence loss and the last one the probability loss.
         """
         strides = np.array(strides)
 
@@ -269,13 +274,14 @@ class YoloV3Calculus:
     
     def best_bboxes_iou(self, boxes1, boxes2):
         """
-        Compute Intersection Over Union between bounding 
-        boxes and return the best choices to apply nms algorithm
-        Arguments:
-            boxes1: an array or tensor with a shape (n, 4)
-            boxes2: an array or tensor with a shape (n, 4)
+        Compute Intersection Over Union between bounding boxes and return the best choices to apply nms algorithm.
+        
+        Args:
+            boxes1: an array or tensor with a shape (n, 4).
+            boxes2: an array or tensor with a shape (n, 4).
+        
         Returns:
-            A value between (0, 1) that correspond with IoU
+            A value between (0, 1) that correspond with IoU.
         """
         boxes1 = np.array(boxes1)
         boxes2 = np.array(boxes2)
@@ -296,15 +302,16 @@ class YoloV3Calculus:
     def nms(self, bboxes, iou_threshold, sigma=0.3, method='nms'):
         """
         Compute Non maximum supression algorithm.
-        Note: soft-nms, https://arxiv.org/pdf/1704.04503.pdf
-            https://github.com/bharatsingh430/soft-nms
-        Arguments:
+        Note: see this paper to understand soft-nms https://arxiv.org/pdf/1704.04503.pdf.
+
+        Args:
             bboxes: (xmin, ymin, xmax, ymax, score, class).
-            iou_threshold: a parameter between (0, 1)
-            sigma: a parameter between (0, 1)
-            method: a string that can be  'nms' or 'soft-nms'
+            iou_threshold: a parameter between (0, 1).
+            sigma: a parameter between (0, 1).
+            method: a string that can be  'nms' or 'soft-nms'.
+
         Returns:
-            Better bounding boxes
+            Better bounding boxes.
         """
         classes_in_img = list(set(bboxes[:, 5]))
         best_bboxes = []
@@ -342,11 +349,13 @@ class YoloV3Calculus:
     def postprocess_boxes(self, pred_bbox, original_image, input_size, score_threshold):
         """
         Improve predicted bounding boxes and resize them.
-        Arguments:
+
+        Args:
             pred_bbox: a predicted bonding box.
             original_image: an image before resizing.
             input_size: the dimension of original image after resizing like an square image.
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
+
         Returns:
             Bounding boxes that are inside the range, valids and with a score greather than score_threshold.
         """

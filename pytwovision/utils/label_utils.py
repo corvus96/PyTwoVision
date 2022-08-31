@@ -4,13 +4,7 @@ label retrieval, loading label csv file,
 drawing label on an image
 """
 
-import numpy as np
-import csv
-import matplotlib.pyplot as plt
 import os
-
-from matplotlib.patches import Rectangle
-from random import randint
 
 def label_map(labels, dst_path=None, name='label_map'):
     """

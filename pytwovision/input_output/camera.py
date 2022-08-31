@@ -14,11 +14,10 @@ from pytwovision.compute.error_compute import re_projection_error
 
 class Camera():
     """An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters. 
-    Arguments:
+
+    Args:
         id: A string to identify our camera.
-        source: When you use webcam you need to put (int) 0, 
-        if you want to use videos or streaming, you will need to put his URL or path even
-        you can put in a video file or a image path.
+        source: When you use webcam you need to put (int) 0, if you want to use videos or streaming, you will need to put his URL or path even you can put in a video file or a image path.
     """
     def __init__(self, id, source):
         self.id = id
@@ -35,8 +34,9 @@ class Camera():
             self.type_source = 'webcam'
 
     def take_photos(self, num_photos=15, save_dir="images", prefix_name="photo", rotate=0, resize=False, resize_dim=(640,480)):
-        """ A simple way to take photos in console and save in a folder
-        Arguments:
+        """ A simple way to take photos in console and save in a folder.
+
+        Args:
             num_photos: Number of photos to take, 15 by default.
             save_dir: Directory name where the photos will be saved.
             prefix_name: A prefix for the names of the photos.
@@ -111,17 +111,19 @@ class Camera():
         os.chdir(cwd)
 
     def calibrate(self, images_path='', pattern_type='chessboard', pattern_size=(8,5), export_file=True, show=True, fish_eye=True):
-        """ Compute camera parameters
-        Arguments:
+        """ Compute camera parameters.
+
+        Args:
             images_path: folder where is saved calibration pattern photos.
             pattern_type: It can be "circles" pattern or "chessboard" pattern (default).
             pattern_size: If pattern_type is "chessboard"  this the Number of inner corners per a chessboard row and column. But If pattern_type is "circles" this will be the number of circles per row and column. 
             export_file: To export camera parameters on xml file.
             show: if is true it show corners or centers found by calibration algorithm  at each iteration.
-            fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it'll
-            use normal calibration, fish eye is recomended when cameras has an field of view > 160.
+            fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it'll use normal calibration, fish eye is recomended when cameras has an field of view > 160.
+
         Returns: 
-            RMS calibration's error
+            RMS calibration's error.
+
         Raises:
             OSError: If didn't find photos on images_path folder.
             ValueError: If pattern_type is different of 'chessboard' or 'circles' or when
@@ -229,10 +231,8 @@ class Camera():
 
     def get_parameters(self, path):
         """ Loads camera parameters from a xml file
-        Arguments: 
-            path: a path where is saved xml file. (Note: if you don't 
-            have any parameters you can use calibrate method first
-            and then pass true in export file argument)
+        Args: 
+            path: a path where is saved xml file. (Note: if you don't have any parameters you can use calibrate method first and then pass true in export file argument)
         Raises:
             OSError: when path is wrong.
          """

@@ -35,6 +35,7 @@ class XmlParser(Parser):
             image_path: a full path where the images are saved.
             work_dir: a path where the annotations and classes files will be saved, if is None these will be 
             saved in current directory.
+            print_output: a boolean to print in console each annotation line
         """
 
         anno.visit_xml_parser(self, xml_path, annotations_output_name, classes_output_name, image_path, work_dir, print_output)
@@ -54,6 +55,7 @@ class YoloV3AnnotationsFormat(AnnotationsFormat):
     """Get a group of xml annotations to transform in a .txt file compatible with YoloV3 dataset"""
     def visit_xml_parser(self, element ,xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None, print_output=False):
         xmls = glob.glob(xml_path+'/*.xml')
+        xmls = sorted(xmls)
         if len(xmls) == 0:
             raise FileNotFoundError("There isn't annotations in {}".format(xml_path))
         if work_dir is None:

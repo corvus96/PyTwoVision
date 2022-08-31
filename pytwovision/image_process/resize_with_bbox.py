@@ -5,12 +5,14 @@ from pytwovision.image_process.frame_decorator import FrameDecorator
 
 class ResizeWithBBox(FrameDecorator):
     def apply(self, target_size, gt_boxes=None):
-        """Apply resizing on an image and their bounding boxes
-        Arguments:
+        """Apply resizing on an image and their bounding boxes.
+        
+        Args:
              target_size: a tuple or list with the new dimensions of an image.
-             gt_boxes: bounding boxes 
+             gt_boxes: bounding boxes. 
+        
         Returns:
-            a resized image and their reescaling bounding boxes
+            a resized image and their reescaling bounding boxes.
         """
         ih, iw    = target_size
         h,  w, _  = self._frame.apply().shape

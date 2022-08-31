@@ -1,29 +1,27 @@
 import cv2 as cv
 
 def re_projection_error(objpoints, rvecs, tvecs, mtx, imgpoints, dist):
-    """Calculate the error when calibrate a camera. 
-    when the error is near zero, 
-    the more accurate the parameters we found are. 
-    Given the intrinsic, distortion, rotation and 
-    translation matrices, we must first transform 
+    """Calculates the error when calibrating a camera. 
+    when the error approaches zero, 
+    the more accurate are the parameters found. 
+    Given the intrinsic, distortion, rotation and translation matrices, we must first transform the 
+    translation matrices, we must first transform the object point to the point of the camera. 
     the object point to image point using cv.projectPoints().
-    Then, we're gonna calculate the absolute norm between what 
-    we got with our transformation and the corner finding algorithm. 
-    To find the average error, we calculate the arithmetical mean
-    of the errors calculated for all the calibration images.
-    Arguments:
-        objpoints: Array of object points expressed wrt. 
-        the world coordinate frame. 
-        A 3xN/Nx3 1-channel or 1xN/Nx1 3-channel, 
-        where N is the number of points in the view.
-        rvecs: The rotation vector (Rodrigues) that, together with tvec, performs a 
-        change of basis from world to camera coordinate system, see calibrateCamera for details.
-        tvecs: The translation vector, see parameter description above.
-        mtx: Camera intrinsic matrix.
-        imgpoints: reference points to compare with objpoints reprojected.
-        dist: Input vector of distortion coefficients.
-    Returns:
-        a float with average error with L2 norm.
+    Then, we will calculate the absolute norm between what we obtained with our transformation and the algorithm. 
+    obtained with our transformation and the corner search algorithm. 
+    To find the average error, we calculate the arithmetic average
+    of the errors calculated for all calibration images.
+    
+    Args:
+        objpoints: array of object points expressed in the world coordinate frame. A 1-channel 3xN/Nx3 or 3-channel 1xN/Nx1, where N is the number of points in the view.
+        rvecs: the rotation vector (Rodrigues) which, together with tvec, performs a change of base from the world coordinate system to the camera, see calibrateCamera for more details.
+        tvecs: The translation vector, see the description of the parameters above.
+        mtx: The intrinsic matrix of the camera.
+        imgpoints: reference points to compare with the reprojected objpoints.
+        dist: Input vector of the distortion coefficients.
+
+    Returns
+        a float with the mean error with L2 norm.
     """
     mean_error = 0
     for i in range(len(objpoints)):

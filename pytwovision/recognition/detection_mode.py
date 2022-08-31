@@ -63,7 +63,7 @@ class DetectionMode(ABC):
 
         return image_data[np.newaxis, ...].astype(np.float32)
     
-    def draw(self, original_image, bboxes, class_file_name, rectangle_colors, homogeneous_points=None):
+    def draw(self, original_image, bboxes, class_file_name, rectangle_colors, homogeneous_points=None, text_colors=(255,255,0)):
         """Draw bounding boxes on images
         Arguments:
             original_image: an array which correspond with an image
@@ -77,7 +77,7 @@ class DetectionMode(ABC):
             An image with bounding boxes and homogeneous coordinates.
         """
         return draw_bbox(original_image, bboxes, class_file_name=class_file_name, 
-                rectangle_colors=rectangle_colors, homogeneous_points=homogeneous_points)
+                rectangle_colors=rectangle_colors, homogeneous_points=homogeneous_points, text_colors=text_colors)
     
     @abstractmethod
     def detect(self):
@@ -115,7 +115,7 @@ class DetectionMode(ABC):
 
 class DetectRealTime(DetectionMode):
     def detect(self, model, camera: Camera, class_file_name, output_path="", input_size=416, 
-                score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
+                score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", show=True):
         """Apply detection pipeline in realtime, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
@@ -128,6 +128,7 @@ class DetectRealTime(DetectionMode):
             rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
+            show: a boolean to show frame pcessed.
         """
         times = []
         vid = self.camera_input(camera)
@@ -163,11 +164,12 @@ class DetectRealTime(DetectionMode):
             cv.putText(frame, "Time: {:.1f}FPS".format(fps), (0, 30),
                           cv.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
             if output_path != '': out.write(frame)
-            self.show(frame, camera)
-            if cv.waitKey(25) & 0xFF == ord("q"):
-                cv.destroyAllWindows()
-                break
-        cv.destroyAllWindows()
+            if show: 
+                self.show(frame, camera)
+                if cv.waitKey(25) & 0xFF == ord("q"):
+                    cv.destroyAllWindows()
+                    break
+        if show: cv.destroyAllWindows()
 
     def prepare_input(self, vid, output_path):
         """Initialization for writing and reading videos
@@ -373,7 +375,7 @@ class DetectRealTimeMP(DetectionMode):
 
 class DetectVideo(DetectionMode):
     def detect(self, model, input_path, class_file_name, output_path="", input_size=416, 
-                score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
+                score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", show=True):
         """Apply detection pipeline in a saved video, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
@@ -386,6 +388,7 @@ class DetectVideo(DetectionMode):
             rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
+            show: a boolean to show frame pcessed
         """
         times, times_2 = [], []
 
@@ -422,11 +425,12 @@ class DetectVideo(DetectionMode):
             
             print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
             if output_path != '': out.write(image)
-            self.show(image)
-            if cv.waitKey(25) & 0xFF == ord("q"):
-                cv.destroyAllWindows()
-                break
-        cv.destroyAllWindows()
+            if show: 
+                self.show(image)
+                if cv.waitKey(25) & 0xFF == ord("q"):
+                    cv.destroyAllWindows()
+                    break
+        if show: cv.destroyAllWindows()
 
     def prepare_input(self, input_path, output_path):
         """Initialization for writing and reading videos
@@ -461,7 +465,7 @@ class DetectVideo(DetectionMode):
 
 class DetectImage(DetectionMode):
     def detect(self, model, input_path, class_file_name, output_path="", input_size=416,
-                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
+                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", show=True):
         """Apply detection pipeline in an image, if you want to close the window just press 'q'.
         Arguments:
             model: expects a tensorflow model trained.
@@ -474,6 +478,7 @@ class DetectImage(DetectionMode):
             rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
             however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
+            show: a boolean to show frame pcessed.
         Returns:
             an image with prediction drawed
         """
@@ -485,7 +490,8 @@ class DetectImage(DetectionMode):
         pred_bbox = self.predict(model, image_data)
         bboxes = self.postprocess_boxes(original_image, pred_bbox, input_size, score_threshold, iou_threshold, nms_method)
         image = self.draw(original_image, bboxes, class_file_name, rectangle_colors)
-        self.show(image, output_path)
+        if output_path != '': cv.imwrite(output_path, image)
+        if show: self.show(image, output_path)
 
         return image
 
@@ -507,7 +513,6 @@ class DetectImage(DetectionMode):
             image: an image array.
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
         """
-        if output_path != '': cv.imwrite(output_path, image)
         # Show the image
         cv.imshow("predicted image", image)
         # Load and hold the image

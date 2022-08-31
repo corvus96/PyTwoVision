@@ -62,13 +62,13 @@ class StereoController:
     The StereoController can construct several product variations using the same
     building steps.
     """
-    def pre_process_step(self, frameL, frameR, downsample=4):
+    def pre_process_step(self, frameL, frameR, downsample=2):
         """ First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.
         Arguments: 
             frameL: it's the left frame
             frameR: it's the right frame
             downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 4, 16, 64, 256, 1024, 4096. If downsample factor is 1 or None or False won't apply downsampling.
+            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
         Returns:
             Both frames to apply stereo correspondence or apply more processing to the images.
         """

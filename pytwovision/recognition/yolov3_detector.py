@@ -89,7 +89,12 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         
     def train(self, train_annotations_path, test_annotations_path, class_file_name, 
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6, 
+                strides=[8, 16, 32],
+                anchors=[[[10,  13], [16,   30], [33,   23]],
+                        [[30,  61], [62,   45], [59,  119]],
+                        [[116, 90], [156, 198], [373, 326]]],
+                anchor_per_scale=3, max_bbox_per_scale=100):
         """Train an yolov3 network or yolov3 tiny.
         Arguments:
             train_annotations_path: a string corresponding to the folder where train annotations are located.
@@ -108,6 +113,10 @@ class ObjectDetectorYoloV3(NeuralNetwork):
             batch_size: an integer with the size of batches in test and train datasets.
             lr_init: a float which is initial learning rate
             lr_end: a float which is final learning rate
+            strides: a list with the strides in a yolo model.
+            anchors: these are the yolo anchors sizes.
+            anchor_per_scale: an integer with the number of anchor boxes per scale. 
+            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. 
         """
         training = True
         if self.training == False:
@@ -115,8 +124,8 @@ class ObjectDetectorYoloV3(NeuralNetwork):
 
         if os.path.exists(log_dir): shutil.rmtree(log_dir)
         self.writer = tf.summary.create_file_writer(log_dir)
-        train_set = YoloV3DatasetGenerator(train_annotations_path, class_file_name, batch_size=batch_size)
-        test_set = YoloV3DatasetGenerator(test_annotations_path, class_file_name, batch_size=batch_size)
+        train_set = YoloV3DatasetGenerator(train_annotations_path, class_file_name, batch_size=batch_size, strides=strides, anchors=anchors, anchor_per_scale=anchor_per_scale, max_bbox_per_scale=max_bbox_per_scale)
+        test_set = YoloV3DatasetGenerator(test_annotations_path, class_file_name, batch_size=batch_size, strides=strides, anchors=anchors, anchor_per_scale=anchor_per_scale, max_bbox_per_scale=max_bbox_per_scale)
 
         steps_per_epoch = len(train_set)
         self.global_steps = tf.Variable(1, trainable=False, dtype=tf.int64)

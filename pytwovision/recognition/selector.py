@@ -48,7 +48,12 @@ class Recognizer:
 
     def train_using_weights(self, train_annotations_path, test_annotations_path, class_file_name, weights_path,
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6,
+                strides=[8, 16, 32],
+                anchors=[[[10,  13], [16,   30], [33,   23]],
+                        [[30,  61], [62,   45], [59,  119]],
+                        [[116, 90], [156, 198], [373, 326]]],
+                anchor_per_scale=3, max_bbox_per_scale=100):
         """Train with transfer learning
         Arguments:
             Arguments:
@@ -72,6 +77,10 @@ class Recognizer:
             batch_size: an integer with the size of batches in test and train datasets.
             lr_init: a float which is initial learning rate.
             lr_end: a float which is final learning rate.
+            strides: a list with the strides in a yolo model.
+            anchors: these are the yolo anchors sizes.
+            anchor_per_scale: an integer with the number of anchor boxes per scale. 
+            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. 
         """
         regex = '((http|https)://)(www.)?' + '[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]' + '{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)'
         regular_exp = re.compile(regex)
@@ -81,11 +90,16 @@ class Recognizer:
         # restore weights
         self.implementation.restore_weights(weights_path)
         # train with a pre-trained net
-        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size, lr_init, lr_end)
+        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size, lr_init, lr_end, strides=strides, anchors=anchors, anchor_per_scale=anchor_per_scale, max_bbox_per_scale=max_bbox_per_scale)
 
     def train(self, train_annotations_path, test_annotations_path, class_file_name, 
                 checkpoint_path="checkpoints", use_checkpoint=False, warmup_epochs=2, 
-                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6):
+                epochs=100, log_dir="logs", save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=1e-4, lr_end=1e-6,
+                strides=[8, 16, 32],
+                anchors=[[[10,  13], [16,   30], [33,   23]],
+                        [[30,  61], [62,   45], [59,  119]],
+                        [[116, 90], [156, 198], [373, 326]]],
+                anchor_per_scale=3, max_bbox_per_scale=100):
         """Train an ssd network.
         Arguments:
             train_annotations_path: a string corresponding to the folder where train annotations are located.
@@ -104,8 +118,12 @@ class Recognizer:
             batch_size: an integer with the size of batches in test and train datasets.
             lr_init: a float which is initial learning rate.
             lr_end: a float which is final learning rate.
+            strides: a list with the strides in a yolo model.
+            anchors: these are the yolo anchors sizes.
+            anchor_per_scale: an integer with the number of anchor boxes per scale. 
+            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. 
         """
-        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size, lr_init, lr_end)
+        self.implementation.train(train_annotations_path, test_annotations_path, class_file_name, checkpoint_path, use_checkpoint, warmup_epochs, epochs, log_dir, save_only_best_model, save_all_checkpoints, batch_size, lr_init, lr_end, strides=strides, anchors=anchors, anchor_per_scale=anchor_per_scale, max_bbox_per_scale=max_bbox_per_scale)
     
     def evaluate(self, model, dataset, classes_file, score_threshold=0.05, iou_threshold=0.50, test_input_size=416):
         """Apply evaluation using mAP
