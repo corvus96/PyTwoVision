@@ -19,4 +19,4 @@ Open a console and write this:
 
 If you want to learn how to use it I recommend see inside tutorials folder because it have some tools and notebooks that can help you to understand how it's works.
 
-Or you can see or documentation website 
+Or you can see our documentation website here: https://corvus96.github.io/PyTwoVision/html/index.html
