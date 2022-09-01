@@ -7,16 +7,18 @@ from pytwovision.models.layers.upsample_layer import UpsampleLayer
 
 
 class BuildYoloV3(tf.keras.Model):
+    """Build YoloV3 model given a backbone.
+        
+    Args:
+        backbone: an object with a backbone network.
+        num_class: an integer with the quantity of classes. 
+        
+    Returns:
+        A list where the first one is used to predict large-sized objects, 
+        the second one is used to predict medium-sized objects, the third one is used to small objects
+        and the last one is the input shape returned.
+    """
     def __init__(self, backbone, num_class):
-        """Build YoloV3 model given a backbone
-        Arguments:
-            backbone: an object with a backbone network
-            num_class: an integer with the quantity of classes 
-        Returns:
-            A list where the first one is used to predict large-sized objects, 
-            the second one is used to predict medium-sized objects, the third one is used to small objects
-            and the last one is the input shape returned.
-        """
         super().__init__()
         if not isinstance(num_class, int):
             raise ValueError('num_class has to be an integer')

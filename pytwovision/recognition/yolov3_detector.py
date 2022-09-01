@@ -18,13 +18,15 @@ from pytwovision.datasets_loader.yolov3_dataset_generator import YoloV3DatasetGe
 
 class ObjectDetectorYoloV3(NeuralNetwork):
     """Made of an Yolo network model and a dataset generator.
-    Arguments:
+    
+    Args:
         mode_name: an string to naming the model.
         num_class: an integer with the numbers of classes in the model.
         input_shape: A tuple with dims shape (height, weight, channels). 
         version: it can be 'yolov3' or 'yolov3_tiny'.
         training: a boolean that change depending if you want to train the model
         gpu_name: a gpu name if it is None this class search automatically a gpu compatible.
+
     Attributes:
         model: A model instance.
         num_class: an integer with the numbers of classes in the model.
@@ -67,12 +69,12 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         self.model = self.build_model(self.conv_tensors, training)
     
     def build_model(self, conv_tensors, training):
-        """Build the complete yolo model and return model instance
-        Arguments:
-            conv_tensors: a tensor with convolutional layers of a 
-            yolo network without output  layers or prediction layers.
-            training: a boolean that change network structure, if is true the last 
-            layers will be predict tensors otherwise it will be output tensors.
+        """Build the complete yolo model and return model instance.
+        
+        Args:
+            conv_tensors: a tensor with convolutional layers of a yolo network without output  layers or prediction layers.
+            training: a boolean that change network structure, if is true the last layers will be predict tensors otherwise it will be output tensors.
+
         Returns:
             A yolo model.
         """
@@ -96,19 +98,17 @@ class ObjectDetectorYoloV3(NeuralNetwork):
                         [[116, 90], [156, 198], [373, 326]]],
                 anchor_per_scale=3, max_bbox_per_scale=100):
         """Train an yolov3 network or yolov3 tiny.
-        Arguments:
+        
+        Args:
             train_annotations_path: a string corresponding to the folder where train annotations are located.
             test_annotations_path: a string corresponding to the folder where test annotations are located.
             class_file_name: a string corresponding to the classes file (a .txt file with a list of classes) is located.
             checkpoint_path: a string corresponding to the checkpoint file that is inside of a checkpoints folder.
             use_checkpoint: a boolean that controls if use chepoint before train 
-            warmup_epochs: an hiperparameter that update learning rate like 
-            this paper https://arxiv.org/pdf/1812.01187.pdf&usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg
+            warmup_epochs: an hiperparameter that update learning rate like this paper https://arxiv.org/pdf/1812.01187.pdf&usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg
             epochs: Number of epochs to train.
             log_dir: a folder to save logs.
-            save_only_best_model: if is true the model will be saved when 
-            best validation loss > total validation loss/total test elements, but if it isn't true model 
-            will be saved always.
+            save_only_best_model: if is true the model will be saved when best validation loss > total validation loss/total test elements, but if it isn't true model will be saved always.
             save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
             batch_size: an integer with the size of batches in test and train datasets.
             lr_init: a float which is initial learning rate
@@ -203,14 +203,16 @@ class ObjectDetectorYoloV3(NeuralNetwork):
 
     
     def train_step(self, image_data, target, optimizer, lr_init=1e-4, lr_end=1e-6):
-        """ training step 
-        Arguments: 
+        """ training step.
+        
+        Args: 
             image_data: an image.
             target: labels
             optimizer: an tensorflow optimizer like Adams optimizer.
             lr_init: initial leraning rate hiperparameter.
             lr_end: final learning rate hiperparameter.
-        Return:
+
+        Returns:
             (global_steps, optimizer.lr, giou_loss, conf_loss, prob_loss, total_loss)
         """
         
@@ -255,10 +257,12 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         return self.global_steps.numpy(), optimizer.lr.numpy(), giou_loss.numpy(), conf_loss.numpy(), prob_loss.numpy(), total_loss.numpy()
 
     def validate_step(self, image_data, target):
-        """ Validation step 
-        Arguments: 
+        """ Validation step.
+
+        Args: 
             image_data: an image.
-            target: labels
+            target: labels.
+
         Returns:
             (giou_loss, conf_loss, prob_loss, total_loss)
         """
@@ -280,10 +284,10 @@ class ObjectDetectorYoloV3(NeuralNetwork):
         return giou_loss.numpy(), conf_loss.numpy(), prob_loss.numpy(), total_loss.numpy()
 
     def restore_weights(self, weights_file, use_checkpoint=False):
-        """Load previously trained model weights
-        Arguments: 
-            weights_file: beginning by project root this is the path 
-            where is save your weights; example: "weights/weights_01.h5"
+        """Load previously trained model weights.
+
+        Args: 
+            weights_file: beginning by project root this is the path where is save your weights; example: "weights/weights_01.h5".
             use_checkpoint: if you wanna use a .ckpt file this variable should be True.
         """
         tf.keras.backend.clear_session() # used to reset layer names
@@ -343,13 +347,15 @@ class ObjectDetectorYoloV3(NeuralNetwork):
 
 
     def inference(self, image_path, input_size=416, score_threshold=0.3, iou_threshold=0.45, nms_method="nms"):
-        """ Apply inference with trained model
-        Arguments:
+        """ Apply inference with trained model.
+
+        Args:
             image_path: a path to an image.
             input_size: integer to resize an input image from their original dimensions to an square image.
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
             nms_method: a string that can be  'nms' or 'soft-nms'.
+
         Returns:
             An array with bounding boxes
         """
@@ -371,14 +377,16 @@ class ObjectDetectorYoloV3(NeuralNetwork):
 
 
     def evaluate(self, model, dataset, classes_file, score_threshold=0.05, iou_threshold=0.50, test_input_size=416):
-        """Apply evaluation using mAP
-        Arguments:
+        """Apply evaluation using mAP.
+
+        Args:
             model: a tesorflow detection model.
             dataset: an YoloV3DatasetGenerator instance with test dataset.
             classes_file: a string corresponding to the classes file (a .txt file with a list of classes) is located.
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm.
             test_input_size: integer to resize an input image from their original dimensions to an square image.
+            
         Returns:
             mAP score
         """

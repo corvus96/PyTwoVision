@@ -1,6 +1,5 @@
 import glob
 import os
-from xmlrpc.client import boolean
 import cv2 as cv
 import numpy as np 
 import requests
@@ -10,7 +9,6 @@ import errno
 from pytwovision.image_process.frame_decorator import Frame
 from pytwovision.image_process.resize import Resize
 from pytwovision.image_process.rotate import Rotate
-from pytwovision.compute.error_compute import re_projection_error
 
 class Camera():
     """An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters. 

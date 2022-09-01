@@ -9,9 +9,6 @@ from pytwovision.recognition.detection_mode import DetectImage
 from pytwovision.stereo.match_method import Matcher
 from pytwovision.stereo.stereo_builder import StereoController
 from pytwovision.stereo.standard_stereo import StandardStereoBuilder
-from pytwovision.compute.yolov3_calculus import YoloV3Calculus
-from pytwovision.image_process.frame_decorator import Frame
-from pytwovision.image_process.resize import Resize
 
 class VisionSystem:
     """Provide an interface to apply recognition and stereo vision. Initialization of all necessary parameteres to implement an stereo-recognition system 
@@ -20,14 +17,12 @@ class VisionSystem:
         cam_left: a camera instance which can be streaming, mp4 file path, image path or even realtime source.
         cam_right: a camera instance which can be streaming, mp4 file path, image path or even realtime source.
         stereo_maps_path: a path stereo maps with rectify images.
-        q_matrix: a 4x4 array with the following structure, 
-        .. math::
-            [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx')/Tx ]]
-                cx: is the principal point x in left image
-                cx': is the principal point x in right image
-                cy: is the principal point y in left image
-                f: is the focal lenth in left image
-                Tx: The x coordinate in Translation matrix
+        q_matrix: a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx')/Tx ]]
+            cx: is the principal point x in left image
+            cx': is the principal point x in right image
+            cy: is the principal point y in left image
+            f: is the focal lenth in left image
+            Tx: The x coordinate in Translation matrix
     """
     def __init__(self, cam_left: Camera, cam_right: Camera, stereo_maps_path, matcher: Matcher, q_matrix):
         self.camL = cam_left
@@ -42,24 +37,22 @@ class VisionSystem:
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", 
                 post_process_match=True, lmbda=128.0, sigma=1.5, downsample_for_match=2, show_window=True, otsu_thresh_inverse=True, text_colors=(255,255,0)):
         """ Implement a stereo recognition system for video or streaming 
-        Arguments:
+
+        Args:
             model: expects a tensorflow model trained.
             class_file_name: it's the path of classes .txt file
             output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
-            post_process_match: if is true apply post_process and return improved disparity map, 
-            otherwise return left disparity map without post processing.
+            post_process_match: if is true apply post_process and return an improved disparity map, otherwise return left disparity map without post processing.
             lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
             sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.
-            downsample_for_match: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
-            show_window: show a window with implementation.
-            otsu_thresh_inverse: Otsu thresholding transforms a grayscale image to a binary image, if this variable is True the binary image is is according to the formula $dst(x,y) = \fork{\texttt{maxValue}}{if \(src(x,y) > T(x,y)\)}{0}{otherwise}$ otherwise it will be $dst(x,y) = \fork{0}{if \(src(x,y) > T(x,y)\)}{\texttt{maxValue}}{otherwise}$. where T(x,y) is a threshold calculated individually for each pixel.
+            downsample_for_match: if true, will apply the blur on both frames and demultiply it. The downsampling factor can be 2, 4, 8, 16, 32, 64. If the downsample factor is 1 or None or False it will not apply the downsampling.
+            show_window: shows a window with the application.
+            otsu_thresh_inverse: The Otsu threshold transforms a grayscale image into a binary image, if this variable is True the binary image will favor darker pixels otherwise it will favor lighter pixels.
             text_colors: a tuple that represents (R, G, B) colors for drawed text.
         """
         times, times_2 = [], []
@@ -167,20 +160,21 @@ class VisionSystem:
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
-            post_process_match: if is true apply post_process and return improved disparity map, 
-            otherwise return left disparity map without post processing.
+            post_process_match: if is true apply post_process and return an improved disparity map, otherwise return left disparity map without post processing.
             lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
             sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.
-            downsample_for_match: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
-            show_window: show a window with implementation.
-            otsu_thresh_inverse: Otsu thresholding transforms a grayscale image to a binary image, if this variable is True the binary image is is according to the formula $dst(x,y) = \fork{\texttt{maxValue}}{if \(src(x,y) > T(x,y)\)}{0}{otherwise}$ otherwise it will be $dst(x,y) = \fork{0}{if \(src(x,y) > T(x,y)\)}{\texttt{maxValue}}{otherwise}$. where T(x,y) is a threshold calculated individually for each pixel.
+            downsample_for_match: if true, will apply the blur on both frames and demultiply it. The downsampling factor can be 2, 4, 8, 16, 32, 64. If the downsample factor is 1 or None or False it will not apply the downsampling.
+            show_window: shows a window with the application.
+            otsu_thresh_inverse: The Otsu threshold transforms a grayscale image into a binary image, if this variable is True the binary image will favor darker pixels otherwise it will favor lighter pixels.
             text_colors: a tuple that represents (R, G, B) colors for drawed text.
+
         Returns:
-            an image processed, bounding boxes and 3D points
+            an image processed, bounding boxes and 3D points.
+
+        Raises:
+            ValueError: if input images are not some of this formats [".bmp", ".dib", ".jpg", ".jpeg", ".jpe", ".png", ".webp"].
         """
         detector = DetectImage()
         compatible_outputs = [".bmp", ".dib", ".jpg", ".jpeg", ".jpe", ".png", ".webp"]

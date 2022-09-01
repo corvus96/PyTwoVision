@@ -6,22 +6,19 @@ import requests
 import time
 
 from pytwovision.stereo.stereo_builder import StereoSystemBuilder
-from pytwovision.stereo.stereo_builder import StereoController 
 from pytwovision.stereo.match_method import Matcher
-from pytwovision.stereo.match_method import StereoSGBM
 from pytwovision.input_output.camera import Camera
 from pytwovision.utils.draw import draw_lines
 from pytwovision.compute.error_compute import re_projection_error
 
 
 class StandardStereo:
-    """An emulation of a real world stereo system with his relevant parameters, like 
-        fundamental matrix, rotation matrix, translation matrix and esential matrix. 
+    """An emulation of a real world stereo system with his relevant parameters, like fundamental matrix, rotation matrix, translation matrix and esential matrix. 
+
     Attributes:
         camL: left camera instance.
         camR: right camera instance.
-        fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it'll
-        use normal calibration, fish eye is recomended when cameras has an field of view > 160.
+        fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it'll use normal calibration, fish eye is recomended when cameras has an field of view > 160.
     """
     def __init__(self, cam_left: Camera, cam_right: Camera, fish_eye=True):
         if type(fish_eye) != bool:
@@ -31,11 +28,12 @@ class StandardStereo:
         self.fish_eye = fish_eye
     
     def take_dual_photos(self, num_photos=15, save_dir_left="images_left", save_dir_right="images_right", prefix_name="photo"):
-        """ A simple way to take photos in console and save in a folder
-        Arguments:
+        """ A simple way to take photos in console and save in a folder.
+        
+        Args:
             num_photos: number of photos to take, 15 by default.
-            save_dir_left: Directory name where the left photos will be saved.
-            save_dir_right: Directory name where the right photos will be saved.
+            save_dir_left: directory name where the left photos will be saved.
+            save_dir_right: directory name where the right photos will be saved.
             prefix_name: A prefix for the names of the photos.
 
         Raises:
@@ -127,21 +125,19 @@ class StandardStereo:
 
     def calibrate(self, images_left_path, images_right_path, pattern_type='chessboard', pattern_size=(8,5), show=True):
         """ Compute intrinsics and extrinsics parameters for two cameras at once.
-        Note:
-        if you want a good calibration your images in 'images_left_path' and 'images_right_path'
-        have to follow a format for example: example/left_images/photo_1.jpg and example/right_images/photo_1.jpg 
-        the number is important because calibrate method order the pair of images with sorted method.
-        Arguments:
+        Note: if you want a good calibration your images in 'images_left_path' and 'images_right_path' have to follow a format for example: example/left_images/photo_1.jpg and example/right_images/photo_1.jpg the number is important because calibrate method order the pair of images with sorted method.
+        
+        Args:
             images_left_path: folder where is saved left calibration pattern photos.
             images_right_path: folder where is saved right calibration pattern photos.
             pattern_type: It can be "circles" pattern or "chessboard" pattern (default).
-            pattern_size: If pattern_type is "chessboard"  this the Number of inner corners
-            per a chessboard row and column. But If pattern_type is "circles" this will be
-            the number of circles per row and column. 
+            pattern_size: If pattern_type is "chessboard"  this the Number of inner corners per a chessboard row and column. But If pattern_type is "circles" this will be the number of circles per row and column. 
             show: if is true it show corners or centers found by calibration algorithm  at each iteration.
+        
         Returns: 
             Three floats, The first is the reprojection error in left side,  the another one is right side
-            and the third one is rms error (these have to be less than 1)
+            and the third one is rms error (these have to be less than 1).
+
         Raises:
             OSError: If didn't find photos on images_left_path or images_right_path folders.
         """
@@ -288,15 +284,16 @@ class StandardStereo:
         return errorL, errorR, rms_error
 
     def rectify(self, image_left__dims, image_right_dims, export_file_name="stereoMap", alpha=1, output_size=(0,0), export_file=True):
-        """ Compute stereo rectification maps and export left and right stereo maps in xml format.
-            Note: you will need to calibrate first
-        Arguments: 
+        """ Compute stereo rectification maps and export left and right stereo maps in xml format. Note: you will need to calibrate first
+        
+        Args: 
             image_left__dims: a tuple or list with left image (width, height).
             image_right_dims: a tuple or list with right image (width, height).
             export_file_name: personalize the name of output file.
             alpha: free scaling parameter. If it is -1 or absent, the function performs the default scaling. Otherwise, the parameter should be between 0 and 1. alpha=0 means that the rectified images are zoomed and shifted so that only valid pixels are visible (no black areas after rectification). alpha=1 (default) means that the rectified image is decimated and shifted so that all the pixels from the original images from the cameras are retained in the rectified images (no source image pixels are lost). Any intermediate value yields an intermediate result between those two extreme cases (Only apply for no fish eye cameras). 
-            output_size: New image resolution after rectification. When (0,0) is passed (default), it is set to the original image Size . Setting it to a larger value can help you preserve details in the original image, especially when there is a big radial distortion.
+            output_size: New image resolution after rectification. When (0,0) is passed (default), it is set to the original image Size. Setting it to a larger value can help you preserve details in the original image, especially when there is a big radial distortion.
             export_file: if is true this method will save the parameters in an xml with the name in export_file_name. 
+        
         Raises: 
             AttributeError: If haven't calibrated before, you need all parameters of calibrate() method.
          """
@@ -333,10 +330,9 @@ class StandardStereo:
     
     def get_stereo_maps(self, path):
         """ Loads stereo maps parameters from a xml file
-        Arguments: 
-            path: path where is saved xml file. (Note: if you don't 
-            have stereo maps you can use calibrate method first,
-            then use rectify method and pass true in export file argument)
+        
+        Args: 
+            path: path where is saved xml file. (Note: if you don't have stereo maps you can use calibrate method first, then use rectify method and pass true in export file argument)
          """
         # file storage read
         cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
@@ -354,12 +350,11 @@ class StandardStereo:
         cv_file.release()
     
     def print_parameters(self, one_camera_parameters=['matrix', 'dist_coeffs'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']):
-        """ Print required individual camera parameters and stereo parameters already defined
-        Arguments: 
-            one_camera_parameters: All elements in list  will be printed, 
-            they match with cameras parameters.
-            stereo_parameters: All elements in list  will be printed, 
-            they match with stereo parameters. 
+        """ Print required individual camera parameters and stereo parameters already defined.
+
+        Args: 
+            one_camera_parameters: All elements in list  will be printed, they match with cameras parameters.
+            stereo_parameters: All elements in list  will be printed, they match with stereo parameters. 
          """
         np.set_printoptions(suppress=True)
         print("Left camera:")
@@ -382,6 +377,7 @@ class StandardStereo:
 class StandardStereoBuilder(StereoSystemBuilder):
     """
     Implement methods to get depth using OpenCV matchers like SGBM or BM.
+    
     Attributes:
         camL: left camera instance.
         camR: right camera instance.
@@ -390,8 +386,7 @@ class StandardStereoBuilder(StereoSystemBuilder):
 
     def __init__(self, cam_left: Camera, cam_right: Camera, stereo_maps_path) -> None:
         """
-        A fresh builder instance should contain a blank product object, which is
-        used in further assembly.
+        A fresh builder instance should contain a blank product object, which is used in further assembly.
         """
         self.reset(cam_left, cam_right, stereo_maps_path)
 
@@ -410,11 +405,12 @@ class StandardStereoBuilder(StereoSystemBuilder):
 
     def pre_process(self, frameL, frameR, downsample=2):
         """ First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.
-        Arguments: 
+        
+        Args: 
             frameL: it's the left frame
             frameR: it's the right frame
-            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor 
-            just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
+            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won't apply downsampling.
+        
         Returns:
             Both frames to apply stereo correspondence or apply more processing to the images.
         """
@@ -442,10 +438,12 @@ class StandardStereoBuilder(StereoSystemBuilder):
         return rectified_left, rectified_right
     
     def find_epilines(self, frameL, frameR):
-        """ Draw epilines to both frames
-        Arguments: 
-            frameL: it's the left frame
-            frameR: it's the right frame
+        """ Draw epilines to both frames.
+        
+        Args: 
+            frameL: it's the left frame.
+            frameR: it's the right frame.
+        
         Returns:
             Two elements, the left and right frame with epilines
         """
@@ -486,13 +484,15 @@ class StandardStereoBuilder(StereoSystemBuilder):
         return img5, img3
 
     def match(self, frameL, frameR, matcher: Matcher, metrics=True):
-        """ Apply stereo SGBM
-        Arguments: 
-            frameL: it's the left frame
-            frameR: it's the right frame
+        """ Apply stereo SGBM.
+        
+        Args: 
+            frameL: it's the left frame.
+            frameR: it's the right frame.
             metrics: a boolean, if is true print by console the time of execution of correspondence step.
+
         Returns:
-            left and right disparity maps and even matcher instance
+            left and right disparity maps and even matcher instance.
         """
         left_matcher = matcher.match()
         right_matcher = cv.ximgproc.createRightMatcher(left_matcher)
@@ -507,15 +507,17 @@ class StandardStereoBuilder(StereoSystemBuilder):
          
     
     def post_process(self, frameL, left_disp, right_disp, matcher, lmbda=8000, sigma=1.5, metrics=True):
-        """ Apply wls filter in disparity maps to smooth contours
-        Arguments: 
-            frameL: it's the left frame
-            left_disp: it's the left disparity frame
-            right_disp: it's the right disparity frame
-            matcher: it's the matcher instance
-            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step
+        """ Apply wls filter in disparity maps to smooth contours.
+        
+        Args: 
+            frameL: it's the left frame.
+            left_disp: it's the left disparity frame.
+            right_disp: it's the right disparity frame.
+            matcher: it's the matcher instance.
+            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step.
             sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step
             metrics: if is true print by console the time of execution of post process step.
+
         Returns:
             Improved disparity map
         """
@@ -530,30 +532,25 @@ class StandardStereoBuilder(StereoSystemBuilder):
         return filtered_disp
 
     def estimate_disparity_colormap(self, disparity):
-        """ It converts disparity maps with a shape of (w, h, 1) to  (w, h, 3)
-        Arguments: 
-            disparity: a disparity map with a shape of (w, h, 1)
+        """ It converts disparity maps with a shape of (w, h, 1) to  (w, h, 3).
+
+        Args: 
+            disparity: a disparity map with a shape of (w, h, 1).
+
         Returns:
             disparity with color
         """
         return cv.applyColorMap((disparity).astype(np.uint8), cv.COLORMAP_JET)
     
     def estimate_depth_map(self, disparity, Q, frame, metrics=True):
-        """ Convert disparity map to depth map
-        Arguments:
+        """ Convert disparity map to depth map.
+
+        Args:
             frame: left or right frame.
             disparity: a disparity map with a shape of (w, h, 1)
-            Q: a 4x4 array with the following structure, 
-                    [[1 0   0          -cx     ]
-                     [0 1   0          -cy     ]
-                     [0 0   0           f      ]
-                     [0 0 -1/Tx (cx - cx')/Tx ]]
-                    cx: is the principal point x in left image
-                    cx': is the principal point x in right image
-                    cy: is the principal point y in left image
-                    f: is the focal lenth in left image
-                    Tx: The x coordinate in Translation matrix  
+            Q: a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx')/Tx ]] cx: is the principal point x in left image, cx': is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.  
             metrics: a boolean, if is true print by console the time of execution of depth map step.
+
         Returns:
             reprojected points image and a depth map in RGB
         """
@@ -570,22 +567,15 @@ class StandardStereoBuilder(StereoSystemBuilder):
         return out_points, out_colors
 
     def estimate_3D_points(self, points, disparity, Q):
-        """ Convert image plane points to homogeneous 3d points
-        Arguments:
-            points: contains the (x, y) coordinates in image plane to convert to (X, Y, Z)
+        """ Convert image plane points to homogeneous 3d points.
+
+        Args:
+            points: contains the (x, y) coordinates in image plane to convert to (X, Y, Z).
             disparity: a disparity map with a shape of (w, h, 1)
-            Q: a 4x4 array with the following structure, 
-                    [[1 0   0          -cx     ]
-                     [0 1   0          -cy     ]
-                     [0 0   0           f      ]
-                     [0 0 -1/Tx (cx - cx')/Tx ]]
-                    cx: is the principal point x in left image
-                    cx': is the principal point x in right image
-                    cy: is the principal point y in left image
-                    f: is the focal lenth in left image
-                    Tx: The x coordinate in Translation matrix
+            Q: a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx')/Tx ]] cx: is the principal point x in left image, cx': is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.  
+
         Returns:
-            An array of points in 3D homogeneous coordinates (X, Y, Z, W)
+            An array of points in 3D homogeneous coordinates (X, Y, Z, W).
         """
         points = np.array(points)
         disparity = np.array(disparity)

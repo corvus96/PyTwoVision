@@ -10,13 +10,13 @@ from pytwovision.models.layers.batch_normalization_layer import BatchNormalizati
 def conv2d_bn_leaky_relu_layer(input_layer, filters_shape, downsample=False, activate=True, bn=True):
     """ A resnet block with depthwise separable convolutions to reduce the computational demand.
 
-    Arguments: 
+    Args: 
         input_layer: A tensor that works like input.
-        filters_shape: An array or list or tuple that contains the shape of 
-        the filters which filters_shape[0] is kernel size for conv2d layer.
+        filters_shape: An array or list or tuple that contains the shape of the filters which filters_shape[0] is kernel size for conv2d layer.
         downsample: a boolean to know when apply zero padding layer.
         activate: a boolean to know when apply leaky ReLu layer.
         bn: a boolean to know when apply a batch normalization layer.
+
     Returns: 
         A resnet block
     """

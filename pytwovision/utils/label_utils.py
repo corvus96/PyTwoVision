@@ -1,25 +1,18 @@
-"""Label utility functions
-Main use: labeling, dictionary of colors,
-label retrieval, loading label csv file,
-drawing label on an image
-"""
-
 import os
 
 def label_map(labels, dst_path=None, name='label_map'):
-    """
-    An easy way to convert classes names and ids to a 
-    .pbtxt file compatible with tensorflow models API.
+    """An easy way to convert classes names and ids to a .pbtxt file compatible with tensorflow models API.
+    
     Args:
-        labels (list): a list, which each element is a dictionary with two keys
-        'name' and 'id'.
-        dst_path (str): a path where the file will be saved.
-        name (str): the name of the file, with which it will save the .pbtxt
+        labels: a list, which each element is a dictionary with two keys 'name' and 'id'.
+        dst_path: a path where the file will be saved.
+        name: the name of the file, with which it will save the .pbtxt
+
     Returns:
         a string where the file was saved.
+
     Raises:
-        Exception: When someone element in internal dictionaries have another keys different 
-        of name and id.
+        Exception: When someone element in internal dictionaries have another keys different of name and id.
         TypeError: when labels aren't list type
         ValueError: when labels are empty
     """

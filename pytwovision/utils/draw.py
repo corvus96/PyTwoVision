@@ -8,8 +8,7 @@ import cv2 as cv
 from pytwovision.utils.label_utils import read_class_names
 
 def draw_lines(img1,img2,lines,pts1,pts2):
-    ''' img1 - image on which we draw the epilines for the points in img2
-        lines - corresponding epilines '''
+    ''' img1 - image on which we draw the epilines for the points in img2 lines - corresponding epilines '''
     r,c = img1.shape
     img1 = cv.cvtColor(img1,cv.COLOR_GRAY2BGR)
     img2 = cv.cvtColor(img2,cv.COLOR_GRAY2BGR)
@@ -24,17 +23,17 @@ def draw_lines(img1,img2,lines,pts1,pts2):
 
 def draw_bbox(image, bboxes, class_file_name, show_label=True, show_confidence = True, text_colors=(255,255,0), rectangle_colors='', tracking=False, homogeneous_points=None):   
     """Draw bounding boxes on images
-    Arguments:
+
+    Args:
         image: an array which correspond with an image
         bboxes: their bounding boxes.
         class_file_name: a path with a .txt file where the classes are saved.
         show_label: a boolean to show or hide object label.
         show_confidence: a boolean to show or hide confidence level.
         text_colors: a tuple that represents (R, G, B) colors.
-        rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-        however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
-        homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W).
-        However if is None it won't be drawed.
+        rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+        homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W). However if is None it won't be drawed.
+        
     Returns:
         An image with bounding boxes and homogeneous coordinates.
     """

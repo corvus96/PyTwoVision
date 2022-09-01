@@ -1,5 +1,5 @@
-import cv2 as cv
-from pytwovision.image_process.frame_decorator import FrameDecorator, Frame
+from pytwovision.image_process.frame_decorator import FrameDecorator
+
 class SplitPair(FrameDecorator):
     """
     Concrete Decorators call the wrapped object and alter its result in some

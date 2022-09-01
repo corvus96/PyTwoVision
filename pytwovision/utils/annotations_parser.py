@@ -8,10 +8,8 @@ import xml.etree.ElementTree as ET
 
 class Parser(ABC):
     """
-    The Parser interface declares an `parse` method that should take the
-    base AnnotationsFormat interface as an argument.
+    The Parser interface declares an `parse` method that should take the base AnnotationsFormat interface as an argument.
     """
-
     @abstractmethod
     def parse(self, anno: AnnotationsFormat):
         pass
@@ -19,22 +17,19 @@ class Parser(ABC):
 
 class XmlParser(Parser):
     """
-    Each Concrete Parser must implement the `parse` method in such a way
-    that it calls the annotationsFormat's method corresponding to the Parser's class.
+    Each Concrete Parser must implement the `parse` method in such a way that it calls the annotationsFormat's method corresponding to the Parser's class.
     """
 
     def parse(self, anno: AnnotationsFormat, xml_path, annotations_output_name, classes_output_name, image_path, work_dir=None, print_output=False):
         """
-        This method convert annotations  from COCO or PASCAL VOC dataset in xml format
-         to be compatible with an especific network model. Exporting a 
-         text file for annotations and a text file for classes names 
-         Arguments:
+        This method convert annotations  from COCO or PASCAL VOC dataset in xml format to be compatible with an especific network model. Exporting a text file for annotations and a text file for classes names 
+
+        Args:
             xml_path: a string with the full path of xml annotations.
             annotations_output_name: a string with the name of annotations file that will be generated.
             classes_output_name: a string with the name of classes file that will be generated.
             image_path: a full path where the images are saved.
-            work_dir: a path where the annotations and classes files will be saved, if is None these will be 
-            saved in current directory.
+            work_dir: a path where the annotations and classes files will be saved, if is None these will be saved in current directory.
             print_output: a boolean to print in console each annotation line
         """
 
@@ -42,9 +37,7 @@ class XmlParser(Parser):
 
 class AnnotationsFormat(ABC):
     """
-    The AnnotationsFormat Interface declares a set of visiting methods that correspond to
-    Parser classes. The signature of a visiting method allows the visitor to
-    identify the exact class of the Parser that it's dealing with.
+    The AnnotationsFormat Interface declares a set of visiting methods that correspond to Parser classes. The signature of a visiting method allows the visitor to identify the exact class of the Parser that it's dealing with.
     """
 
     @abstractmethod

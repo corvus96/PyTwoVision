@@ -21,7 +21,7 @@ Image transformations
     .. automodule:: pytwovision.image_process.split_pair
         :members:
 
-How to use
+How to use?
 -----------
 .. code-block:: python
     :linenos:

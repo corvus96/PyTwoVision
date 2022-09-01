@@ -25,16 +25,16 @@ What could you archieve with pytwovision?
 #. Train your own object detection model and infer with it.
 #. Combine detection and stereo vision to get homogeneous coordinates of objects im an scene.
 
-.. figure:: https://github.com/corvus96/PyTwoVision/blob/master/tests/test_dataset/images/2007_000027.jpg?raw=true
+.. figure:: https://github.com/corvus96/PyTwoVision/blob/master/source/doc_static/disparity_map_example.jpg?raw=true
    :height: 250
    :width: 250
    :align: center
 
    Example of a disparity map
 
-.. figure:: https://github.com/corvus96/PyTwoVision/blob/master/tests/test_dataset/images/2007_000027.jpg?raw=true
-   :height: 250
-   :width: 250
+.. figure:: https://github.com/corvus96/PyTwoVision/blob/master/source/doc_static/position_example.jpg?raw=true
+   :height: 300
+   :width: 300
    :align: center
    
    Example of positioning of objects

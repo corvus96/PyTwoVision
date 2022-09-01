@@ -1,19 +1,6 @@
-"""ResNet model builder as SSD backbone
-Adopted fr Chapter 2 of ADL - Deep Networks
-ResNet v1
-[a] Deep Residual Learning for Image Recognition
-https://arxiv.org/pdf/1512.03385.pdf
-ResNet v2
-[b] Identity Mappings in Deep Residual Networks
-https://arxiv.org/pdf/1603.05027.pdf
-"""
 from abc import ABC, abstractmethod
 
-from tensorflow.keras.layers import BatchNormalization, Activation
-from tensorflow.keras.layers import AveragePooling2D, Input
-from tensorflow.keras.layers import Add
 from tensorflow.keras.layers import MaxPool2D
-from tensorflow.keras.models import Model
 
 from pytwovision.models.layers.conv2d_bn_leaky_relu_layer import conv2d_bn_leaky_relu_layer
 from pytwovision.models.layers.residual_layer import residual_layer
@@ -60,14 +47,12 @@ class BackboneBlock():
         self._strategy = strategy
 
     def build_model(self, input_shape):
-        """Build a backbone for our net
-        # Arguments:
-            input_shape (list): Input image size and channels
-            n_layers (int): Number of feature layers for SSD
-            version (int): Supports ResNetv1 and v2
-            n (int): Determines number of ResNet layers
-                    (Default is ResNet50)
-        # Returns
+        """Build a backbone for our net.
+        
+        Args:
+            input_shape: Input image size and channels.
+
+        Returns
             model (Keras Model)
         """
         if type(self._strategy).__name__ == 'darknet53':
@@ -77,9 +62,13 @@ class BackboneBlock():
 
 class darknet53(BackboneStrategy):
     def build(self, x):
-        """ Build a darknet53 model
-        Arguments: 
-            x: an input tensor that can be an image
+        """ Build a darknet53 model.
+
+        Args: 
+            x: an input tensor that can be an image.
+            
+        Returns:
+            three branches of darknet53.
         """
         x = conv2d_bn_leaky_relu_layer(x, (3, 3,  3,  32))
         x = conv2d_bn_leaky_relu_layer(x, (3, 3, 32,  64), downsample=True)
@@ -113,9 +102,13 @@ class darknet53(BackboneStrategy):
 
 class darknet19_tiny(BackboneStrategy):
     def build(self, x):
-        """ Build a darknet19 tiny model
-        Arguments: 
-            x: an input tensor that can be an image
+        """ Build a darknet19 tiny model.
+        
+        Args: 
+            x: an input tensor that can be an image.
+        
+        Returns: 
+            Two branches of darknet19 tiny.
         """
         filters_shapes = [(3, 3, 3, 16), (3, 3, 16, 32), (3, 3, 32, 64), (3, 3, 64, 128), (3, 3, 128, 256)]
         for i, filter_shape in enumerate(filters_shapes):

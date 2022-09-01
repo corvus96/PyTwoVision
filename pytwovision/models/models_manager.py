@@ -18,31 +18,37 @@ class ModelManagerInterface(metaclass=ABCMeta):
 
 
 class ModelManager(ModelManagerInterface):
-    """A selector of models that depends of which method is used."""
+    """A selector of models that depends of which method is used.
+
+    Attributes:
+        model1: an instance of Yolov3Model
+        model2: an instance of Yolov3TinyModel
+    """
     def __init__(self):
         self.model1 = Yolov3Model()
         self.model2 = Yolov3TinyModel()
     
     def build_yolov3(self, backbone, num_class):
         """ Create the model to do YoloV3 based in darknet53.
-        Arguments:
-            backbone: an object with a backbone network
-            num_class: an integer with the quantity of classes 
+
+        Args:
+            backbone: an object with a backbone network.
+            num_class: an integer with the quantity of classes.
+
         Returns:
-            A list where the first one is used to predict large-sized objects, 
-            the second one is used to predict medium-sized objects, the third one is used to small objects
-            and the last one is the input shape returned.
+            A list where the first one is used to predict large-sized objects, the second one is used to predict medium-sized objects, the third one is used to small objects and the last one is the input shape returned.
         """
         return self.model1.build(backbone, num_class)
     
     def build_yolov3_tiny(self, backbone, num_class):
         """ Create the model to do YoloV3 based in darknet19 tiny.
-        Arguments:
-            backbone: an object with a backbone network
-            num_class: an integer with the quantity of classes 
+
+        Args:
+            backbone: an object with a backbone network.
+            num_class: an integer with the quantity of classes.
+
         Returns:
-            A list where the first one is used to predict large-sized objects, 
-            the second one is used to predict medium-sized objects and the  last one is the input shape returned.
+            A list where the first one is used to predict large-sized objects, the second one is used to predict medium-sized objects and the  last one is the input shape returned.
         """
         return self.model2.build(backbone, num_class)
 

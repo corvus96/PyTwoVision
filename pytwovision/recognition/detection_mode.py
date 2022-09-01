@@ -16,17 +16,17 @@ from pytwovision.input_output.camera import Camera
 
 class DetectionMode(ABC):
     """
-    The Abstract Class which defines detect method that contains the skeleton of
-    detection algorithm with different methods such as detection on images, detection on video,
-    detection using multiprocessing and real time detection.
+    The Abstract Class which defines detect method that contains the skeleton of detection algorithm with different methods such as detection on images, detection on video, detection using multiprocessing and real time detection.
     """
     def predict(self, model, image_data):
         """Apply a prediction step.
-        Arguments:
+
+        Args:
             model: expects a tensorflow model trained.
             image_data: expects an array or tensor with image data.
+
         Returns:
-            predicted bounding boxes
+            predicted bounding boxes.
         """
         pred_bbox = model.predict(image_data)
         pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
@@ -35,13 +35,15 @@ class DetectionMode(ABC):
     
     def postprocess_boxes(self, original_image, pred_bbox, input_size=416, score_threshold=0.3, iou_threshold=0.45, nms_method="nms"):
         """Apply a postprocess and non maximum supression step and resize bboxes.
-        Arguments:
+
+        Args:
             original_image: expects a tensorflow model trained.
             pred_bbox: a tensor of predicted bounding boxes.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
             nms_method: a string that can be  'nms' or 'soft-nms'.
+
         Returns:
             Improved bounding boxes
         """
@@ -52,11 +54,13 @@ class DetectionMode(ABC):
 
     def pre_process(self, image, input_size):
         """Apply resize images step.
-        Arguments:
+
+        Args:
             image: expects a an array.
             input_size: integer to resize an input image from their original dimensions to an square image.
+
         Returns:
-            Resized images and bounding boxes
+            Resized images and bounding boxes.
         """
         frame = Frame(np.copy(image))
         image_data = ResizeWithBBox(frame).apply([input_size, input_size])
@@ -64,15 +68,15 @@ class DetectionMode(ABC):
         return image_data[np.newaxis, ...].astype(np.float32)
     
     def draw(self, original_image, bboxes, class_file_name, rectangle_colors, homogeneous_points=None, text_colors=(255,255,0)):
-        """Draw bounding boxes on images
-        Arguments:
+        """Draw bounding boxes on images.
+
+        Args:
             original_image: an array which correspond with an image
             bboxes: their bounding boxes.
             class_file_name: a path with a .txt file where the classes are saved.
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
-            homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W).
-            However if is None it won't be drawed.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W). However if is None it won't be drawed.
+
         Returns:
             An image with bounding boxes and homogeneous coordinates.
         """
@@ -95,9 +99,9 @@ class DetectionMode(ABC):
         pass
 
     def camera_input(self, camera: Camera):
-        """If camera source is webcam or other it is gonna create attribute 'vid', otherwise 
-        return a frame from streaming.
-        Arguments:
+        """If camera source is webcam or other it is gonna create attribute 'vid', otherwise return a frame from streaming.
+        
+        Args:
             camera: is an instance of Camera Object
         """
         if camera.type_source == "other" or camera.type_source == "webcam":
@@ -117,16 +121,16 @@ class DetectRealTime(DetectionMode):
     def detect(self, model, camera: Camera, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", show=True):
         """Apply detection pipeline in realtime, if you want to close the window just press 'q'.
-        Arguments:
+        
+        Args:
             model: expects a tensorflow model trained.
             camera: An instance of camera object.
-            class_file_name: it's the path of classes .txt file
+            class_file_name: it's the path of classes .txt file.
             output_path: if is an empty string, it won't be saved, but it is a path it save like a video.
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
-            iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            iou_threshold: a parameter between (0, 1) which is used for nms algorithm.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
             show: a boolean to show frame pcessed.
         """
@@ -173,13 +177,13 @@ class DetectRealTime(DetectionMode):
 
     def prepare_input(self, vid, output_path):
         """Initialization for writing and reading videos
-        Arguments: 
+        
+        Args: 
             vid: a cv.VideoCapture instance.
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
+
         Returns: 
-            a tuple where its first argument is an instance to Opencv video writes,
-            the second element is an instance to read frames,
-            and the last element is the frames per second
+            a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames, and the last element is the frames per second
         """
         if os.path.splitext(output_path)[1] != ".mp4":
                 raise ValueError("output_path has to be an .mp4 file")
@@ -194,7 +198,8 @@ class DetectRealTime(DetectionMode):
     
     def show(self, image, camera: Camera):
         """Show an image
-        Arguments: 
+
+        Args: 
             image: an image array.
             camera: An instance of camera object.
         """
@@ -204,7 +209,8 @@ class DetectRealTimeMP(DetectionMode):
     def detect(self, model, camera: Camera, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
         """Apply detection pipeline using multiprocessing, if you want to close the window just press 'q'.
-        Arguments:
+        
+        Args:
             model: expects a tensorflow model trained.
             camera: An instance of camera object.
             class_file_name: it's the path of classes .txt file
@@ -212,8 +218,7 @@ class DetectRealTimeMP(DetectionMode):
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
         """
         vid = self.camera_input(camera)
@@ -256,13 +261,14 @@ class DetectRealTimeMP(DetectionMode):
         cv.destroyAllWindows()
 
     def prepare_input(self, vid, output_path) -> None:
-        """Initialization for writing and reading videos
-        Arguments: 
+        """Initialization for writing and reading videos.
+
+        Args: 
             vid: cv.VideoCapture instance
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
+
         Returns: 
-            a tuple where its first argument is an instance to Opencv video writes,
-            the second element is an instance to read frames,
+            a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames,
             and the last element is the frames per second
         """
         if os.path.splitext(output_path)[1] != ".mp4":
@@ -278,12 +284,13 @@ class DetectRealTimeMP(DetectionMode):
         return out, vid, fps 
 
     def predict_bbox_mp(self, model, frames_data, predicted_data, processing_times):
-        """ predict bounding boxes using multiprocessing. It needs to be initialized
-        Arguments: 
+        """ predict bounding boxes using multiprocessing. It needs to be initialized.
+
+        Args: 
             model: expects a tensorflow model trained.
             frames_data: a queue from multiprocessing package, that corresponds with frames. 
             predicted_data: a queue from multiprocessing package, that corresponds with predictions.
-            processing times: a queue from multiprocessing package, that corresponds with times
+            processing_times: a queue from multiprocessing package, that corresponds with times.
         """
         gpus = tf.config.experimental.list_physical_devices('GPU')
         if len(gpus) > 0:
@@ -300,8 +307,9 @@ class DetectRealTimeMP(DetectionMode):
                 predicted_data.put(pred_bbox)
     
     def postprocess_mp(self, predicted_data, original_frames, processed_frames, processing_times, input_size, class_file_name, score_threshold, iou_threshold, rectangle_colors, nms_method):
-        """ Improve bounding boxes using multiprocessing. It needs to be initialized
-        Arguments: 
+        """ Improve bounding boxes using multiprocessing. It needs to be initialized.
+
+        Args: 
             predicted_data: a queue from multiprocessing package, that corresponds with predictions.
             original_frames: a queue from multiprocessing package, that corresponds with frames. 
             processed_frames: a queue from multiprocessing package, that corresponds with processed frames. 
@@ -310,8 +318,7 @@ class DetectRealTimeMP(DetectionMode):
             class_file_name: it's the path of classes .txt file
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
         """
         times = []
@@ -333,8 +340,9 @@ class DetectRealTimeMP(DetectionMode):
                 processed_frames.put(image)
 
     def show(self, processed_frames, final_frames):
-        """ Show preocessed input
-        Arguments: 
+        """ Show preocessed input.
+        
+        Args: 
             processed_frames: a queue from multiprocessing package, that corresponds with processed frames. 
             final_frames: a queue from multiprocessing package, that corresponds with final frames. 
         """
@@ -348,8 +356,9 @@ class DetectRealTimeMP(DetectionMode):
                     break
 
     def multi_process_initialization(self, model, original_frames, frames_data, predicted_data, processed_frames, processing_times, final_frames, class_file_name, input_size=416, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms"):
-        """Apply an initialite multi processing prediction, postprocessing and show steps
-        Arguments:
+        """Apply an initialite multi processing prediction, postprocessing and show steps.
+        
+        Args:
             model: expects a tensorflow model trained.
             original_frames: a queue from multiprocessing package, that corresponds with frames. 
             frames_data: a queue from multiprocessing package, that corresponds with frames. 
@@ -361,9 +370,9 @@ class DetectRealTimeMP(DetectionMode):
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
+
         Returns: 
             an Process tuple (prediction, postprocessing, show)
         """
@@ -377,7 +386,8 @@ class DetectVideo(DetectionMode):
     def detect(self, model, input_path, class_file_name, output_path="", input_size=416, 
                 score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", show=True):
         """Apply detection pipeline in a saved video, if you want to close the window just press 'q'.
-        Arguments:
+        
+        Args:
             model: expects a tensorflow model trained.
             input_path: a video path.
             class_file_name: it's the path of classes .txt file
@@ -385,8 +395,7 @@ class DetectVideo(DetectionMode):
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
             show: a boolean to show frame pcessed
         """
@@ -433,13 +442,14 @@ class DetectVideo(DetectionMode):
         if show: cv.destroyAllWindows()
 
     def prepare_input(self, input_path, output_path):
-        """Initialization for writing and reading videos
-        Arguments: 
+        """Initialization for writing and reading videos.
+
+        Args: 
             input_path: an video path.
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
+        
         Returns: 
-            a tuple where its first argument is an instance to Opencv video writes,
-            the second element is an instance to read frames,
+            a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames,
             and the last element is the frames per second
         """
         if os.path.splitext(output_path)[1] != ".mp4":
@@ -455,7 +465,7 @@ class DetectVideo(DetectionMode):
         return out, vid, fps
     
     def show(self, image):
-        """Show an image
+        """Show an image.
         Arguments: 
             image: an image array.
         """
@@ -467,6 +477,7 @@ class DetectImage(DetectionMode):
     def detect(self, model, input_path, class_file_name, output_path="", input_size=416,
                  score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', nms_method="nms", show=True):
         """Apply detection pipeline in an image, if you want to close the window just press 'q'.
+        
         Arguments:
             model: expects a tensorflow model trained.
             input_path: an image path
@@ -475,10 +486,10 @@ class DetectImage(DetectionMode):
             input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).
             score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
             iou_threshold: a parameter between (0, 1) which is used for nms algorithm
-            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default,
-            however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
+            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.
             nms_method: a string that can be  'nms' or 'soft-nms'.
             show: a boolean to show frame pcessed.
+
         Returns:
             an image with prediction drawed
         """
@@ -496,9 +507,11 @@ class DetectImage(DetectionMode):
         return image
 
     def prepare_input(self, image_path):
-        """Get a path an convert in an image array
-        Arguments: 
+        """Get a path an convert in an image array.
+
+        Args: 
             image_path: a path.
+
         Returns: 
             An image array
         """
@@ -508,8 +521,9 @@ class DetectImage(DetectionMode):
         return  cv.cvtColor(original_image, cv.COLOR_BGR2RGB)
     
     def show(self, image, output_path=''):
-        """Get a an image, then save it and finally show it
-        Arguments: 
+        """Get a an image, then save it and finally show it.
+
+        Args: 
             image: an image array.
             output_path: if is an empty string, it won't be saved, but it is a path it save like an image.
         """
