@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compute &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Datasets loader" href="module_datasets_loader.html" />
+    <link rel="prev" title="Welcome to Pytwovision’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#calculate-the-reprojection-error">Calculate the reprojection error</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yolo-v3-computations">Yolo V3 Computations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Compute</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/module_compute.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="compute">
+<h1>Compute<a class="headerlink" href="#compute" title="Permalink to this headline">¶</a></h1>
+<p>This module was created in order to house the calculations that may be needed by the stereo mechanisms and those required by the neural networks.</p>
+<div class="section" id="calculate-the-reprojection-error">
+<h2>Calculate the reprojection error<a class="headerlink" href="#calculate-the-reprojection-error" title="Permalink to this headline">¶</a></h2>
+<p>It can be useful when you need to obtain the calibration of the error of the cameras, the calibration is when you find the intrinsic and extrinsic parameters of a camera, such as: distortions, center of projections, focal lengths and so on.</p>
+<blockquote>
+<div><span class="target" id="module-pytwovision.compute.error_compute"></span><dl class="function">
+<dt id="pytwovision.compute.error_compute.re_projection_error">
+<code class="descclassname">pytwovision.compute.error_compute.</code><code class="descname">re_projection_error</code><span class="sig-paren">(</span><em>objpoints</em>, <em>rvecs</em>, <em>tvecs</em>, <em>mtx</em>, <em>imgpoints</em>, <em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/error_compute.html#re_projection_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.error_compute.re_projection_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the error when calibrating a camera.
+when the error approaches zero,
+the more accurate are the parameters found.
+Given the intrinsic, distortion, rotation and translation matrices, we must first transform the
+translation matrices, we must first transform the object point to the point of the camera.
+the object point to image point using cv.projectPoints().
+Then, we will calculate the absolute norm between what we obtained with our transformation and the algorithm.
+obtained with our transformation and the corner search algorithm.
+To find the average error, we calculate the arithmetic average
+of the errors calculated for all calibration images.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>objpoints</strong> – array of object points expressed in the world coordinate frame. A 1-channel 3xN/Nx3 or 3-channel 1xN/Nx1, where N is the number of points in the view.</li>
+<li><strong>rvecs</strong> – the rotation vector (Rodrigues) which, together with tvec, performs a change of base from the world coordinate system to the camera, see calibrateCamera for more details.</li>
+<li><strong>tvecs</strong> – The translation vector, see the description of the parameters above.</li>
+<li><strong>mtx</strong> – The intrinsic matrix of the camera.</li>
+<li><strong>imgpoints</strong> – reference points to compare with the reprojected objpoints.</li>
+<li><strong>dist</strong> – Input vector of the distortion coefficients.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>a float with the mean error with L2 norm.</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="yolo-v3-computations">
+<h2>Yolo V3 Computations<a class="headerlink" href="#yolo-v3-computations" title="Permalink to this headline">¶</a></h2>
+<p>The class YoloV3Calculus is responsible for adding the prediction layer in a YOLO version 3 network, converting the matrices containing the bounding box coordinates from a format ($xmin$, $ymin$, $xmax$, $ymax$) to a format ($cx$, $cy$, $w$, $h$) where $cx$ and $cy$ are the coordinates of the center point of the bounding box and the variables $w$ and $h$ are the width and height of the box respectively, such conversion can be done in both directions.</p>
+<p>It is also in charge of calculating the IoU value and applying the <strong>Non maximum suppression</strong> algorithm to filter the bounding boxes that do not meet a certain threshold, in order to obtain predictions with a lower amount of noise and calculate the network error.</p>
+<blockquote>
+<div><span class="target" id="module-pytwovision.compute.yolov3_calculus"></span><dl class="class">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus">
+<em class="property">class </em><code class="descclassname">pytwovision.compute.yolov3_calculus.</code><code class="descname">YoloV3Calculus</code><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Useful methods for calculating the IOU, decode
+network output when training, nms, yolov3 loss, and bounding box offsets.
+and bounding box offsets.</p>
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_ciou">
+<code class="descname">bbox_ciou</code><span class="sig-paren">(</span><em>boxes1</em>, <em>boxes2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.bbox_ciou"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_ciou" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Complete Intersection Over Union between bounding boxes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>boxes1</strong> – an array or tensor with a shape (n, 4).</li>
+<li><strong>boxes2</strong> – an array or tensor with a shape (n, 4).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value between (0, 1) that correspond with CIoU.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_giou">
+<code class="descname">bbox_giou</code><span class="sig-paren">(</span><em>boxes1</em>, <em>boxes2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.bbox_giou"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_giou" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Generalized Intersection Over Union between bounding boxes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>boxes1</strong> – an array or tensor with a shape (n, 4).</li>
+<li><strong>boxes2</strong> – an array or tensor with a shape (n, 4).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value between (0, 1) that correspond with GIoU.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_iou">
+<code class="descname">bbox_iou</code><span class="sig-paren">(</span><em>boxes1</em>, <em>boxes2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.bbox_iou"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_iou" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Intersection Over Union between anchor boxes and bounding boxes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>boxes1</strong> – an array or tensor with a shape (n, 4).</li>
+<li><strong>boxes2</strong> – an array or tensor with a shape (n, 4).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value between (0, 1) that correspond with IoU.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.best_bboxes_iou">
+<code class="descname">best_bboxes_iou</code><span class="sig-paren">(</span><em>boxes1</em>, <em>boxes2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.best_bboxes_iou"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.best_bboxes_iou" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Intersection Over Union between bounding boxes and return the best choices to apply nms algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>boxes1</strong> – an array or tensor with a shape (n, 4).</li>
+<li><strong>boxes2</strong> – an array or tensor with a shape (n, 4).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value between (0, 1) that correspond with IoU.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.centroid2minmax">
+<code class="descname">centroid2minmax</code><span class="sig-paren">(</span><em>boxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.centroid2minmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.centroid2minmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Centroid to minmax format (cx, cy, w, h) to (xmin, ymin, xmax, ymax).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>boxes</strong> – Batch of  bounding boxes in centroid format.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Batch of boxes in minmax format</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">minmax</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.decode">
+<code class="descname">decode</code><span class="sig-paren">(</span><em>conv_output, num_class, i=0, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>A piece of code that receives convolutional layers and returns the prediction layers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conv_output</strong> – output of the Yolo model.</li>
+<li><strong>num_class</strong> – an integer representing how many classes the model has.</li>
+<li><strong>i</strong> – an integer that can be 0, 1 or 2 to correspond to the three scales of the grid.</li>
+<li><strong>strides</strong> – a list with a length of 3 corresponding to the strides of the prediction layer.</li>
+<li><strong>anchors</strong> – a 3-dimensional list of anchor sizes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the predicted probability category box object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.loss">
+<code class="descname">loss</code><span class="sig-paren">(</span><em>pred, conv, label, bboxes, num_class, i=0, strides=[8, 16, 32], loss_thresh=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a loss vector to train a yolo network using GIoU, confidence and probability losses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pred</strong> – the prediction of the model.</li>
+<li><strong>conv</strong> – the last convolutional layer of a yolo model.</li>
+<li><strong>label</strong> – expected label.</li>
+<li><strong>bboxes</strong> – ground truth.</li>
+<li><strong>num_class</strong> – an integer with the number of classes to detect.</li>
+<li><strong>i</strong> – an integer which can be 0, 1, or 2 to correspond to the three grid scales.</li>
+<li><strong>strides</strong> – a list with a len of 3 that correspond with the strides between each prediction.</li>
+<li><strong>loss_thresh</strong> – a number between (0, 1) which if IoU is less than it, it is considered that the prediction box contains no objects.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A tuple with a len of 3 where the first argument is the GIoU loss, next
+Confidence loss and the last one the probability loss.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.minmax2centroid">
+<code class="descname">minmax2centroid</code><span class="sig-paren">(</span><em>boxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.minmax2centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.minmax2centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minmax to centroid format (xmin, ymin, xmax, ymax) to (cx, cy, w, h).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>boxes</strong> – Batch of bounding boxes in minmax format.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A Batch of boxes in centroid format</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.nms">
+<code class="descname">nms</code><span class="sig-paren">(</span><em>bboxes</em>, <em>iou_threshold</em>, <em>sigma=0.3</em>, <em>method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.nms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.nms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Non maximum supression algorithm.
+Note: see this paper to understand soft-nms <a class="reference external" href="https://arxiv.org/pdf/1704.04503.pdf">https://arxiv.org/pdf/1704.04503.pdf</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bboxes</strong> – (xmin, ymin, xmax, ymax, score, class).</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1).</li>
+<li><strong>sigma</strong> – a parameter between (0, 1).</li>
+<li><strong>method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Better bounding boxes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.compute.yolov3_calculus.YoloV3Calculus.postprocess_boxes">
+<code class="descname">postprocess_boxes</code><span class="sig-paren">(</span><em>pred_bbox</em>, <em>original_image</em>, <em>input_size</em>, <em>score_threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/compute/yolov3_calculus.html#YoloV3Calculus.postprocess_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.compute.yolov3_calculus.YoloV3Calculus.postprocess_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Improve predicted bounding boxes and resize them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pred_bbox</strong> – a predicted bonding box.</li>
+<li><strong>original_image</strong> – an image before resizing.</li>
+<li><strong>input_size</strong> – the dimension of original image after resizing like an square image.</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Bounding boxes that are inside the range, valids and with a score greather than score_threshold.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Pytwovision’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="module_datasets_loader.html" class="btn btn-neutral float-right" title="Datasets loader" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

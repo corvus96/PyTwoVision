@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytwovision.compute.yolov3_calculus &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pytwovision.compute.yolov3_calculus</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytwovision.compute.yolov3_calculus</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<div class="viewcode-block" id="YoloV3Calculus"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus">[docs]</a><span class="k">class</span> <span class="nc">YoloV3Calculus</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Useful methods for calculating the IOU, decode </span>
+<span class="sd">    network output when training, nms, yolov3 loss, and bounding box offsets.</span>
+<span class="sd">    and bounding box offsets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="YoloV3Calculus.decode"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conv_output</span><span class="p">,</span> <span class="n">num_class</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">],</span> 
+                <span class="n">anchors</span><span class="o">=</span><span class="p">[[[</span><span class="mi">10</span><span class="p">,</span>  <span class="mi">13</span><span class="p">],</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span>   <span class="mi">23</span><span class="p">]],</span>
+                        <span class="p">[[</span><span class="mi">30</span><span class="p">,</span>  <span class="mi">61</span><span class="p">],</span> <span class="p">[</span><span class="mi">62</span><span class="p">,</span>   <span class="mi">45</span><span class="p">],</span> <span class="p">[</span><span class="mi">59</span><span class="p">,</span>  <span class="mi">119</span><span class="p">]],</span>
+                        <span class="p">[[</span><span class="mi">116</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="p">[</span><span class="mi">156</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="p">[</span><span class="mi">373</span><span class="p">,</span> <span class="mi">326</span><span class="p">]]]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A piece of code that receives convolutional layers and returns the prediction layers.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            conv_output: output of the Yolo model.</span>
+<span class="sd">            num_class: an integer representing how many classes the model has.</span>
+<span class="sd">            i: an integer that can be 0, 1 or 2 to correspond to the three scales of the grid.</span>
+<span class="sd">            strides: a list with a length of 3 corresponding to the strides of the prediction layer.</span>
+<span class="sd">            anchors: a 3-dimensional list of anchor sizes.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            the predicted probability category box object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strides</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">strides</span><span class="p">)</span>
+        <span class="n">anchors</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">anchors</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">/</span><span class="n">strides</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="c1"># where i = 0, 1 or 2 to correspond to the three grid scales  </span>
+        <span class="n">conv_shape</span>       <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">conv_output</span><span class="p">)</span>
+        <span class="n">batch_size</span>       <span class="o">=</span> <span class="n">conv_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output_size</span>      <span class="o">=</span> <span class="n">conv_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">conv_output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">conv_output</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">num_class</span><span class="p">))</span>
+
+        <span class="n">conv_raw_dxdy</span> <span class="o">=</span> <span class="n">conv_output</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># offset of center position     </span>
+        <span class="n">conv_raw_dwdh</span> <span class="o">=</span> <span class="n">conv_output</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="c1"># Prediction box length and width offset</span>
+        <span class="n">conv_raw_conf</span> <span class="o">=</span> <span class="n">conv_output</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="c1"># confidence of the prediction box</span>
+        <span class="n">conv_raw_prob</span> <span class="o">=</span> <span class="n">conv_output</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">5</span><span class="p">:</span> <span class="p">]</span> <span class="c1"># category probability of the prediction box </span>
+
+        <span class="c1"># next need Draw the grid. Where output_size is equal to 13, 26 or 52  </span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">output_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">output_size</span><span class="p">])</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">output_size</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">output_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">xy_grid</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">x</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">y</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">xy_grid</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">xy_grid</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">xy_grid</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">xy_grid</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the center position of the prediction box:</span>
+        <span class="n">pred_xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">conv_raw_dxdy</span><span class="p">)</span> <span class="o">+</span> <span class="n">xy_grid</span><span class="p">)</span> <span class="o">*</span> <span class="n">strides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># Calculate the length and width of the prediction box:</span>
+        <span class="n">pred_wh</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">conv_raw_dwdh</span><span class="p">)</span> <span class="o">*</span> <span class="n">anchors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">strides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">pred_xywh</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pred_xy</span><span class="p">,</span> <span class="n">pred_wh</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">pred_conf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">conv_raw_conf</span><span class="p">)</span> <span class="c1"># object box calculates the predicted confidence</span>
+        <span class="n">pred_prob</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">conv_raw_prob</span><span class="p">)</span> <span class="c1"># calculating the predicted probability category box object</span>
+
+        <span class="c1"># calculating the predicted probability category box object</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">pred_xywh</span><span class="p">,</span> <span class="n">pred_conf</span><span class="p">,</span> <span class="n">pred_prob</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YoloV3Calculus.centroid2minmax"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.centroid2minmax">[docs]</a>    <span class="k">def</span> <span class="nf">centroid2minmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boxes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Centroid to minmax format (cx, cy, w, h) to (xmin, ymin, xmax, ymax).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            boxes: Batch of  bounding boxes in centroid format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            minmax: Batch of boxes in minmax format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">minmax</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">minmax</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">minmax</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="n">minmax</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">minmax</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">minmax</span></div>
+
+<div class="viewcode-block" id="YoloV3Calculus.minmax2centroid"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.minmax2centroid">[docs]</a>    <span class="k">def</span> <span class="nf">minmax2centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boxes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Minmax to centroid format (xmin, ymin, xmax, ymax) to (cx, cy, w, h).</span>
+<span class="sd">        </span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            boxes: Batch of bounding boxes in minmax format.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A Batch of boxes in centroid format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> 
+        <span class="n">centroid</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> 
+        <span class="n">centroid</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">centroid</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">centroid</span></div>
+    
+<div class="viewcode-block" id="YoloV3Calculus.bbox_iou"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_iou">[docs]</a>    <span class="k">def</span> <span class="nf">bbox_iou</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute Intersection Over Union between anchor boxes and bounding boxes.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            boxes1: an array or tensor with a shape (n, 4).</span>
+<span class="sd">            boxes2: an array or tensor with a shape (n, 4).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A value between (0, 1) that correspond with IoU.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">boxes1_area</span> <span class="o">=</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">boxes2_area</span> <span class="o">=</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+        <span class="n">boxes1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">boxes2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">left_up</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">right_down</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:])</span>
+
+        <span class="n">inter_section</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">right_down</span> <span class="o">-</span> <span class="n">left_up</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">inter_area</span> <span class="o">=</span> <span class="n">inter_section</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">inter_section</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">union_area</span> <span class="o">=</span> <span class="n">boxes1_area</span> <span class="o">+</span> <span class="n">boxes2_area</span> <span class="o">-</span> <span class="n">inter_area</span>
+
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">inter_area</span> <span class="o">/</span> <span class="n">union_area</span></div>
+
+<div class="viewcode-block" id="YoloV3Calculus.bbox_giou"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_giou">[docs]</a>    <span class="k">def</span> <span class="nf">bbox_giou</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute Generalized Intersection Over Union between bounding boxes.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            boxes1: an array or tensor with a shape (n, 4).</span>
+<span class="sd">            boxes2: an array or tensor with a shape (n, 4).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A value between (0, 1) that correspond with GIoU.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">boxes1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">boxes2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">boxes1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]),</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:])],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">boxes2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]),</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:])],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">boxes1_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">boxes2_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">left_up</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">right_down</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:])</span>
+
+        <span class="n">inter_section</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">right_down</span> <span class="o">-</span> <span class="n">left_up</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">inter_area</span> <span class="o">=</span> <span class="n">inter_section</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">inter_section</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">union_area</span> <span class="o">=</span> <span class="n">boxes1_area</span> <span class="o">+</span> <span class="n">boxes2_area</span> <span class="o">-</span> <span class="n">inter_area</span>
+
+        <span class="c1"># Calculate the iou value between the two bounding boxes</span>
+        <span class="n">iou</span> <span class="o">=</span> <span class="n">inter_area</span> <span class="o">/</span> <span class="n">union_area</span>
+
+        <span class="c1"># Calculate the coordinates of the upper left corner and the lower right corner of the smallest closed convex surface</span>
+        <span class="n">enclose_left_up</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">enclose_right_down</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:])</span>
+        <span class="n">enclose</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">enclose_right_down</span> <span class="o">-</span> <span class="n">enclose_left_up</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the area of the smallest closed convex surface C</span>
+        <span class="n">enclose_area</span> <span class="o">=</span> <span class="n">enclose</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">enclose</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Calculate the GIoU value according to the GioU formula  </span>
+        <span class="n">giou</span> <span class="o">=</span> <span class="n">iou</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">enclose_area</span> <span class="o">-</span> <span class="n">union_area</span><span class="p">)</span> <span class="o">/</span> <span class="n">enclose_area</span>
+
+        <span class="k">return</span> <span class="n">giou</span></div>
+
+<div class="viewcode-block" id="YoloV3Calculus.bbox_ciou"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.bbox_ciou">[docs]</a>    <span class="k">def</span> <span class="nf">bbox_ciou</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute Complete Intersection Over Union between bounding boxes.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            boxes1: an array or tensor with a shape (n, 4).</span>
+<span class="sd">            boxes2: an array or tensor with a shape (n, 4).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A value between (0, 1) that correspond with CIoU.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">boxes1_coor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">boxes2_coor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">left</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">boxes2_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">boxes2_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">boxes2_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">boxes2_coor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">up</span> <span class="o">-</span> <span class="n">down</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">up</span> <span class="o">-</span> <span class="n">down</span><span class="p">)</span>
+        <span class="n">iou</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_iou</span><span class="p">(</span><span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">)</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">u</span> <span class="o">/</span> <span class="n">c</span>
+
+        <span class="n">ar_gt</span> <span class="o">=</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">ar_pred</span> <span class="o">=</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+        <span class="n">ar_loss</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">ar_gt</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">ar_pred</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">ar_gt</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">ar_pred</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">ar_loss</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">iou</span> <span class="o">+</span> <span class="n">ar_loss</span> <span class="o">+</span> <span class="mf">0.000001</span><span class="p">)</span>
+        <span class="n">ciou_term</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">ar_loss</span>
+
+        <span class="k">return</span> <span class="n">iou</span> <span class="o">-</span> <span class="n">ciou_term</span></div>
+    
+<div class="viewcode-block" id="YoloV3Calculus.loss"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.loss">[docs]</a>    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">num_class</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">],</span> <span class="n">loss_thresh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate a loss vector to train a yolo network using GIoU, confidence and probability losses.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            pred: the prediction of the model.</span>
+<span class="sd">            conv: the last convolutional layer of a yolo model.</span>
+<span class="sd">            label: expected label.</span>
+<span class="sd">            bboxes: ground truth.</span>
+<span class="sd">            num_class: an integer with the number of classes to detect.</span>
+<span class="sd">            i: an integer which can be 0, 1, or 2 to correspond to the three grid scales.</span>
+<span class="sd">            strides: a list with a len of 3 that correspond with the strides between each prediction.</span>
+<span class="sd">            loss_thresh: a number between (0, 1) which if IoU is less than it, it is considered that the prediction box contains no objects.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple with a len of 3 where the first argument is the GIoU loss, next</span>
+<span class="sd">            Confidence loss and the last one the probability loss.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strides</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">strides</span><span class="p">)</span>
+
+        <span class="n">conv_shape</span>  <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>
+        <span class="n">batch_size</span>  <span class="o">=</span> <span class="n">conv_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output_size</span> <span class="o">=</span> <span class="n">conv_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">input_size</span>  <span class="o">=</span> <span class="n">strides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">output_size</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">num_class</span><span class="p">))</span>
+
+        <span class="n">conv_raw_conf</span> <span class="o">=</span> <span class="n">conv</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">conv_raw_prob</span> <span class="o">=</span> <span class="n">conv</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">5</span><span class="p">:]</span>
+
+        <span class="n">pred_xywh</span>     <span class="o">=</span> <span class="n">pred</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">pred_conf</span>     <span class="o">=</span> <span class="n">pred</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+
+        <span class="n">label_xywh</span>    <span class="o">=</span> <span class="n">label</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">respond_bbox</span>  <span class="o">=</span> <span class="n">label</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">label_prob</span>    <span class="o">=</span> <span class="n">label</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">5</span><span class="p">:]</span>
+
+        <span class="n">giou</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox_giou</span><span class="p">(</span><span class="n">pred_xywh</span><span class="p">,</span> <span class="n">label_xywh</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="n">bbox_loss_scale</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">label_xywh</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">label_xywh</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">input_size</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">giou_loss</span> <span class="o">=</span> <span class="n">respond_bbox</span> <span class="o">*</span> <span class="n">bbox_loss_scale</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">giou</span><span class="p">)</span>
+
+        <span class="n">iou</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_iou</span><span class="p">(</span><span class="n">pred_xywh</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bboxes</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+        <span class="c1"># Find the value of IoU with the real box The largest prediction box</span>
+        <span class="n">max_iou</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">iou</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># If the largest iou is less than the threshold, it is considered that the prediction box contains no objects, then the background box</span>
+        <span class="n">respond_bgd</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">respond_bbox</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span> <span class="n">max_iou</span> <span class="o">&lt;</span> <span class="n">loss_thresh</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span> <span class="p">)</span>
+
+        <span class="n">conf_focal</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">respond_bbox</span> <span class="o">-</span> <span class="n">pred_conf</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the loss of confidence</span>
+        <span class="c1"># we hope that if the grid contains objects, then the network output prediction box has a confidence of 1 and 0 when there is no object.</span>
+        <span class="n">conf_loss</span> <span class="o">=</span> <span class="n">conf_focal</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">respond_bbox</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">respond_bbox</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">conv_raw_conf</span><span class="p">)</span>
+                <span class="o">+</span>
+                <span class="n">respond_bgd</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">respond_bbox</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">conv_raw_conf</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">prob_loss</span> <span class="o">=</span> <span class="n">respond_bbox</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">label_prob</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">conv_raw_prob</span><span class="p">)</span>
+
+        <span class="n">giou_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">giou_loss</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
+        <span class="n">conf_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">conf_loss</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
+        <span class="n">prob_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">prob_loss</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">giou_loss</span><span class="p">,</span> <span class="n">conf_loss</span><span class="p">,</span> <span class="n">prob_loss</span></div>
+    
+<div class="viewcode-block" id="YoloV3Calculus.best_bboxes_iou"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.best_bboxes_iou">[docs]</a>    <span class="k">def</span> <span class="nf">best_bboxes_iou</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boxes1</span><span class="p">,</span> <span class="n">boxes2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute Intersection Over Union between bounding boxes and return the best choices to apply nms algorithm.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            boxes1: an array or tensor with a shape (n, 4).</span>
+<span class="sd">            boxes2: an array or tensor with a shape (n, 4).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A value between (0, 1) that correspond with IoU.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">boxes1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">boxes1</span><span class="p">)</span>
+        <span class="n">boxes2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">boxes2</span><span class="p">)</span>
+
+        <span class="n">boxes1_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">boxes2_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">left_up</span>       <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">right_down</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">boxes1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:],</span> <span class="n">boxes2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">:])</span>
+
+        <span class="n">inter_section</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">right_down</span> <span class="o">-</span> <span class="n">left_up</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">inter_area</span>    <span class="o">=</span> <span class="n">inter_section</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">inter_section</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">union_area</span>    <span class="o">=</span> <span class="n">boxes1_area</span> <span class="o">+</span> <span class="n">boxes2_area</span> <span class="o">-</span> <span class="n">inter_area</span>
+        <span class="n">ious</span>          <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">inter_area</span> <span class="o">/</span> <span class="n">union_area</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ious</span></div>
+
+<div class="viewcode-block" id="YoloV3Calculus.nms"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.nms">[docs]</a>    <span class="k">def</span> <span class="nf">nms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nms&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute Non maximum supression algorithm.</span>
+<span class="sd">        Note: see this paper to understand soft-nms https://arxiv.org/pdf/1704.04503.pdf.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bboxes: (xmin, ymin, xmax, ymax, score, class).</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1).</span>
+<span class="sd">            sigma: a parameter between (0, 1).</span>
+<span class="sd">            method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Better bounding boxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classes_in_img</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">bboxes</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]))</span>
+        <span class="n">best_bboxes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">classes_in_img</span><span class="p">:</span>
+            <span class="n">cls_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">bboxes</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="bp">cls</span><span class="p">)</span>
+            <span class="n">cls_bboxes</span> <span class="o">=</span> <span class="n">bboxes</span><span class="p">[</span><span class="n">cls_mask</span><span class="p">]</span>
+            <span class="c1"># Process 1: Determine whether the number of bounding boxes is greater than 0 </span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">cls_bboxes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Process 2: Select the bounding box with the highest score according to socre order A</span>
+                <span class="n">max_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">cls_bboxes</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">])</span>
+                <span class="n">best_bbox</span> <span class="o">=</span> <span class="n">cls_bboxes</span><span class="p">[</span><span class="n">max_ind</span><span class="p">]</span>
+                <span class="n">best_bboxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_bbox</span><span class="p">)</span>
+                <span class="n">cls_bboxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">cls_bboxes</span><span class="p">[:</span> <span class="n">max_ind</span><span class="p">],</span> <span class="n">cls_bboxes</span><span class="p">[</span><span class="n">max_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]])</span>
+                <span class="c1"># Process 3: Calculate this bounding box A and</span>
+                <span class="c1"># Remain all iou of the bounding box and remove those bounding boxes whose iou value is higher than the threshold </span>
+                <span class="n">iou</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_bboxes_iou</span><span class="p">(</span><span class="n">best_bbox</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">cls_bboxes</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">iou</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+                <span class="k">assert</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;nms&#39;</span><span class="p">,</span> <span class="s1">&#39;soft-nms&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;nms&#39;</span><span class="p">:</span>
+                    <span class="n">iou_mask</span> <span class="o">=</span> <span class="n">iou</span> <span class="o">&gt;</span> <span class="n">iou_threshold</span>
+                    <span class="n">weight</span><span class="p">[</span><span class="n">iou_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;soft-nms&#39;</span><span class="p">:</span>
+                    <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">iou</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">))</span>
+
+                <span class="n">cls_bboxes</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls_bboxes</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight</span>
+                <span class="n">score_mask</span> <span class="o">=</span> <span class="n">cls_bboxes</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.</span>
+                <span class="n">cls_bboxes</span> <span class="o">=</span> <span class="n">cls_bboxes</span><span class="p">[</span><span class="n">score_mask</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">best_bboxes</span></div>
+
+<div class="viewcode-block" id="YoloV3Calculus.postprocess_boxes"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.yolov3_calculus.YoloV3Calculus.postprocess_boxes">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">original_image</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Improve predicted bounding boxes and resize them.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pred_bbox: a predicted bonding box.</span>
+<span class="sd">            original_image: an image before resizing.</span>
+<span class="sd">            input_size: the dimension of original image after resizing like an square image.</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Bounding boxes that are inside the range, valids and with a score greather than score_threshold.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid_scale</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
+        <span class="n">pred_bbox</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pred_bbox</span><span class="p">)</span>
+
+        <span class="n">pred_xywh</span> <span class="o">=</span> <span class="n">pred_bbox</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">pred_conf</span> <span class="o">=</span> <span class="n">pred_bbox</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+        <span class="n">pred_prob</span> <span class="o">=</span> <span class="n">pred_bbox</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">:]</span>
+
+        <span class="c1"># 1. (x, y, w, h) --&gt; (xmin, ymin, xmax, ymax)</span>
+        <span class="n">pred_coor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">pred_xywh</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">pred_xywh</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
+                                    <span class="n">pred_xywh</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">pred_xywh</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># 2. (xmin, ymin, xmax, ymax) -&gt; (xmin_org, ymin_org, xmax_org, ymax_org)</span>
+        <span class="n">org_h</span><span class="p">,</span> <span class="n">org_w</span> <span class="o">=</span> <span class="n">original_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">resize_ratio</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">input_size</span> <span class="o">/</span> <span class="n">org_w</span><span class="p">,</span> <span class="n">input_size</span> <span class="o">/</span> <span class="n">org_h</span><span class="p">)</span>
+
+        <span class="n">dw</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_size</span> <span class="o">-</span> <span class="n">resize_ratio</span> <span class="o">*</span> <span class="n">org_w</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">dh</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_size</span> <span class="o">-</span> <span class="n">resize_ratio</span> <span class="o">*</span> <span class="n">org_h</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">dw</span><span class="p">)</span> <span class="o">/</span> <span class="n">resize_ratio</span>
+        <span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">dh</span><span class="p">)</span> <span class="o">/</span> <span class="n">resize_ratio</span>
+
+        <span class="c1"># 3. clip some boxes those are out of range</span>
+        <span class="n">pred_coor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+                                    <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:],</span> <span class="p">[</span><span class="n">org_w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">org_h</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">invalid_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">((</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]))</span>
+        <span class="n">pred_coor</span><span class="p">[</span><span class="n">invalid_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># 4. discard some invalid boxes</span>
+        <span class="n">bboxes_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span> <span class="n">pred_coor</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">scale_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">valid_scale</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bboxes_scale</span><span class="p">),</span> <span class="p">(</span><span class="n">bboxes_scale</span> <span class="o">&lt;</span> <span class="n">valid_scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1"># 5. discard boxes with low scores</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">pred_prob</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">pred_conf</span> <span class="o">*</span> <span class="n">pred_prob</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pred_coor</span><span class="p">)),</span> <span class="n">classes</span><span class="p">]</span>
+        <span class="n">score_mask</span> <span class="o">=</span> <span class="n">scores</span> <span class="o">&gt;</span> <span class="n">score_threshold</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">scale_mask</span><span class="p">,</span> <span class="n">score_mask</span><span class="p">)</span>
+        <span class="n">coors</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">classes</span> <span class="o">=</span> <span class="n">pred_coor</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">scores</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">classes</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">coors</span><span class="p">,</span> <span class="n">scores</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">classes</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

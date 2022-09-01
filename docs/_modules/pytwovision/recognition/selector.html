@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytwovision.recognition.selector &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pytwovision.recognition.selector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytwovision.recognition.selector</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">wget</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+
+<div class="viewcode-block" id="Recognizer"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer">[docs]</a><span class="k">class</span> <span class="nc">Recognizer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An Abstraction that expects an implementation of a detector like:</span>
+<span class="sd">    &#39;ObjectDetectorYoloV3&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neural_network</span><span class="p">:</span> <span class="n">NeuralNetwork</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">=</span> <span class="n">neural_network</span>
+
+<div class="viewcode-block" id="Recognizer.get_model"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a tensorflow model with an implemented network&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">model</span></div>
+    
+<div class="viewcode-block" id="Recognizer.print_model"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.print_model">[docs]</a>    <span class="k">def</span> <span class="nf">print_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print network summary for debugging purposes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">print_summary</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Recognizer.inference"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.inference">[docs]</a>    <span class="k">def</span> <span class="nf">inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply inference with trained model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image_path: a path to an image.</span>
+<span class="sd">            input_size: integer to resize an input image from their original dimensions to an square image.</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An array with bounding boxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">inference</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Recognizer.restore_weights"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.restore_weights">[docs]</a>    <span class="k">def</span> <span class="nf">restore_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights_file</span><span class="p">,</span> <span class="n">use_checkpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load previously trained model weights.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            weights_file: beginning by project root this is the path where is save your weights; example: &quot;weights/weights_01.h5&quot;.</span>
+<span class="sd">            use_checkpoint: if you wanna use a .ckpt file this variable should be True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">restore_weights</span><span class="p">(</span><span class="n">weights_file</span><span class="p">,</span> <span class="n">use_checkpoint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Recognizer.train_using_weights"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.train_using_weights">[docs]</a>    <span class="k">def</span> <span class="nf">train_using_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_annotations_path</span><span class="p">,</span> <span class="n">test_annotations_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">weights_path</span><span class="p">,</span>
+                <span class="n">checkpoint_path</span><span class="o">=</span><span class="s2">&quot;checkpoints&quot;</span><span class="p">,</span> <span class="n">use_checkpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">warmup_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
+                <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">log_dir</span><span class="o">=</span><span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="n">save_only_best_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_all_checkpoints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">lr_init</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">lr_end</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">],</span>
+                <span class="n">anchors</span><span class="o">=</span><span class="p">[[[</span><span class="mi">10</span><span class="p">,</span>  <span class="mi">13</span><span class="p">],</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span>   <span class="mi">23</span><span class="p">]],</span>
+                        <span class="p">[[</span><span class="mi">30</span><span class="p">,</span>  <span class="mi">61</span><span class="p">],</span> <span class="p">[</span><span class="mi">62</span><span class="p">,</span>   <span class="mi">45</span><span class="p">],</span> <span class="p">[</span><span class="mi">59</span><span class="p">,</span>  <span class="mi">119</span><span class="p">]],</span>
+                        <span class="p">[[</span><span class="mi">116</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="p">[</span><span class="mi">156</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="p">[</span><span class="mi">373</span><span class="p">,</span> <span class="mi">326</span><span class="p">]]],</span>
+                <span class="n">anchor_per_scale</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_bbox_per_scale</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Train with transfer learning.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            train_annotations_path: a string corresponding to the folder where train annotations are located.</span>
+<span class="sd">            test_annotations_path: a string corresponding to the folder where test annotations are located.</span>
+<span class="sd">            class_file_name: a string corresponding to the classes file (a .txt file with a list of classes) is located.</span>
+<span class="sd">            weights_path: a path which in case if it&#39;s an url with weights like: &#39;https://pjreddie.com/media/files/yolov3.weights&#39; or &#39;https://pjreddie.com/media/files/yolov3-tiny.weights&#39; this method first download the weights and then train the net but if the path is a local file the method is going to load the weights and next train the network.</span>
+<span class="sd">            checkpoint_path: a string corresponding to the checkpoint file that is inside of a checkpoints folder.</span>
+<span class="sd">            use_checkpoint: a boolean that controls if use chepoint before train.</span>
+<span class="sd">            warmup_epochs: an hiperparameter that update learning rate like this paper https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg.</span>
+<span class="sd">            epochs: Number of epochs to train.</span>
+<span class="sd">            log_dir: a folder to save logs.</span>
+<span class="sd">            save_only_best_model: if is true the model will be saved when best validation loss &gt; total validation loss/total test elements, but if it isn&#39;t true model will be saved always.</span>
+<span class="sd">            save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.</span>
+<span class="sd">            batch_size: an integer with the size of batches in test and train datasets.</span>
+<span class="sd">            lr_init: a float which is initial learning rate.</span>
+<span class="sd">            lr_end: a float which is final learning rate.</span>
+<span class="sd">            strides: a list with the strides in a yolo model.</span>
+<span class="sd">            anchors: these are the yolo anchors sizes.</span>
+<span class="sd">            anchor_per_scale: an integer with the number of anchor boxes per scale. </span>
+<span class="sd">            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">regex</span> <span class="o">=</span> <span class="s1">&#39;((http|https)://)(www.)?&#39;</span> <span class="o">+</span> <span class="s1">&#39;[a-zA-Z0-9@:%._</span><span class="se">\\</span><span class="s1">+~#?&amp;//=]{2,256}</span><span class="se">\\</span><span class="s1">.[a-z]&#39;</span> <span class="o">+</span> <span class="s1">&#39;{2,6}</span><span class="se">\\</span><span class="s1">b([-a-zA-Z0-9@:%._</span><span class="se">\\</span><span class="s1">+~#?&amp;//=]*)&#39;</span>
+        <span class="n">regular_exp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regular_exp</span><span class="p">,</span> <span class="n">weights_path</span><span class="p">):</span>
+            <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">weights_path</span><span class="p">)</span>
+            <span class="n">weights_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">weights_path</span><span class="p">)</span>
+        <span class="c1"># restore weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">restore_weights</span><span class="p">(</span><span class="n">weights_path</span><span class="p">)</span>
+        <span class="c1"># train with a pre-trained net</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_annotations_path</span><span class="p">,</span> <span class="n">test_annotations_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">,</span> <span class="n">use_checkpoint</span><span class="p">,</span> <span class="n">warmup_epochs</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">log_dir</span><span class="p">,</span> <span class="n">save_only_best_model</span><span class="p">,</span> <span class="n">save_all_checkpoints</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">lr_init</span><span class="p">,</span> <span class="n">lr_end</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="n">strides</span><span class="p">,</span> <span class="n">anchors</span><span class="o">=</span><span class="n">anchors</span><span class="p">,</span> <span class="n">anchor_per_scale</span><span class="o">=</span><span class="n">anchor_per_scale</span><span class="p">,</span> <span class="n">max_bbox_per_scale</span><span class="o">=</span><span class="n">max_bbox_per_scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Recognizer.train"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_annotations_path</span><span class="p">,</span> <span class="n">test_annotations_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> 
+                <span class="n">checkpoint_path</span><span class="o">=</span><span class="s2">&quot;checkpoints&quot;</span><span class="p">,</span> <span class="n">use_checkpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">warmup_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
+                <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">log_dir</span><span class="o">=</span><span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="n">save_only_best_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_all_checkpoints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">lr_init</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">lr_end</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+                <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">],</span>
+                <span class="n">anchors</span><span class="o">=</span><span class="p">[[[</span><span class="mi">10</span><span class="p">,</span>  <span class="mi">13</span><span class="p">],</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span>   <span class="mi">23</span><span class="p">]],</span>
+                        <span class="p">[[</span><span class="mi">30</span><span class="p">,</span>  <span class="mi">61</span><span class="p">],</span> <span class="p">[</span><span class="mi">62</span><span class="p">,</span>   <span class="mi">45</span><span class="p">],</span> <span class="p">[</span><span class="mi">59</span><span class="p">,</span>  <span class="mi">119</span><span class="p">]],</span>
+                        <span class="p">[[</span><span class="mi">116</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span> <span class="p">[</span><span class="mi">156</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="p">[</span><span class="mi">373</span><span class="p">,</span> <span class="mi">326</span><span class="p">]]],</span>
+                <span class="n">anchor_per_scale</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_bbox_per_scale</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Train an ssd network.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            train_annotations_path: a string corresponding to the folder where train annotations are located.</span>
+<span class="sd">            test_annotations_path: a string corresponding to the folder where test annotations are located.</span>
+<span class="sd">            class_file_name: a string corresponding to the classes file (a .txt file with a list of classes) is located.</span>
+<span class="sd">            checkpoint_path: a string corresponding to the checkpoint file that is inside of a checkpoints folder.</span>
+<span class="sd">            use_checkpoint: a boolean that controls if use chepoint before train. </span>
+<span class="sd">            warmup_epochs: an hiperparameter that update learning rate like this paper https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg.</span>
+<span class="sd">            epochs: Number of epochs to train.</span>
+<span class="sd">            log_dir: a folder to save logs.</span>
+<span class="sd">            save_only_best_model: if is true the model will be saved when best validation loss &gt; total validation loss/total test elements, but if it isn&#39;t true model will be saved always.</span>
+<span class="sd">            save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.</span>
+<span class="sd">            batch_size: an integer with the size of batches in test and train datasets.</span>
+<span class="sd">            lr_init: a float which is initial learning rate.</span>
+<span class="sd">            lr_end: a float which is final learning rate.</span>
+<span class="sd">            strides: a list with the strides in a yolo model.</span>
+<span class="sd">            anchors: these are the yolo anchors sizes.</span>
+<span class="sd">            anchor_per_scale: an integer with the number of anchor boxes per scale. </span>
+<span class="sd">            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_annotations_path</span><span class="p">,</span> <span class="n">test_annotations_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">,</span> <span class="n">use_checkpoint</span><span class="p">,</span> <span class="n">warmup_epochs</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">log_dir</span><span class="p">,</span> <span class="n">save_only_best_model</span><span class="p">,</span> <span class="n">save_all_checkpoints</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">lr_init</span><span class="p">,</span> <span class="n">lr_end</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="n">strides</span><span class="p">,</span> <span class="n">anchors</span><span class="o">=</span><span class="n">anchors</span><span class="p">,</span> <span class="n">anchor_per_scale</span><span class="o">=</span><span class="n">anchor_per_scale</span><span class="p">,</span> <span class="n">max_bbox_per_scale</span><span class="o">=</span><span class="n">max_bbox_per_scale</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Recognizer.evaluate"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.Recognizer.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">classes_file</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">test_input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply evaluation using mAP.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: a tesorflow detection model.</span>
+<span class="sd">            dataset: an YoloV3DatasetGenerator instance with test dataset.</span>
+<span class="sd">            classes_file: a string corresponding to the classes file (a .txt file with a list of classes) is located.</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm.</span>
+<span class="sd">            test_input_size: integer to resize an input image from their original dimensions to an square image.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mAP score</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">classes_file</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">test_input_size</span><span class="p">)</span></div></div>
+
+
+
+<div class="viewcode-block" id="NeuralNetwork"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.selector.NeuralNetwork">[docs]</a><span class="k">class</span> <span class="nc">NeuralNetwork</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Implementation defines the interface for all implementation classes. It doesn&#39;t have to match the Abstraction&#39;s interface. In fact, the two interfaces can be entirely different. Typically the Implementation interface provides only primitive operations, while the Abstraction defines higher-level operations based on those primitives.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">inference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">restore_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">print_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+    
+
+    
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

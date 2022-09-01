@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytwovision.stereo.stereo_builder &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pytwovision.stereo.stereo_builder</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytwovision.stereo.stereo_builder</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="k">import</span> <span class="n">Matcher</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+
+<div class="viewcode-block" id="StereoSystemBuilder"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoSystemBuilder">[docs]</a><span class="k">class</span> <span class="nc">StereoSystemBuilder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Builder interface specifies methods for stereo contoller</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">pre_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">post_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">estimate_depth_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">estimate_3D_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="StereoController"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController">[docs]</a><span class="k">class</span> <span class="nc">StereoController</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The StereoController is only responsible for executing the stereo steps in a particular sequence. It is helpful when producing products according to a specific order or configuration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stereo_builder</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stereo_builder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StereoSystemBuilder</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stereo_builder</span>
+
+    <span class="nd">@stereo_builder</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">stereo_builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builder</span><span class="p">:</span> <span class="n">StereoSystemBuilder</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To change stereo builder instance used by this class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stereo_builder</span> <span class="o">=</span> <span class="n">builder</span>
+
+<div class="viewcode-block" id="StereoController.pre_process_step"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController.pre_process_step">[docs]</a>    <span class="k">def</span> <span class="nf">pre_process_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            frameL: it&#39;s the left frame</span>
+<span class="sd">            frameR: it&#39;s the right frame</span>
+<span class="sd">            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won&#39;t apply downsampling.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Both frames to apply stereo correspondence or apply more processing to the images.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">right_for_matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">downsample</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">right_for_matcher</span></div>
+    
+<div class="viewcode-block" id="StereoController.get_epilines"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController.get_epilines">[docs]</a>    <span class="k">def</span> <span class="nf">get_epilines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Draw epilines to both frames.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            frameL (arr): it&#39;s the left frame.</span>
+<span class="sd">            frameR (arr): it&#39;s the right frame.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Two elements, the left and right frame with epilines.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">left_epilines</span><span class="p">,</span> <span class="n">right_epilines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">find_epilines</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">left_epilines</span><span class="p">,</span> <span class="n">right_epilines</span></div>
+        
+<div class="viewcode-block" id="StereoController.compute_disparity"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController.compute_disparity">[docs]</a>    <span class="k">def</span> <span class="nf">compute_disparity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply the pre process step, next compute left and right disparity maps, and finally execute the post process with a wls filter to improve the final result.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            frameL: it&#39;s the left frame.</span>
+<span class="sd">            frameR: it&#39;s the right frame.</span>
+<span class="sd">            matcher: A Matcher instance.</span>
+<span class="sd">            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won&#39;t apply downsampling.</span>
+<span class="sd">            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</span>
+<span class="sd">            sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</span>
+<span class="sd">            post_process: if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</span>
+<span class="sd">            metrics: if is true print by console the time of execution of correspondence and post process steps.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Two elements, disparity map and correspondence method used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">right_for_matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">downsample</span><span class="p">)</span>
+        <span class="n">left_disp</span><span class="p">,</span> <span class="n">right_disp</span><span class="p">,</span> <span class="n">left_matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">right_for_matcher</span><span class="p">,</span> <span class="n">matcher</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">post_process</span><span class="p">:</span>
+            <span class="n">disparity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">left_disp</span><span class="p">,</span> <span class="n">right_disp</span><span class="p">,</span> <span class="n">left_matcher</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">disparity</span> <span class="o">=</span> <span class="n">left_disp</span>
+        <span class="c1"># recover original size</span>
+        <span class="k">if</span> <span class="n">downsample</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+                <span class="n">n_upsamples</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_upsamples</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">downsample</span><span class="p">)</span>
+            <span class="n">n_upsamples</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">n_upsamples</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_upsamples</span><span class="p">):</span>
+                <span class="n">disparity</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">pyrUp</span><span class="p">(</span><span class="n">disparity</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">disparity</span><span class="p">,</span> <span class="n">left_matcher</span></div>
+
+<div class="viewcode-block" id="StereoController.compute_disparity_color_map"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController.compute_disparity_color_map">[docs]</a>    <span class="k">def</span> <span class="nf">compute_disparity_color_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute disparity map with color.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            frameL: it&#39;s the left frame.</span>
+<span class="sd">            frameR: it&#39;s the right frame.</span>
+<span class="sd">            matcher: A Matcher instance.</span>
+<span class="sd">            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won&#39;t apply downsampling.</span>
+<span class="sd">            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</span>
+<span class="sd">            sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.</span>
+<span class="sd">            post_process: if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</span>
+<span class="sd">            metrics: if is true print by console the time of execution of correspondence and post process steps.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Two elements, disparity map (with 3 colors channels) and correspondence method used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">disparity</span><span class="p">,</span> <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_disparity</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">lmbda</span><span class="p">),</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">post_process</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+        <span class="n">disparity_colormap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">estimate_disparity_colormap</span><span class="p">(</span><span class="n">disparity</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">disparity_colormap</span><span class="p">,</span> <span class="n">matcher</span></div>
+
+
+<div class="viewcode-block" id="StereoController.compute_3D_map"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController.compute_3D_map">[docs]</a>    <span class="k">def</span> <span class="nf">compute_3D_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="n">metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute depth map.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            frameL: it&#39;s the left frame.</span>
+<span class="sd">            frameR: it&#39;s the right frame.</span>
+<span class="sd">            Q: a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx&#39;)/Tx ]], cx: is the principal point x in left image, cx&#39;: is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.  </span>
+<span class="sd">            matcher: A Matcher instance.</span>
+<span class="sd">            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won&#39;t apply downsampling.</span>
+<span class="sd">            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</span>
+<span class="sd">            sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</span>
+<span class="sd">            post_process: if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</span>
+<span class="sd">            metrics: if is true print by console the time of execution of correspondence, post process and depth map step.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            reprojected points image, a depth map in RGB and correspondence method used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">disparity</span><span class="p">,</span> <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_disparity</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">lmbda</span><span class="p">),</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">post_process</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">estimate_depth_map</span><span class="p">(</span><span class="n">disparity</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">),</span> <span class="n">matcher</span></div>
+
+<div class="viewcode-block" id="StereoController.compute_3D_points"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.stereo_builder.StereoController.compute_3D_points">[docs]</a>    <span class="k">def</span> <span class="nf">compute_3D_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">post_process</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="n">metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute 3D points for an input array that can be [[x1, y1], [x2, y2], [x3, y3], ... [xn, yn]].</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            frameL: it&#39;s the left frame.</span>
+<span class="sd">            frameR: it&#39;s the right frame.</span>
+<span class="sd">            points: contains the (x, y) coordinates in image plane to convert to (X, Y, Z)</span>
+<span class="sd">            Q: a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx&#39;)/Tx ]], cx: is the principal point x in left image, cx&#39;: is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.  </span>
+<span class="sd">            matcher: A Matcher instance.</span>
+<span class="sd">            downsample: if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won&#39;t apply downsampling.</span>
+<span class="sd">            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</span>
+<span class="sd">            sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</span>
+<span class="sd">            post_process: if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</span>
+<span class="sd">            metrics: if is true print by console the time of execution of correspondence, post process and depth map step.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Two elements, an array of points in 3D homogeneous coordinates (X, Y, Z, W) and correspondence method used</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">disparity</span><span class="p">,</span> <span class="n">matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_disparity</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">frameR</span><span class="p">,</span> <span class="n">matcher</span><span class="p">,</span> <span class="n">downsample</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">lmbda</span><span class="p">),</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">post_process</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">estimate_3D_points</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">disparity</span><span class="p">,</span> <span class="n">Q</span><span class="p">),</span> <span class="n">matcher</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

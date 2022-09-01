@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytwovision.image_process.split_pair &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pytwovision.image_process.split_pair</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytwovision.image_process.split_pair</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pytwovision.image_process.frame_decorator</span> <span class="k">import</span> <span class="n">FrameDecorator</span>
+
+<div class="viewcode-block" id="SplitPair"><a class="viewcode-back" href="../../../module_image_process.html#pytwovision.image_process.split_pair.SplitPair">[docs]</a><span class="k">class</span> <span class="nc">SplitPair</span><span class="p">(</span><span class="n">FrameDecorator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Concrete Decorators call the wrapped object and alter its result in some</span>
+<span class="sd">    way.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SplitPair.apply"><a class="viewcode-back" href="../../../module_image_process.html#pytwovision.image_process.split_pair.SplitPair.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;sbs&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply split in an image pair from stereo cameras.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mode: if it is &quot;sbs&quot; (side-by-side) it will do a vertical slice, if it is &quot;tb&quot; (top-bottom) it will do a a horizontal slice.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns: </span>
+<span class="sd">            left image and right image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># dividing height and width by 2</span>
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">new_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">new_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">height</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;sbs&quot;</span><span class="p">:</span>
+            <span class="n">img_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="n">height</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="n">new_width</span><span class="p">]</span> <span class="c1">#Y+H and X+W</span>
+            <span class="n">img_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="n">height</span><span class="p">,</span><span class="n">new_width</span><span class="p">:</span><span class="n">width</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;tb&quot;</span><span class="p">:</span>
+            <span class="n">img_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="n">new_height</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">width</span><span class="p">]</span> <span class="c1">#Y+H and X+W</span>
+            <span class="n">img_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">()[</span><span class="n">new_height</span><span class="p">:</span><span class="n">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">width</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mode just can be &#39;sbs&#39; or &#39;tb&#39;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">img_left</span><span class="p">,</span> <span class="n">img_right</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

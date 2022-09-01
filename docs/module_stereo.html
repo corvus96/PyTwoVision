@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stereo Vision &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utilities" href="module_utils.html" />
+    <link rel="prev" title="Object detection (Recognition)" href="module_recognition.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Stereo Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#implement-sgbm-algorithm">Implement SGBM Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standard-stereo-builder">Standard Stereo Builder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stereo-controller">Stereo Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Stereo Vision</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/module_stereo.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="stereo-vision">
+<h1>Stereo Vision<a class="headerlink" href="#stereo-vision" title="Permalink to this headline">¶</a></h1>
+<p>Includes stereo mechanism</p>
+<div class="section" id="implement-sgbm-algorithm">
+<h2>Implement SGBM Algorithm<a class="headerlink" href="#implement-sgbm-algorithm" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><span class="target" id="module-pytwovision.stereo.match_method"></span><dl class="class">
+<dt id="pytwovision.stereo.match_method.Matcher">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.match_method.</code><code class="descname">Matcher</code><span class="sig-paren">(</span><em>strategy: pytwovision.stereo.match_method.MatcherStrategy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#Matcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.Matcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Context defines the interface of interest to clients.
+The matcher accepts a strategy through the constructor, but also provides a setter to change it at runtime.</p>
+<dl class="method">
+<dt id="pytwovision.stereo.match_method.Matcher.match">
+<code class="descname">match</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#Matcher.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.Matcher.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Context delegates some work to the Strategy object instead of
+implementing multiple versions of the algorithm on its own.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.stereo.match_method.Matcher.strategy">
+<code class="descname">strategy</code><a class="headerlink" href="#pytwovision.stereo.match_method.Matcher.strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Context maintains a reference to one of the Strategy objects. The
+Context does not know the concrete class of a strategy. It should work
+with all strategies via the Strategy interface.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.stereo.match_method.MatcherStrategy">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.match_method.</code><code class="descname">MatcherStrategy</code><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#MatcherStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.MatcherStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Strategy interface declares operations common to all supported versions
+of some algorithm.</p>
+<p>The Context uses this interface to call the algorithm defined by Concrete
+Strategies.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.stereo.match_method.StereoSGBM">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.match_method.</code><code class="descname">StereoSGBM</code><span class="sig-paren">(</span><em>min_disp=0</em>, <em>max_disp=160</em>, <em>window_size=3</em>, <em>p1=216</em>, <em>p2=864</em>, <em>pre_filter_cap=63</em>, <em>mode=1</em>, <em>speckle_window_size=1100</em>, <em>speckle_range=1</em>, <em>uniqueness_ratio=5</em>, <em>disp_12_max_diff=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#StereoSGBM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.StereoSGBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>To create an instance of stereo SGBM algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>min_disp</strong> – Minimum possible disparity value. Normally, it is zero but sometimes rectification algorithms can shift images, so this parameter needs to be adjusted accordingly.</li>
+<li><strong>max_disp</strong> – Maximum disparity minus minimum disparity. The value is always greater than zero. In the current implementation, this parameter must be divisible by 16.</li>
+<li><strong>window_size</strong> – Matched block size. It must be an odd number &gt;=1 . Normally, it should be somewhere in the 3..11 range.</li>
+<li><strong>p1</strong> – The first parameter controlling the disparity smoothness.</li>
+<li><strong>p2</strong> – The second parameter controlling the disparity smoothness. The larger the values are, the smoother the disparity is. P1 is the penalty on the disparity change by plus or minus 1 between neighbor pixels. P2 is the penalty on the disparity change by more than 1 between neighbor pixels. The algorithm requires P2 &gt; P1 . See stereo_match.cpp sample where some reasonably good P1 and P2 values are shown (like 8*number_of_image_channels*SADWindowSize*SADWindowSize and 32*number_of_image_channels*SADWindowSize*SADWindowSize, respectively).</li>
+<li><strong>pre_filter_cap</strong> – Truncation value for the prefiltered image pixels. The algorithm first computes x-derivative at each pixel and clips its value by [-preFilterCap, preFilterCap] interval. The result values are passed to the Birchfield-Tomasi pixel cost function.</li>
+<li><strong>mode</strong> – Set it to StereoSGBM_MODE_HH to run the full-scale two-pass dynamic programming algorithm. It will consume O(W*H*numDisparities) bytes, which is large for 640x480 stereo and huge for HD-size pictures. By default, it is set to false .</li>
+<li><strong>speckle_window_size</strong> – Maximum size of smooth disparity regions to consider their noise speckles and invalidate. Set it to 0 to disable speckle filtering. Otherwise, set it somewhere in the 50-200 range.</li>
+<li><strong>speckle_range</strong> – Maximum disparity variation within each connected component. If you do speckle filtering, set the parameter to a positive value, it will be implicitly multiplied by 16. Normally, 1 or 2 is good enough.</li>
+<li><strong>uniqueness_ratio</strong> – Margin in percentage by which the best (minimum) computed cost function value should “win” the second best value to consider the found match correct. Normally, a value within the 5-15 range is good enough.</li>
+<li><strong>disp_12_max_diff</strong> – Maximum allowed difference (in integer pixel units) in the left-right disparity check. Set it to a non-positive value to disable the check.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pytwovision.stereo.match_method.StereoSGBM.match">
+<code class="descname">match</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#StereoSGBM.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.StereoSGBM.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return stereo sgbm instance</p>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="standard-stereo-builder">
+<h2>Standard Stereo Builder<a class="headerlink" href="#standard-stereo-builder" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><span class="target" id="module-pytwovision.stereo.standard_stereo"></span><dl class="class">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.standard_stereo.</code><code class="descname">StandardStereo</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>fish_eye=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo" title="Permalink to this definition">¶</a></dt>
+<dd><p>An emulation of a real world stereo system with his relevant parameters, like fundamental matrix, rotation matrix, translation matrix and esential matrix.</p>
+<dl class="attribute">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.camL">
+<code class="descname">camL</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.camL" title="Permalink to this definition">¶</a></dt>
+<dd><p>left camera instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.camR">
+<code class="descname">camR</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.camR" title="Permalink to this definition">¶</a></dt>
+<dd><p>right camera instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.fish_eye">
+<code class="descname">fish_eye</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.fish_eye" title="Permalink to this definition">¶</a></dt>
+<dd><p>A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it’ll use normal calibration, fish eye is recomended when cameras has an field of view &gt; 160.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.calibrate">
+<code class="descname">calibrate</code><span class="sig-paren">(</span><em>images_left_path</em>, <em>images_right_path</em>, <em>pattern_type='chessboard'</em>, <em>pattern_size=(8</em>, <em>5)</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute intrinsics and extrinsics parameters for two cameras at once.
+Note: if you want a good calibration your images in ‘images_left_path’ and ‘images_right_path’ have to follow a format for example: example/left_images/photo_1.jpg and example/right_images/photo_1.jpg the number is important because calibrate method order the pair of images with sorted method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>images_left_path</strong> – folder where is saved left calibration pattern photos.</li>
+<li><strong>images_right_path</strong> – folder where is saved right calibration pattern photos.</li>
+<li><strong>pattern_type</strong> – It can be “circles” pattern or “chessboard” pattern (default).</li>
+<li><strong>pattern_size</strong> – If pattern_type is “chessboard”  this the Number of inner corners per a chessboard row and column. But If pattern_type is “circles” this will be the number of circles per row and column.</li>
+<li><strong>show</strong> – if is true it show corners or centers found by calibration algorithm  at each iteration.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Three floats, The first is the reprojection error in left side,  the another one is right side
+and the third one is rms error (these have to be less than 1).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – If didn’t find photos on images_left_path or images_right_path folders.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.get_stereo_maps">
+<code class="descname">get_stereo_maps</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.get_stereo_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.get_stereo_maps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads stereo maps parameters from a xml file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> – path where is saved xml file. (Note: if you don’t have stereo maps you can use calibrate method first, then use rectify method and pass true in export file argument)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.print_parameters">
+<code class="descname">print_parameters</code><span class="sig-paren">(</span><em>one_camera_parameters=['matrix', 'dist_coeffs'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.print_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.print_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print required individual camera parameters and stereo parameters already defined.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>one_camera_parameters</strong> – All elements in list  will be printed, they match with cameras parameters.</li>
+<li><strong>stereo_parameters</strong> – All elements in list  will be printed, they match with stereo parameters.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.rectify">
+<code class="descname">rectify</code><span class="sig-paren">(</span><em>image_left__dims</em>, <em>image_right_dims</em>, <em>export_file_name='stereoMap'</em>, <em>alpha=1</em>, <em>output_size=(0</em>, <em>0)</em>, <em>export_file=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.rectify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.rectify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute stereo rectification maps and export left and right stereo maps in xml format. Note: you will need to calibrate first</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_left__dims</strong> – a tuple or list with left image (width, height).</li>
+<li><strong>image_right_dims</strong> – a tuple or list with right image (width, height).</li>
+<li><strong>export_file_name</strong> – personalize the name of output file.</li>
+<li><strong>alpha</strong> – free scaling parameter. If it is -1 or absent, the function performs the default scaling. Otherwise, the parameter should be between 0 and 1. alpha=0 means that the rectified images are zoomed and shifted so that only valid pixels are visible (no black areas after rectification). alpha=1 (default) means that the rectified image is decimated and shifted so that all the pixels from the original images from the cameras are retained in the rectified images (no source image pixels are lost). Any intermediate value yields an intermediate result between those two extreme cases (Only apply for no fish eye cameras).</li>
+<li><strong>output_size</strong> – New image resolution after rectification. When (0,0) is passed (default), it is set to the original image Size. Setting it to a larger value can help you preserve details in the original image, especially when there is a big radial distortion.</li>
+<li><strong>export_file</strong> – if is true this method will save the parameters in an xml with the name in export_file_name.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code> – If haven’t calibrated before, you need all parameters of calibrate() method.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereo.take_dual_photos">
+<code class="descname">take_dual_photos</code><span class="sig-paren">(</span><em>num_photos=15</em>, <em>save_dir_left='images_left'</em>, <em>save_dir_right='images_right'</em>, <em>prefix_name='photo'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.take_dual_photos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.take_dual_photos" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple way to take photos in console and save in a folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>num_photos</strong> – number of photos to take, 15 by default.</li>
+<li><strong>save_dir_left</strong> – directory name where the left photos will be saved.</li>
+<li><strong>save_dir_right</strong> – directory name where the right photos will be saved.</li>
+<li><strong>prefix_name</strong> – A prefix for the names of the photos.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – if folder exist.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.standard_stereo.</code><code class="descname">StandardStereoBuilder</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>stereo_maps_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement methods to get depth using OpenCV matchers like SGBM or BM.</p>
+<dl class="attribute">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.camL">
+<code class="descname">camL</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.camL" title="Permalink to this definition">¶</a></dt>
+<dd><p>left camera instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.camR">
+<code class="descname">camR</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.camR" title="Permalink to this definition">¶</a></dt>
+<dd><p>right camera instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.stereo_maps_path">
+<code class="descname">stereo_maps_path</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.stereo_maps_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>an xml with Stereo rectification maps</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_3D_points">
+<code class="descname">estimate_3D_points</code><span class="sig-paren">(</span><em>points</em>, <em>disparity</em>, <em>Q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_3D_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_3D_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert image plane points to homogeneous 3d points.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>points</strong> – contains the (x, y) coordinates in image plane to convert to (X, Y, Z).</li>
+<li><strong>disparity</strong> – a disparity map with a shape of (w, h, 1)</li>
+<li><strong>Q</strong> – a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx’)/Tx ]] cx: is the principal point x in left image, cx’: is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An array of points in 3D homogeneous coordinates (X, Y, Z, W).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_depth_map">
+<code class="descname">estimate_depth_map</code><span class="sig-paren">(</span><em>disparity</em>, <em>Q</em>, <em>frame</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_depth_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_depth_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert disparity map to depth map.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frame</strong> – left or right frame.</li>
+<li><strong>disparity</strong> – a disparity map with a shape of (w, h, 1)</li>
+<li><strong>Q</strong> – a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx’)/Tx ]] cx: is the principal point x in left image, cx’: is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.</li>
+<li><strong>metrics</strong> – a boolean, if is true print by console the time of execution of depth map step.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">reprojected points image and a depth map in RGB</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_disparity_colormap">
+<code class="descname">estimate_disparity_colormap</code><span class="sig-paren">(</span><em>disparity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_disparity_colormap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_disparity_colormap" title="Permalink to this definition">¶</a></dt>
+<dd><p>It converts disparity maps with a shape of (w, h, 1) to  (w, h, 3).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>disparity</strong> – a disparity map with a shape of (w, h, 1).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">disparity with color</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.find_epilines">
+<code class="descname">find_epilines</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.find_epilines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.find_epilines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw epilines to both frames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>frameR</strong> – it’s the right frame.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Two elements, the left and right frame with epilines</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.get_product">
+<code class="descname">get_product</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.get_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.get_product" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return: StandardStereo builded object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.match">
+<code class="descname">match</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply stereo SGBM.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>frameR</strong> – it’s the right frame.</li>
+<li><strong>metrics</strong> – a boolean, if is true print by console the time of execution of correspondence step.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">left and right disparity maps and even matcher instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.post_process">
+<code class="descname">post_process</code><span class="sig-paren">(</span><em>frameL</em>, <em>left_disp</em>, <em>right_disp</em>, <em>matcher</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.post_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply wls filter in disparity maps to smooth contours.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>left_disp</strong> – it’s the left disparity frame.</li>
+<li><strong>right_disp</strong> – it’s the right disparity frame.</li>
+<li><strong>matcher</strong> – it’s the matcher instance.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step.</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</li>
+<li><strong>metrics</strong> – if is true print by console the time of execution of post process step.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Improved disparity map</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.pre_process">
+<code class="descname">pre_process</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>downsample=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.pre_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.pre_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame</li>
+<li><strong>frameR</strong> – it’s the right frame</li>
+<li><strong>downsample</strong> – if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won’t apply downsampling.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Both frames to apply stereo correspondence or apply more processing to the images.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>stereo_maps_path</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialitation of product</p>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="stereo-controller">
+<h2>Stereo Controller<a class="headerlink" href="#stereo-controller" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><span class="target" id="module-pytwovision.stereo.stereo_builder"></span><dl class="class">
+<dt id="pytwovision.stereo.stereo_builder.StereoController">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.stereo_builder.</code><code class="descname">StereoController</code><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController" title="Permalink to this definition">¶</a></dt>
+<dd><p>The StereoController is only responsible for executing the stereo steps in a particular sequence. It is helpful when producing products according to a specific order or configuration.</p>
+<dl class="method">
+<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_3D_map">
+<code class="descname">compute_3D_map</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>Q</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_3D_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_3D_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute depth map.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>frameR</strong> – it’s the right frame.</li>
+<li><strong>Q</strong> – a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx’)/Tx ]], cx: is the principal point x in left image, cx’: is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.</li>
+<li><strong>matcher</strong> – A Matcher instance.</li>
+<li><strong>downsample</strong> – if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won’t apply downsampling.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</li>
+<li><strong>post_process</strong> – if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</li>
+<li><strong>metrics</strong> – if is true print by console the time of execution of correspondence, post process and depth map step.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">reprojected points image, a depth map in RGB and correspondence method used</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_3D_points">
+<code class="descname">compute_3D_points</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>points</em>, <em>Q</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_3D_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_3D_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute 3D points for an input array that can be [[x1, y1], [x2, y2], [x3, y3], … [xn, yn]].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>frameR</strong> – it’s the right frame.</li>
+<li><strong>points</strong> – contains the (x, y) coordinates in image plane to convert to (X, Y, Z)</li>
+<li><strong>Q</strong> – a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx’)/Tx ]], cx: is the principal point x in left image, cx’: is the principal point x in right image, cy: is the principal point y in left image, f: is the focal lenth in left image, Tx: The x coordinate in Translation matrix.</li>
+<li><strong>matcher</strong> – A Matcher instance.</li>
+<li><strong>downsample</strong> – if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won’t apply downsampling.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</li>
+<li><strong>post_process</strong> – if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</li>
+<li><strong>metrics</strong> – if is true print by console the time of execution of correspondence, post process and depth map step.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Two elements, an array of points in 3D homogeneous coordinates (X, Y, Z, W) and correspondence method used</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_disparity">
+<code class="descname">compute_disparity</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_disparity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the pre process step, next compute left and right disparity maps, and finally execute the post process with a wls filter to improve the final result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>frameR</strong> – it’s the right frame.</li>
+<li><strong>matcher</strong> – A Matcher instance.</li>
+<li><strong>downsample</strong> – if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won’t apply downsampling.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step</li>
+<li><strong>post_process</strong> – if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</li>
+<li><strong>metrics</strong> – if is true print by console the time of execution of correspondence and post process steps.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Two elements, disparity map and correspondence method used.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_disparity_color_map">
+<code class="descname">compute_disparity_color_map</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_disparity_color_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_disparity_color_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute disparity map with color.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame.</li>
+<li><strong>frameR</strong> – it’s the right frame.</li>
+<li><strong>matcher</strong> – A Matcher instance.</li>
+<li><strong>downsample</strong> – if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won’t apply downsampling.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.</li>
+<li><strong>post_process</strong> – if is true apply post_process and return improved disparity map, otherwise return left disparity map without post processing.</li>
+<li><strong>metrics</strong> – if is true print by console the time of execution of correspondence and post process steps.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Two elements, disparity map (with 3 colors channels) and correspondence method used</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.stereo_builder.StereoController.get_epilines">
+<code class="descname">get_epilines</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.get_epilines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.get_epilines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw epilines to both frames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> (<em>arr</em>) – it’s the left frame.</li>
+<li><strong>frameR</strong> (<em>arr</em>) – it’s the right frame.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Two elements, the left and right frame with epilines.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.stereo.stereo_builder.StereoController.pre_process_step">
+<code class="descname">pre_process_step</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>downsample=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.pre_process_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.pre_process_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frameL</strong> – it’s the left frame</li>
+<li><strong>frameR</strong> – it’s the right frame</li>
+<li><strong>downsample</strong> – if it is true, it will apply blurry in both frames and downsamples it. The downsampling factor just can be 2, 4, 8, 16, 32, 64. If downsample factor is 1 or None or False won’t apply downsampling.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Both frames to apply stereo correspondence or apply more processing to the images.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.stereo.stereo_builder.StereoSystemBuilder">
+<em class="property">class </em><code class="descclassname">pytwovision.stereo.stereo_builder.</code><code class="descname">StereoSystemBuilder</code><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoSystemBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoSystemBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Builder interface specifies methods for stereo contoller</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>If you want to use an interactive code I recommend this tutorial:</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="module_recognition.html" class="btn btn-neutral float-left" title="Object detection (Recognition)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="module_utils.html" class="btn btn-neutral float-right" title="Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

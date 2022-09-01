@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytwovision.recognition.detection_mode &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pytwovision.recognition.detection_mode</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytwovision.recognition.detection_mode</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">os</span> 
+
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.frame_decorator</span> <span class="k">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.resize_with_bbox</span> <span class="k">import</span> <span class="n">ResizeWithBBox</span>
+<span class="kn">from</span> <span class="nn">pytwovision.compute.yolov3_calculus</span> <span class="k">import</span> <span class="n">YoloV3Calculus</span>
+<span class="kn">from</span> <span class="nn">pytwovision.utils.draw</span> <span class="k">import</span> <span class="n">draw_bbox</span>
+<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="k">import</span> <span class="n">Camera</span>
+
+<div class="viewcode-block" id="DetectionMode"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode">[docs]</a><span class="k">class</span> <span class="nc">DetectionMode</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Abstract Class which defines detect method that contains the skeleton of detection algorithm with different methods such as detection on images, detection on video, detection using multiprocessing and real time detection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DetectionMode.predict"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">image_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply a prediction step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            image_data: expects an array or tensor with image data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            predicted bounding boxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pred_bbox</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+        <span class="n">pred_bbox</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pred_bbox</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">pred_bbox</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DetectionMode.postprocess_boxes"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.postprocess_boxes">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_image</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply a postprocess and non maximum supression step and resize bboxes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            original_image: expects a tensorflow model trained.</span>
+<span class="sd">            pred_bbox: a tensor of predicted bounding boxes.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Improved bounding boxes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">compute</span> <span class="o">=</span> <span class="n">YoloV3Calculus</span><span class="p">()</span>
+        <span class="n">bboxes</span> <span class="o">=</span> <span class="n">compute</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">pred_bbox</span><span class="p">,</span> <span class="n">original_image</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">compute</span><span class="o">.</span><span class="n">nms</span><span class="p">(</span><span class="n">bboxes</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">nms_method</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DetectionMode.pre_process"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.pre_process">[docs]</a>    <span class="k">def</span> <span class="nf">pre_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">input_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply resize images step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image: expects a an array.</span>
+<span class="sd">            input_size: integer to resize an input image from their original dimensions to an square image.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Resized images and bounding boxes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+        <span class="n">image_data</span> <span class="o">=</span> <span class="n">ResizeWithBBox</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">([</span><span class="n">input_size</span><span class="p">,</span> <span class="n">input_size</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">image_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DetectionMode.draw"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.draw">[docs]</a>    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_image</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">homogeneous_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Draw bounding boxes on images.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            original_image: an array which correspond with an image</span>
+<span class="sd">            bboxes: their bounding boxes.</span>
+<span class="sd">            class_file_name: a path with a .txt file where the classes are saved.</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W). However if is None it won&#39;t be drawed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An image with bounding boxes and homogeneous coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">draw_bbox</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="o">=</span><span class="n">class_file_name</span><span class="p">,</span> 
+                <span class="n">rectangle_colors</span><span class="o">=</span><span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">homogeneous_points</span><span class="o">=</span><span class="n">homogeneous_points</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="n">text_colors</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DetectionMode.detect"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.detect">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply detection pipeline&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+        
+<div class="viewcode-block" id="DetectionMode.prepare_input"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.prepare_input">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;It&#39;s the first step to convert inputs like video paths or images in compatible data.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+    
+<div class="viewcode-block" id="DetectionMode.show"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.show">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show actual frame in a window&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="DetectionMode.camera_input"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectionMode.camera_input">[docs]</a>    <span class="k">def</span> <span class="nf">camera_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera</span><span class="p">:</span> <span class="n">Camera</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If camera source is webcam or other it is gonna create attribute &#39;vid&#39;, otherwise return a frame from streaming.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            camera: is an instance of Camera Object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">camera</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s2">&quot;other&quot;</span> <span class="ow">or</span> <span class="n">camera</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s2">&quot;webcam&quot;</span><span class="p">:</span>
+            <span class="n">vid</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">camera</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">vid</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cannot open camera&quot;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">vid</span>
+
+        <span class="k">if</span> <span class="n">camera</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s2">&quot;stream&quot;</span><span class="p">:</span>
+            <span class="n">img_resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">camera</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+            <span class="n">img_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">img_resp</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">imdecode</span><span class="p">(</span><span class="n">img_arr</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">frame</span></div></div>
+
+<div class="viewcode-block" id="DetectRealTime"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTime">[docs]</a><span class="k">class</span> <span class="nc">DetectRealTime</span><span class="p">(</span><span class="n">DetectionMode</span><span class="p">):</span>
+<div class="viewcode-block" id="DetectRealTime.detect"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTime.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">camera</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> 
+                <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply detection pipeline in realtime, if you want to close the window just press &#39;q&#39;.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            camera: An instance of camera object.</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file.</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like a video.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm.</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">            show: a boolean to show frame pcessed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_input</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+        
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">):</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="n">vid</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">original_frame</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                <span class="n">original_frame</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">original_frame</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">image_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">original_frame</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">pred_bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_data</span><span class="p">)</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">bboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">original_frame</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span>
+                                             <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+            <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t2</span><span class="o">-</span><span class="n">t1</span><span class="p">)</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+            
+            <span class="n">ms</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span>
+            <span class="n">fps</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">ms</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time: </span><span class="si">{:.2f}</span><span class="s2">ms, </span><span class="si">{:.1f}</span><span class="s2"> FPS&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">fps</span><span class="p">))</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">original_frame</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">)</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s2">&quot;Time: </span><span class="si">{:.1f}</span><span class="s2">FPS&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+                          <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">camera</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">):</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span> <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DetectRealTime.prepare_input"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTime.prepare_input">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialization for writing and reading videos</span>
+<span class="sd">        </span>
+<span class="sd">        Args: </span>
+<span class="sd">            vid: a cv.VideoCapture instance.</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like an image.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames, and the last element is the frames per second</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;.mp4&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output_path has to be an .mp4 file&quot;</span><span class="p">)</span>
+        <span class="c1"># by default VideoCapture returns float instead of int</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">))</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">))</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>
+        <span class="n">codec</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s1">&#39;XVID&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">codec</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span> <span class="c1"># output_path must be .mp4</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">fps</span> </div>
+    
+<div class="viewcode-block" id="DetectRealTime.show"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTime.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">camera</span><span class="p">:</span> <span class="n">Camera</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show an image</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            image: an image array.</span>
+<span class="sd">            camera: An instance of camera object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">camera</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="DetectRealTimeMP"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP">[docs]</a><span class="k">class</span> <span class="nc">DetectRealTimeMP</span><span class="p">(</span><span class="n">DetectionMode</span><span class="p">):</span>
+<div class="viewcode-block" id="DetectRealTimeMP.detect"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">camera</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> 
+                <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply detection pipeline using multiprocessing, if you want to close the window just press &#39;q&#39;.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            camera: An instance of camera object.</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like a video.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_input</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+        <span class="n">original_frames</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">frames_data</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">predicted_data</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">processed_frames</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">processing_times</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">final_frames</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+        <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_process_initialization</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">original_frames</span><span class="p">,</span> <span class="n">frames_data</span><span class="p">,</span> <span class="n">predicted_data</span><span class="p">,</span> <span class="n">processed_frames</span><span class="p">,</span> <span class="n">processing_times</span><span class="p">,</span> <span class="n">final_frames</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+        <span class="n">p1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">p2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">p3</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">):</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="n">vid</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="n">camera</span><span class="p">)</span>
+            
+            <span class="n">original_image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="n">original_image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="n">original_frames</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">original_image</span><span class="p">)</span>
+            <span class="n">image_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+            <span class="n">frames_data</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">image_data</span><span class="p">)</span>
+        
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">original_frames</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">frames_data</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">predicted_data</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>  <span class="ow">and</span> <span class="n">processed_frames</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>  <span class="ow">and</span> <span class="n">processing_times</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">final_frames</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">p1</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                <span class="n">p2</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                <span class="n">p3</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">final_frames</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">final_frames</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">output_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DetectRealTimeMP.prepare_input"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP.prepare_input">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialization for writing and reading videos.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            vid: cv.VideoCapture instance</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like an image.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames,</span>
+<span class="sd">            and the last element is the frames per second</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;.mp4&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output_path has to be an .mp4 file&quot;</span><span class="p">)</span>
+        <span class="c1"># by default VideoCapture returns float instead of int</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">))</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">))</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>
+        <span class="n">codec</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s1">&#39;XVID&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">codec</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span> <span class="c1"># output_path must be .mp4</span>
+        <span class="n">no_of_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_COUNT</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">fps</span> </div>
+
+<div class="viewcode-block" id="DetectRealTimeMP.predict_bbox_mp"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp">[docs]</a>    <span class="k">def</span> <span class="nf">predict_bbox_mp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">frames_data</span><span class="p">,</span> <span class="n">predicted_data</span><span class="p">,</span> <span class="n">processing_times</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; predict bounding boxes using multiprocessing. It needs to be initialized.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            frames_data: a queue from multiprocessing package, that corresponds with frames. </span>
+<span class="sd">            predicted_data: a queue from multiprocessing package, that corresponds with predictions.</span>
+<span class="sd">            processing_times: a queue from multiprocessing package, that corresponds with times.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gpus</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gpus</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">set_memory_growth</span><span class="p">(</span><span class="n">gpus</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RuntimeError in tf.config.experimental.list_physical_devices(&#39;GPU&#39;)&quot;</span><span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">frames_data</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">image_data</span> <span class="o">=</span> <span class="n">frames_data</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">processing_times</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+                <span class="n">pred_bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_data</span><span class="p">)</span>
+                
+                <span class="n">predicted_data</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">pred_bbox</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DetectRealTimeMP.postprocess_mp"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess_mp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicted_data</span><span class="p">,</span> <span class="n">original_frames</span><span class="p">,</span> <span class="n">processed_frames</span><span class="p">,</span> <span class="n">processing_times</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Improve bounding boxes using multiprocessing. It needs to be initialized.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            predicted_data: a queue from multiprocessing package, that corresponds with predictions.</span>
+<span class="sd">            original_frames: a queue from multiprocessing package, that corresponds with frames. </span>
+<span class="sd">            processed_frames: a queue from multiprocessing package, that corresponds with processed frames. </span>
+<span class="sd">            processing times: a queue from multiprocessing package, that corresponds with times.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">predicted_data</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">pred_bbox</span> <span class="o">=</span> <span class="n">predicted_data</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="k">while</span> <span class="n">original_frames</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">original_image</span> <span class="o">=</span> <span class="n">original_frames</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">bboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">)</span>
+                <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">processing_times</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+                
+                <span class="n">ms</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span>
+                <span class="n">fps</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">ms</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;Time: </span><span class="si">{:.1f}</span><span class="s2">FPS&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="c1">#print(&quot;Time: {:.2f}ms, Final FPS: {:.1f}&quot;.format(ms, fps))</span>
+                
+                <span class="n">processed_frames</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DetectRealTimeMP.show"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processed_frames</span><span class="p">,</span> <span class="n">final_frames</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Show preocessed input.</span>
+<span class="sd">        </span>
+<span class="sd">        Args: </span>
+<span class="sd">            processed_frames: a queue from multiprocessing package, that corresponds with processed frames. </span>
+<span class="sd">            final_frames: a queue from multiprocessing package, that corresponds with final frames. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">processed_frames</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">processed_frames</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">final_frames</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;Detection output&#39;</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">):</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+                    <span class="k">break</span></div>
+
+<div class="viewcode-block" id="DetectRealTimeMP.multi_process_initialization"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization">[docs]</a>    <span class="k">def</span> <span class="nf">multi_process_initialization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">original_frames</span><span class="p">,</span> <span class="n">frames_data</span><span class="p">,</span> <span class="n">predicted_data</span><span class="p">,</span> <span class="n">processed_frames</span><span class="p">,</span> <span class="n">processing_times</span><span class="p">,</span> <span class="n">final_frames</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply an initialite multi processing prediction, postprocessing and show steps.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            original_frames: a queue from multiprocessing package, that corresponds with frames. </span>
+<span class="sd">            frames_data: a queue from multiprocessing package, that corresponds with frames. </span>
+<span class="sd">            predicted_data: a queue from multiprocessing package, that corresponds with predictions.</span>
+<span class="sd">            processed_frames: a queue from multiprocessing package, that corresponds with processed frames. </span>
+<span class="sd">            processing times: a queue from multiprocessing package, that corresponds with times.</span>
+<span class="sd">            final_frames: a queue from multiprocessing package, that corresponds with final frames. </span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            an Process tuple (prediction, postprocessing, show)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">predict_bbox_mp</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">frames_data</span><span class="p">,</span> <span class="n">predicted_data</span><span class="p">,</span> <span class="n">processing_times</span><span class="p">))</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">postprocess_mp</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">predicted_data</span><span class="p">,</span> <span class="n">original_frames</span><span class="p">,</span> <span class="n">processed_frames</span><span class="p">,</span> <span class="n">processing_times</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">))</span>
+        <span class="n">p3</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">processed_frames</span><span class="p">,</span> <span class="n">final_frames</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span></div></div>
+
+
+<div class="viewcode-block" id="DetectVideo"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectVideo">[docs]</a><span class="k">class</span> <span class="nc">DetectVideo</span><span class="p">(</span><span class="n">DetectionMode</span><span class="p">):</span>
+<div class="viewcode-block" id="DetectVideo.detect"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectVideo.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> 
+                <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply detection pipeline in a saved video, if you want to close the window just press &#39;q&#39;.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            input_path: a video path.</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like a video.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">            show: a boolean to show frame pcessed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">times</span><span class="p">,</span> <span class="n">times_2</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="n">out</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_input</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="n">vid</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">original_image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                <span class="n">original_image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">break</span>
+            
+            <span class="n">image_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">pred_bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_data</span><span class="p">)</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">bboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">)</span>
+            <span class="n">t3</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t2</span><span class="o">-</span><span class="n">t1</span><span class="p">)</span>
+            <span class="n">times_2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t3</span><span class="o">-</span><span class="n">t1</span><span class="p">)</span>
+            
+            <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+            <span class="n">times_2</span> <span class="o">=</span> <span class="n">times_2</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+
+            <span class="n">ms</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span>
+            <span class="n">fps</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">ms</span>
+            <span class="n">fps2</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">/</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">times_2</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">times_2</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+            
+            <span class="n">image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s2">&quot;Time: </span><span class="si">{:.1f}</span><span class="s2">FPS&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="c1"># CreateXMLfile(&quot;XML_Detections&quot;, str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time: </span><span class="si">{:.2f}</span><span class="s2">ms, Detection FPS: </span><span class="si">{:.1f}</span><span class="s2">, total FPS: </span><span class="si">{:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">fps2</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">output_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">):</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span> <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DetectVideo.prepare_input"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectVideo.prepare_input">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialization for writing and reading videos.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            input_path: an video path.</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like an image.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns: </span>
+<span class="sd">            a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames,</span>
+<span class="sd">            and the last element is the frames per second</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;.mp4&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output_path has to be an .mp4 file&quot;</span><span class="p">)</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+        <span class="c1"># by default VideoCapture returns float instead of int</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">))</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">))</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">))</span>
+        <span class="n">codec</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="s1">&#39;XVID&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">codec</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span> <span class="c1"># output_path must be .mp4</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">fps</span></div>
+    
+<div class="viewcode-block" id="DetectVideo.show"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectVideo.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show an image.</span>
+<span class="sd">        Arguments: </span>
+<span class="sd">            image: an image array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;Detection output&#39;</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span></div></div>
+        
+
+
+<div class="viewcode-block" id="DetectImage"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectImage">[docs]</a><span class="k">class</span> <span class="nc">DetectImage</span><span class="p">(</span><span class="n">DetectionMode</span><span class="p">):</span>
+<div class="viewcode-block" id="DetectImage.detect"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectImage.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span>
+                 <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply detection pipeline in an image, if you want to close the window just press &#39;q&#39;.</span>
+<span class="sd">        </span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            input_path: an image path</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like an image.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">            show: a boolean to show frame pcessed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            an image with prediction drawed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">compatible_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.bmp&quot;</span><span class="p">,</span> <span class="s2">&quot;.dib&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpe&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.webp&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">compatible_outputs</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output_path only can be one of this: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">compatible_outputs</span><span class="p">))</span>
+        <span class="n">original_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_input</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+        <span class="n">image_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+        <span class="n">pred_bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_data</span><span class="p">)</span>
+        <span class="n">bboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">cv</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">image</span></div>
+
+<div class="viewcode-block" id="DetectImage.prepare_input"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectImage.prepare_input">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a path an convert in an image array.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            image_path: a path.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            An image array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">original_image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+        <span class="n">original_image</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+
+        <span class="k">return</span>  <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">original_image</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DetectImage.show"><a class="viewcode-back" href="../../../module_recognition.html#pytwovision.recognition.detection_mode.DetectImage.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a an image, then save it and finally show it.</span>
+
+<span class="sd">        Args: </span>
+<span class="sd">            image: an image array.</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like an image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Show the image</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;predicted image&quot;</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+        <span class="c1"># Load and hold the image</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># To close the window after the required kill value was provided</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div></div>
+
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Object detection (Recognition) &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Stereo Vision" href="module_stereo.html" />
+    <link rel="prev" title="Tensorflow models" href="module_models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Object detection (Recognition)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#networks-selector">Networks selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yolov3-implementation">YOLOV3 implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inference-modes">Inference modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Object detection (Recognition)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/module_recognition.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="object-detection-recognition">
+<h1>Object detection (Recognition)<a class="headerlink" href="#object-detection-recognition" title="Permalink to this headline">¶</a></h1>
+<p>Encompasses training, inference, printing the network structure, evaluating it and recovering the pre-trained weights.</p>
+<div class="section" id="networks-selector">
+<h2>Networks selector<a class="headerlink" href="#networks-selector" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><span class="target" id="module-pytwovision.recognition.selector"></span><dl class="class">
+<dt id="pytwovision.recognition.selector.NeuralNetwork">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.selector.</code><code class="descname">NeuralNetwork</code><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#NeuralNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Implementation defines the interface for all implementation classes. It doesn’t have to match the Abstraction’s interface. In fact, the two interfaces can be entirely different. Typically the Implementation interface provides only primitive operations, while the Abstraction defines higher-level operations based on those primitives.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.recognition.selector.Recognizer">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.selector.</code><code class="descname">Recognizer</code><span class="sig-paren">(</span><em>neural_network: pytwovision.recognition.selector.NeuralNetwork</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>An Abstraction that expects an implementation of a detector like:
+‘ObjectDetectorYoloV3’.</p>
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply evaluation using mAP.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – a tesorflow detection model.</li>
+<li><strong>dataset</strong> – an YoloV3DatasetGenerator instance with test dataset.</li>
+<li><strong>classes_file</strong> – a string corresponding to the classes file (a .txt file with a list of classes) is located.</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm.</li>
+<li><strong>test_input_size</strong> – integer to resize an input image from their original dimensions to an square image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">mAP score</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.get_model">
+<code class="descname">get_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.get_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensorflow model with an implemented network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.inference">
+<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.inference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply inference with trained model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_path</strong> – a path to an image.</li>
+<li><strong>input_size</strong> – integer to resize an input image from their original dimensions to an square image.</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An array with bounding boxes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.print_model">
+<code class="descname">print_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.print_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.print_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print network summary for debugging purposes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.restore_weights">
+<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.restore_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load previously trained model weights.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>weights_file</strong> – beginning by project root this is the path where is save your weights; example: “weights/weights_01.h5”.</li>
+<li><strong>use_checkpoint</strong> – if you wanna use a .ckpt file this variable should be True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train an ssd network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>train_annotations_path</strong> – a string corresponding to the folder where train annotations are located.</li>
+<li><strong>test_annotations_path</strong> – a string corresponding to the folder where test annotations are located.</li>
+<li><strong>class_file_name</strong> – a string corresponding to the classes file (a .txt file with a list of classes) is located.</li>
+<li><strong>checkpoint_path</strong> – a string corresponding to the checkpoint file that is inside of a checkpoints folder.</li>
+<li><strong>use_checkpoint</strong> – a boolean that controls if use chepoint before train.</li>
+<li><strong>warmup_epochs</strong> – an hiperparameter that update learning rate like this paper <a class="reference external" href="https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg">https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg</a>.</li>
+<li><strong>epochs</strong> – Number of epochs to train.</li>
+<li><strong>log_dir</strong> – a folder to save logs.</li>
+<li><strong>save_only_best_model</strong> – if is true the model will be saved when best validation loss &gt; total validation loss/total test elements, but if it isn’t true model will be saved always.</li>
+<li><strong>save_all_checkpoints</strong> – it is a boolean, if is true model will be saved in each epoch.</li>
+<li><strong>batch_size</strong> – an integer with the size of batches in test and train datasets.</li>
+<li><strong>lr_init</strong> – a float which is initial learning rate.</li>
+<li><strong>lr_end</strong> – a float which is final learning rate.</li>
+<li><strong>strides</strong> – a list with the strides in a yolo model.</li>
+<li><strong>anchors</strong> – these are the yolo anchors sizes.</li>
+<li><strong>anchor_per_scale</strong> – an integer with the number of anchor boxes per scale.</li>
+<li><strong>max_bbox_per_scale</strong> – nan integer with the number of bounding boxes per scale.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.train_using_weights">
+<code class="descname">train_using_weights</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, weights_path, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.train_using_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.train_using_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train with transfer learning.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>train_annotations_path</strong> – a string corresponding to the folder where train annotations are located.</li>
+<li><strong>test_annotations_path</strong> – a string corresponding to the folder where test annotations are located.</li>
+<li><strong>class_file_name</strong> – a string corresponding to the classes file (a .txt file with a list of classes) is located.</li>
+<li><strong>weights_path</strong> – a path which in case if it’s an url with weights like: ‘<a class="reference external" href="https://pjreddie.com/media/files/yolov3.weights">https://pjreddie.com/media/files/yolov3.weights</a>’ or ‘<a class="reference external" href="https://pjreddie.com/media/files/yolov3-tiny.weights">https://pjreddie.com/media/files/yolov3-tiny.weights</a>’ this method first download the weights and then train the net but if the path is a local file the method is going to load the weights and next train the network.</li>
+<li><strong>checkpoint_path</strong> – a string corresponding to the checkpoint file that is inside of a checkpoints folder.</li>
+<li><strong>use_checkpoint</strong> – a boolean that controls if use chepoint before train.</li>
+<li><strong>warmup_epochs</strong> – an hiperparameter that update learning rate like this paper <a class="reference external" href="https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg">https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg</a>.</li>
+<li><strong>epochs</strong> – Number of epochs to train.</li>
+<li><strong>log_dir</strong> – a folder to save logs.</li>
+<li><strong>save_only_best_model</strong> – if is true the model will be saved when best validation loss &gt; total validation loss/total test elements, but if it isn’t true model will be saved always.</li>
+<li><strong>save_all_checkpoints</strong> – it is a boolean, if is true model will be saved in each epoch.</li>
+<li><strong>batch_size</strong> – an integer with the size of batches in test and train datasets.</li>
+<li><strong>lr_init</strong> – a float which is initial learning rate.</li>
+<li><strong>lr_end</strong> – a float which is final learning rate.</li>
+<li><strong>strides</strong> – a list with the strides in a yolo model.</li>
+<li><strong>anchors</strong> – these are the yolo anchors sizes.</li>
+<li><strong>anchor_per_scale</strong> – an integer with the number of anchor boxes per scale.</li>
+<li><strong>max_bbox_per_scale</strong> – nan integer with the number of bounding boxes per scale.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="yolov3-implementation">
+<h2>YOLOV3 implementation<a class="headerlink" href="#yolov3-implementation" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><span class="target" id="module-pytwovision.recognition.yolov3_detector"></span><dl class="class">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.yolov3_detector.</code><code class="descname">ObjectDetectorYoloV3</code><span class="sig-paren">(</span><em>model_name, num_class, input_shape=[416, 416, 3], version='yolov3', training=False, gpu_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Made of an Yolo network model and a dataset generator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mode_name</strong> – an string to naming the model.</li>
+<li><strong>num_class</strong> – an integer with the numbers of classes in the model.</li>
+<li><strong>input_shape</strong> – A tuple with dims shape (height, weight, channels).</li>
+<li><strong>version</strong> – it can be ‘yolov3’ or ‘yolov3_tiny’.</li>
+<li><strong>training</strong> – a boolean that change depending if you want to train the model</li>
+<li><strong>gpu_name</strong> – a gpu name if it is None this class search automatically a gpu compatible.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model">
+<code class="descname">model</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>A model instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class">
+<code class="descname">num_class</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>an integer with the numbers of classes in the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.version">
+<code class="descname">version</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>it can be ‘yolov3’ or ‘yolov3_tiny’.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name">
+<code class="descname">model_name</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>an string to naming the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape">
+<code class="descname">input_shape</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple with dims shape (height, weight, channels).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus">
+<code class="descname">gpus</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus" title="Permalink to this definition">¶</a></dt>
+<dd><p>a list with all allowed gpus.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors">
+<code class="descname">conv_tensors</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>these are the ouput of build yolov3 without prediction layer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model">
+<code class="descname">build_model</code><span class="sig-paren">(</span><em>conv_tensors</em>, <em>training</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.build_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the complete yolo model and return model instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conv_tensors</strong> – a tensor with convolutional layers of a yolo network without output  layers or prediction layers.</li>
+<li><strong>training</strong> – a boolean that change network structure, if is true the last layers will be predict tensors otherwise it will be output tensors.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A yolo model.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply evaluation using mAP.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – a tesorflow detection model.</li>
+<li><strong>dataset</strong> – an YoloV3DatasetGenerator instance with test dataset.</li>
+<li><strong>classes_file</strong> – a string corresponding to the classes file (a .txt file with a list of classes) is located.</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm.</li>
+<li><strong>test_input_size</strong> – integer to resize an input image from their original dimensions to an square image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">mAP score</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference">
+<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply inference with trained model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_path</strong> – a path to an image.</li>
+<li><strong>input_size</strong> – integer to resize an input image from their original dimensions to an square image.</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An array with bounding boxes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary">
+<code class="descname">print_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.print_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print network summary for debugging purposes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights">
+<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load previously trained model weights.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>weights_file</strong> – beginning by project root this is the path where is save your weights; example: “weights/weights_01.h5”.</li>
+<li><strong>use_checkpoint</strong> – if you wanna use a .ckpt file this variable should be True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train an yolov3 network or yolov3 tiny.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>train_annotations_path</strong> – a string corresponding to the folder where train annotations are located.</li>
+<li><strong>test_annotations_path</strong> – a string corresponding to the folder where test annotations are located.</li>
+<li><strong>class_file_name</strong> – a string corresponding to the classes file (a .txt file with a list of classes) is located.</li>
+<li><strong>checkpoint_path</strong> – a string corresponding to the checkpoint file that is inside of a checkpoints folder.</li>
+<li><strong>use_checkpoint</strong> – a boolean that controls if use chepoint before train</li>
+<li><strong>warmup_epochs</strong> – an hiperparameter that update learning rate like this paper <a class="reference external" href="https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg">https://arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg</a></li>
+<li><strong>epochs</strong> – Number of epochs to train.</li>
+<li><strong>log_dir</strong> – a folder to save logs.</li>
+<li><strong>save_only_best_model</strong> – if is true the model will be saved when best validation loss &gt; total validation loss/total test elements, but if it isn’t true model will be saved always.</li>
+<li><strong>save_all_checkpoints</strong> – it is a boolean, if is true model will be saved in each epoch.</li>
+<li><strong>batch_size</strong> – an integer with the size of batches in test and train datasets.</li>
+<li><strong>lr_init</strong> – a float which is initial learning rate</li>
+<li><strong>lr_end</strong> – a float which is final learning rate</li>
+<li><strong>strides</strong> – a list with the strides in a yolo model.</li>
+<li><strong>anchors</strong> – these are the yolo anchors sizes.</li>
+<li><strong>anchor_per_scale</strong> – an integer with the number of anchor boxes per scale.</li>
+<li><strong>max_bbox_per_scale</strong> – nan integer with the number of bounding boxes per scale.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step">
+<code class="descname">train_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em>, <em>optimizer</em>, <em>lr_init=0.0001</em>, <em>lr_end=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>training step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_data</strong> – an image.</li>
+<li><strong>target</strong> – labels</li>
+<li><strong>optimizer</strong> – an tensorflow optimizer like Adams optimizer.</li>
+<li><strong>lr_init</strong> – initial leraning rate hiperparameter.</li>
+<li><strong>lr_end</strong> – final learning rate hiperparameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(global_steps, optimizer.lr, giou_loss, conf_loss, prob_loss, total_loss)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step">
+<code class="descname">validate_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.validate_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validation step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_data</strong> – an image.</li>
+<li><strong>target</strong> – labels.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(giou_loss, conf_loss, prob_loss, total_loss)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="inference-modes">
+<h2>Inference modes<a class="headerlink" href="#inference-modes" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><span class="target" id="module-pytwovision.recognition.detection_mode"></span><dl class="class">
+<dt id="pytwovision.recognition.detection_mode.DetectImage">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectImage</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectImage.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>input_path</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply detection pipeline in an image, if you want to close the window just press ‘q’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>input_path</strong> – an image path</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like an image.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+<li><strong>show</strong> – a boolean to show frame pcessed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">an image with prediction drawed</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectImage.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>image_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a path an convert in an image array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>image_path</strong> – a path.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An image array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectImage.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>image</em>, <em>output_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a an image, then save it and finally show it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> – an image array.</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like an image.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTime">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectRealTime</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTime.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>camera: pytwovision.input_output.camera.Camera</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply detection pipeline in realtime, if you want to close the window just press ‘q’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>camera</strong> – An instance of camera object.</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file.</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like a video.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm.</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+<li><strong>show</strong> – a boolean to show frame pcessed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTime.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>vid</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization for writing and reading videos</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>vid</strong> – a cv.VideoCapture instance.</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like an image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames, and the last element is the frames per second</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTime.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>image</em>, <em>camera: pytwovision.input_output.camera.Camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show an image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> – an image array.</li>
+<li><strong>camera</strong> – An instance of camera object.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectRealTimeMP</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>camera: pytwovision.input_output.camera.Camera</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply detection pipeline using multiprocessing, if you want to close the window just press ‘q’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>camera</strong> – An instance of camera object.</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like a video.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization">
+<code class="descname">multi_process_initialization</code><span class="sig-paren">(</span><em>model</em>, <em>original_frames</em>, <em>frames_data</em>, <em>predicted_data</em>, <em>processed_frames</em>, <em>processing_times</em>, <em>final_frames</em>, <em>class_file_name</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.multi_process_initialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply an initialite multi processing prediction, postprocessing and show steps.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>original_frames</strong> – a queue from multiprocessing package, that corresponds with frames.</li>
+<li><strong>frames_data</strong> – a queue from multiprocessing package, that corresponds with frames.</li>
+<li><strong>predicted_data</strong> – a queue from multiprocessing package, that corresponds with predictions.</li>
+<li><strong>processed_frames</strong> – a queue from multiprocessing package, that corresponds with processed frames.</li>
+<li><strong>times</strong> (<em>processing</em>) – a queue from multiprocessing package, that corresponds with times.</li>
+<li><strong>final_frames</strong> – a queue from multiprocessing package, that corresponds with final frames.</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">an Process tuple (prediction, postprocessing, show)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp">
+<code class="descname">postprocess_mp</code><span class="sig-paren">(</span><em>predicted_data</em>, <em>original_frames</em>, <em>processed_frames</em>, <em>processing_times</em>, <em>input_size</em>, <em>class_file_name</em>, <em>score_threshold</em>, <em>iou_threshold</em>, <em>rectangle_colors</em>, <em>nms_method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.postprocess_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Improve bounding boxes using multiprocessing. It needs to be initialized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>predicted_data</strong> – a queue from multiprocessing package, that corresponds with predictions.</li>
+<li><strong>original_frames</strong> – a queue from multiprocessing package, that corresponds with frames.</li>
+<li><strong>processed_frames</strong> – a queue from multiprocessing package, that corresponds with processed frames.</li>
+<li><strong>times</strong> (<em>processing</em>) – a queue from multiprocessing package, that corresponds with times.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp">
+<code class="descname">predict_bbox_mp</code><span class="sig-paren">(</span><em>model</em>, <em>frames_data</em>, <em>predicted_data</em>, <em>processing_times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.predict_bbox_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp" title="Permalink to this definition">¶</a></dt>
+<dd><p>predict bounding boxes using multiprocessing. It needs to be initialized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>frames_data</strong> – a queue from multiprocessing package, that corresponds with frames.</li>
+<li><strong>predicted_data</strong> – a queue from multiprocessing package, that corresponds with predictions.</li>
+<li><strong>processing_times</strong> – a queue from multiprocessing package, that corresponds with times.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>vid</em>, <em>output_path</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization for writing and reading videos.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>vid</strong> – cv.VideoCapture instance</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like an image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames,
+and the last element is the frames per second</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>processed_frames</em>, <em>final_frames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show preocessed input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>processed_frames</strong> – a queue from multiprocessing package, that corresponds with processed frames.</li>
+<li><strong>final_frames</strong> – a queue from multiprocessing package, that corresponds with final frames.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.recognition.detection_mode.DetectVideo">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectVideo</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectVideo.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>input_path</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply detection pipeline in a saved video, if you want to close the window just press ‘q’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>input_path</strong> – a video path.</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like a video.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+<li><strong>show</strong> – a boolean to show frame pcessed</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectVideo.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>input_path</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization for writing and reading videos.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_path</strong> – an video path.</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like an image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a tuple where its first argument is an instance to Opencv video writes, the second element is an instance to read frames,
+and the last element is the frames per second</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectVideo.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>image</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show an image.
+:param image: an image array.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectionMode</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Abstract Class which defines detect method that contains the skeleton of detection algorithm with different methods such as detection on images, detection on video, detection using multiprocessing and real time detection.</p>
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.camera_input">
+<code class="descname">camera_input</code><span class="sig-paren">(</span><em>camera: pytwovision.input_output.camera.Camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.camera_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.camera_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>If camera source is webcam or other it is gonna create attribute ‘vid’, otherwise return a frame from streaming.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>camera</strong> – is an instance of Camera Object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply detection pipeline</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><em>original_image</em>, <em>bboxes</em>, <em>class_file_name</em>, <em>rectangle_colors</em>, <em>homogeneous_points=None</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw bounding boxes on images.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>original_image</strong> – an array which correspond with an image</li>
+<li><strong>bboxes</strong> – their bounding boxes.</li>
+<li><strong>class_file_name</strong> – a path with a .txt file where the classes are saved.</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>homogeneous_points</strong> – an array with dimensions n x 4 where each row is like (X, Y, Z, W). However if is None it won’t be drawed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An image with bounding boxes and homogeneous coordinates.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.postprocess_boxes">
+<code class="descname">postprocess_boxes</code><span class="sig-paren">(</span><em>original_image</em>, <em>pred_bbox</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.postprocess_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.postprocess_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a postprocess and non maximum supression step and resize bboxes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>original_image</strong> – expects a tensorflow model trained.</li>
+<li><strong>pred_bbox</strong> – a tensor of predicted bounding boxes.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Improved bounding boxes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.pre_process">
+<code class="descname">pre_process</code><span class="sig-paren">(</span><em>image</em>, <em>input_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.pre_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.pre_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply resize images step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image</strong> – expects a an array.</li>
+<li><strong>input_size</strong> – integer to resize an input image from their original dimensions to an square image.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Resized images and bounding boxes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>model</em>, <em>image_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a prediction step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>image_data</strong> – expects an array or tensor with image data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">predicted bounding boxes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>It’s the first step to convert inputs like video paths or images in compatible data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.detection_mode.DetectionMode.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show actual frame in a window</p>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>If you want to use an interactive code I recommend this tutorial:</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="module_models.html" class="btn btn-neutral float-left" title="Tensorflow models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="module_stereo.html" class="btn btn-neutral float-right" title="Stereo Vision" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

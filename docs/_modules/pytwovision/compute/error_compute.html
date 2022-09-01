@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytwovision.compute.error_compute &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pytwovision.compute.error_compute</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytwovision.compute.error_compute</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+
+<div class="viewcode-block" id="re_projection_error"><a class="viewcode-back" href="../../../module_compute.html#pytwovision.compute.error_compute.re_projection_error">[docs]</a><span class="k">def</span> <span class="nf">re_projection_error</span><span class="p">(</span><span class="n">objpoints</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">tvecs</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">imgpoints</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates the error when calibrating a camera. </span>
+<span class="sd">    when the error approaches zero, </span>
+<span class="sd">    the more accurate are the parameters found. </span>
+<span class="sd">    Given the intrinsic, distortion, rotation and translation matrices, we must first transform the </span>
+<span class="sd">    translation matrices, we must first transform the object point to the point of the camera. </span>
+<span class="sd">    the object point to image point using cv.projectPoints().</span>
+<span class="sd">    Then, we will calculate the absolute norm between what we obtained with our transformation and the algorithm. </span>
+<span class="sd">    obtained with our transformation and the corner search algorithm. </span>
+<span class="sd">    To find the average error, we calculate the arithmetic average</span>
+<span class="sd">    of the errors calculated for all calibration images.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        objpoints: array of object points expressed in the world coordinate frame. A 1-channel 3xN/Nx3 or 3-channel 1xN/Nx1, where N is the number of points in the view.</span>
+<span class="sd">        rvecs: the rotation vector (Rodrigues) which, together with tvec, performs a change of base from the world coordinate system to the camera, see calibrateCamera for more details.</span>
+<span class="sd">        tvecs: The translation vector, see the description of the parameters above.</span>
+<span class="sd">        mtx: The intrinsic matrix of the camera.</span>
+<span class="sd">        imgpoints: reference points to compare with the reprojected objpoints.</span>
+<span class="sd">        dist: Input vector of the distortion coefficients.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">        a float with the mean error with L2 norm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean_error</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">objpoints</span><span class="p">)):</span>
+        <span class="n">imgpoints2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">projectPoints</span><span class="p">(</span><span class="n">objpoints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rvecs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">tvecs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">imgpoints</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">imgpoints2</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">NORM_L2</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">imgpoints2</span><span class="p">)</span>
+        <span class="n">mean_error</span> <span class="o">+=</span> <span class="n">error</span>
+    <span class="k">return</span> <span class="n">mean_error</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">objpoints</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

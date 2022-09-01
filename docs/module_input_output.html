@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inputs and Outputs &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tensorflow models" href="module_models.html" />
+    <link rel="prev" title="Image process" href="module_image_process.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_image_process.html">Image process</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Inputs and Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytwovision.input_output.camera">Inputs like</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-calibrate-a-single-camera">How to calibrate a single camera?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytwovision.input_output.vision_system">Outputs like</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-implement-a-position-system">How to implement a position system?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Inputs and Outputs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/module_input_output.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="inputs-and-outputs">
+<h1>Inputs and Outputs<a class="headerlink" href="#inputs-and-outputs" title="Permalink to this headline">¶</a></h1>
+<p>Contains the classes that allow the input of data to the stereo and recognition system through external hardware such as cameras, video files or even live transmission via wifi, in addition to obtaining the intrinsic and extrinsic parameters of the physical medium that captured the images. On the other hand, its other function is to merge the capabilities of the recognition module and the stereo module with the VisionSystem class.</p>
+<div class="section" id="module-pytwovision.input_output.camera">
+<span id="inputs-like"></span><h2>Inputs like<a class="headerlink" href="#module-pytwovision.input_output.camera" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytwovision.input_output.camera.Camera">
+<em class="property">class </em><code class="descclassname">pytwovision.input_output.camera.</code><code class="descname">Camera</code><span class="sig-paren">(</span><em>id</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera" title="Permalink to this definition">¶</a></dt>
+<dd><p>An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> – A string to identify our camera.</li>
+<li><strong>source</strong> – When you use webcam you need to put (int) 0, if you want to use videos or streaming, you will need to put his URL or path even you can put in a video file or a image path.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pytwovision.input_output.camera.Camera.calibrate">
+<code class="descname">calibrate</code><span class="sig-paren">(</span><em>images_path=''</em>, <em>pattern_type='chessboard'</em>, <em>pattern_size=(8</em>, <em>5)</em>, <em>export_file=True</em>, <em>show=True</em>, <em>fish_eye=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute camera parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>images_path</strong> – folder where is saved calibration pattern photos.</li>
+<li><strong>pattern_type</strong> – It can be “circles” pattern or “chessboard” pattern (default).</li>
+<li><strong>pattern_size</strong> – If pattern_type is “chessboard”  this the Number of inner corners per a chessboard row and column. But If pattern_type is “circles” this will be the number of circles per row and column.</li>
+<li><strong>export_file</strong> – To export camera parameters on xml file.</li>
+<li><strong>show</strong> – if is true it show corners or centers found by calibration algorithm  at each iteration.</li>
+<li><strong>fish_eye</strong> – A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it’ll use normal calibration, fish eye is recomended when cameras has an field of view &gt; 160.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">RMS calibration’s error.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – If didn’t find photos on images_path folder.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – If pattern_type is different of ‘chessboard’ or ‘circles’ or when</li>
+<li>fish_eye isn’t a boolean.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.input_output.camera.Camera.get_parameters">
+<code class="descname">get_parameters</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera.get_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads camera parameters from a xml file
+:param path: a path where is saved xml file. (Note: if you don’t have any parameters you can use calibrate method first and then pass true in export file argument)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – when path is wrong.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.input_output.camera.Camera.take_photos">
+<code class="descname">take_photos</code><span class="sig-paren">(</span><em>num_photos=15</em>, <em>save_dir='images'</em>, <em>prefix_name='photo'</em>, <em>rotate=0</em>, <em>resize=False</em>, <em>resize_dim=(640</em>, <em>480)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera.take_photos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera.take_photos" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple way to take photos in console and save in a folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>num_photos</strong> – Number of photos to take, 15 by default.</li>
+<li><strong>save_dir</strong> – Directory name where the photos will be saved.</li>
+<li><strong>prefix_name</strong> – A prefix for the names of the photos.</li>
+<li><strong>rotate</strong> – rotate input image around his center, 0 grades by default.</li>
+<li><strong>resize</strong> – To resize input image.</li>
+<li><strong>resize_dim</strong> – resize input image dimensions (width, height), its default is (640, 480).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – if folder exist.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="how-to-calibrate-a-single-camera">
+<h3>How to calibrate a single camera?<a class="headerlink" href="#how-to-calibrate-a-single-camera" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+
+<span class="n">fisheye_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;fisheye&quot;</span><span class="p">,</span> <span class="s2">&quot;A_PATH_OR_A_NAME_FOR_CALIBRATION_IT_DOESN&#39;T_MATTER&quot;</span><span class="p">)</span>
+<span class="n">fisheye_camera</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="s2">&quot;A_CALIBRATION_IMAGE_FOLDER_PATH&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">export_file</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="module-pytwovision.input_output.vision_system">
+<span id="outputs-like"></span><h2>Outputs like<a class="headerlink" href="#module-pytwovision.input_output.vision_system" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytwovision.input_output.vision_system.VisionSystem">
+<em class="property">class </em><code class="descclassname">pytwovision.input_output.vision_system.</code><code class="descname">VisionSystem</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>stereo_maps_path</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>q_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/vision_system.html#VisionSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.vision_system.VisionSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide an interface to apply recognition and stereo vision. Initialization of all necessary parameteres to implement an stereo-recognition system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cam_left</strong> – a camera instance which can be streaming, mp4 file path, image path or even realtime source.</li>
+<li><strong>cam_right</strong> – a camera instance which can be streaming, mp4 file path, image path or even realtime source.</li>
+<li><strong>stereo_maps_path</strong> – a path stereo maps with rectify images.</li>
+<li><strong>q_matrix</strong> – a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx’)/Tx ]]
+cx: is the principal point x in left image
+cx’: is the principal point x in right image
+cy: is the principal point y in left image
+f: is the focal lenth in left image
+Tx: The x coordinate in Translation matrix</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pytwovision.input_output.vision_system.VisionSystem.image_pipeline">
+<code class="descname">image_pipeline</code><span class="sig-paren">(</span><em>model</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>post_process_match=True</em>, <em>lmbda=128.0</em>, <em>sigma=1.5</em>, <em>downsample_for_match=2</em>, <em>show_window=True</em>, <em>otsu_thresh_inverse=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/vision_system.html#VisionSystem.image_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.vision_system.VisionSystem.image_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement a stereo recognition system for images.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like a video.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+<li><strong>post_process_match</strong> – if is true apply post_process and return an improved disparity map, otherwise return left disparity map without post processing.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.</li>
+<li><strong>downsample_for_match</strong> – if true, will apply the blur on both frames and demultiply it. The downsampling factor can be 2, 4, 8, 16, 32, 64. If the downsample factor is 1 or None or False it will not apply the downsampling.</li>
+<li><strong>show_window</strong> – shows a window with the application.</li>
+<li><strong>otsu_thresh_inverse</strong> – The Otsu threshold transforms a grayscale image into a binary image, if this variable is True the binary image will favor darker pixels otherwise it will favor lighter pixels.</li>
+<li><strong>text_colors</strong> – a tuple that represents (R, G, B) colors for drawed text.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">an image processed, bounding boxes and 3D points.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – if input images are not some of this formats [“.bmp”, “.dib”, “.jpg”, “.jpeg”, “.jpe”, “.png”, “.webp”].</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline">
+<code class="descname">realtime_or_video_pipeline</code><span class="sig-paren">(</span><em>model</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>post_process_match=True</em>, <em>lmbda=128.0</em>, <em>sigma=1.5</em>, <em>downsample_for_match=2</em>, <em>show_window=True</em>, <em>otsu_thresh_inverse=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/vision_system.html#VisionSystem.realtime_or_video_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement a stereo recognition system for video or streaming</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> – expects a tensorflow model trained.</li>
+<li><strong>class_file_name</strong> – it’s the path of classes .txt file</li>
+<li><strong>output_path</strong> – if is an empty string, it won’t be saved, but it is a path it save like a video.</li>
+<li><strong>input_size</strong> – integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</li>
+<li><strong>score_threshold</strong> – if the score of a bounding boxes is less than score_threshold, it will be discard.</li>
+<li><strong>iou_threshold</strong> – a parameter between (0, 1) which is used for nms algorithm</li>
+<li><strong>rectangle_colors</strong> – if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</li>
+<li><strong>nms_method</strong> – a string that can be  ‘nms’ or ‘soft-nms’.</li>
+<li><strong>post_process_match</strong> – if is true apply post_process and return an improved disparity map, otherwise return left disparity map without post processing.</li>
+<li><strong>lmbda</strong> – is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</li>
+<li><strong>sigma</strong> – is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.</li>
+<li><strong>downsample_for_match</strong> – if true, will apply the blur on both frames and demultiply it. The downsampling factor can be 2, 4, 8, 16, 32, 64. If the downsample factor is 1 or None or False it will not apply the downsampling.</li>
+<li><strong>show_window</strong> – shows a window with the application.</li>
+<li><strong>otsu_thresh_inverse</strong> – The Otsu threshold transforms a grayscale image into a binary image, if this variable is True the binary image will favor darker pixels otherwise it will favor lighter pixels.</li>
+<li><strong>text_colors</strong> – a tuple that represents (R, G, B) colors for drawed text.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="how-to-implement-a-position-system">
+<h3>How to implement a position system?<a class="headerlink" href="#how-to-implement-a-position-system" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">pytwovision.input_output.vision_system</span> <span class="kn">import</span> <span class="n">VisionSystem</span>
+<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.standard_stereo</span> <span class="kn">import</span> <span class="n">StandardStereo</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="kn">import</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">StereoSGBM</span>
+<span class="kn">from</span> <span class="nn">pytwovision.recognition.yolov3_detector</span> <span class="kn">import</span> <span class="n">ObjectDetectorYoloV3</span>
+<span class="kn">from</span> <span class="nn">pytwovision.recognition.selector</span> <span class="kn">import</span> <span class="n">Recognizer</span>
+
+<span class="n">anno_out_file</span> <span class="o">=</span> <span class="s2">&quot;annotations_formated&quot;</span>
+<span class="n">xml_path</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/annotations&quot;</span>
+<span class="n">classes_file</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/classes/coco.names&quot;</span>
+<span class="n">work_dir</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/to_generator_test&quot;</span>
+<span class="n">images_path</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/images&quot;</span>
+<span class="n">stereo_maps_path</span> <span class="o">=</span> <span class="s2">&quot;stereoMap&quot;</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="n">left_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;left_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/left/left_indoor_photo_5.png&quot;</span><span class="p">)</span>
+<span class="n">right_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;right_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/right/right_indoor_photo_5.png&quot;</span><span class="p">)</span>
+<span class="n">stereo_pair_fisheye</span> <span class="o">=</span> <span class="n">StandardStereo</span><span class="p">(</span><span class="n">left_camera</span><span class="p">,</span> <span class="n">right_camera</span><span class="p">)</span>
+<span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="s2">&quot;tests/assets/left_camera_calibration&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/right_camera_calibration&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">rectify</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">export_file</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">export_file_name</span><span class="o">=</span><span class="n">stereo_maps_path</span><span class="p">)</span>
+<span class="c1"># Add path format</span>
+<span class="n">stereo_maps_path</span> <span class="o">=</span> <span class="n">stereo_maps_path</span> <span class="o">+</span> <span class="s2">&quot;.xml&quot;</span>
+<span class="n">sgbm</span> <span class="o">=</span> <span class="n">StereoSGBM</span><span class="p">(</span><span class="n">min_disp</span><span class="o">=-</span><span class="mi">32</span><span class="p">,</span> <span class="n">max_disp</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="mi">107</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="mi">710</span><span class="p">,</span> <span class="n">pre_filter_cap</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">speckle_window_size</span><span class="o">=</span><span class="mi">117</span><span class="p">,</span> <span class="n">speckle_range</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">uniqueness_ratio</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">disp_12_max_diff</span><span class="o">=-</span><span class="mi">38</span><span class="p">)</span>
+<span class="n">matcher</span> <span class="o">=</span> <span class="n">Matcher</span><span class="p">(</span><span class="n">sgbm</span><span class="p">)</span>
+<span class="n">lmbda</span> <span class="o">=</span> <span class="mi">13673</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.3175</span>
+<span class="n">left_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;left_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/left/left_plant_1.png&quot;</span><span class="p">)</span>
+<span class="n">right_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;right_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/right/right_plant_1.png&quot;</span><span class="p">)</span>
+<span class="n">vis_sys</span> <span class="o">=</span> <span class="n">VisionSystem</span><span class="p">(</span><span class="n">left_camera</span><span class="p">,</span> <span class="n">right_camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">,</span> <span class="n">matcher</span><span class="p">,</span> <span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span>
+<span class="n">yolov3</span> <span class="o">=</span> <span class="n">ObjectDetectorYoloV3</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">Recognizer</span><span class="p">(</span><span class="n">yolov3</span><span class="p">)</span>
+<span class="n">link_yolov3_weights</span> <span class="o">=</span> <span class="s2">&quot;https://pjreddie.com/media/files/yolov3.weights&quot;</span>
+<span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">link_yolov3_weights</span><span class="p">)</span>
+<span class="n">weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">link_yolov3_weights</span><span class="p">)</span>
+<span class="n">recognizer</span><span class="o">.</span><span class="n">restore_weights</span><span class="p">(</span><span class="n">weights_file</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span>
+<span class="c1"># Here the magic happens</span>
+<span class="n">vis_sys</span><span class="o">.</span><span class="n">image_pipeline</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">classes_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;test_position.jpg&quot;</span><span class="p">),</span>  <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">otsu_thresh_inverse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="module_image_process.html" class="btn btn-neutral float-left" title="Image process" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="module_models.html" class="btn btn-neutral float-right" title="Tensorflow models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

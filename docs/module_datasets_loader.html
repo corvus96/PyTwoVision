@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Datasets loader &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Image process" href="module_image_process.html" />
+    <link rel="prev" title="Compute" href="module_compute.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="module_compute.html">Compute</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Datasets loader</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/module_datasets_loader.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="datasets-loader">
+<h1>Datasets loader<a class="headerlink" href="#datasets-loader" title="Permalink to this headline">¶</a></h1>
+<p>It was developed because the way in which the data sets introduced in a network are presented can vary depending on the type of recognition (detection, classification or segmentation) and even the training mechanism of each network architecture varies, sometimes requiring special preprocessing. For these reasons in this module each file must contain a class that adapts the data set to be introduced in a neural network. Currently it hosts the <strong>YoloV3DatasetGenerator</strong> class, which takes the annotations of a file containing the locations of the images of the set, its bounding boxes and the class to which the object belongs and adapts them to the network for training and evaluation.</p>
+<blockquote>
+<div><span class="target" id="module-pytwovision.datasets_loader.yolov3_dataset_generator"></span><dl class="class">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator">
+<em class="property">class </em><code class="descclassname">pytwovision.datasets_loader.yolov3_dataset_generator.</code><code class="descname">YoloV3DatasetGenerator</code><span class="sig-paren">(</span><em>annotations_path, class_file_name, batch_size=4, data_augmentation=True, input_shape=(416, 416, 3), strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100, images_to_ram=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator compatible with YOLO V3 network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>annotations_path</strong> – a path where the annotations are saved.</li>
+<li><strong>class_file_name</strong> – a path with a .txt file where the classes are saved.</li>
+<li><strong>batch_size</strong> – an integer that corresponds with the number of image which we introduce in a network per iteration.</li>
+<li><strong>data_augmentation</strong> – a boolean that controls data augmentation which change original images in new ways.</li>
+<li><strong>input_shape</strong> – a tuple with the input images dimensions.</li>
+<li><strong>strides</strong> – a list with the strides in a yolo model.</li>
+<li><strong>anchors</strong> – these are the yolo anchors sizes.</li>
+<li><strong>anchor_per_scale</strong> – an integer with the number of anchor boxes per scale.</li>
+<li><strong>max_bbox_per_scale</strong> – nan integer with the number of bounding boxes per scale.</li>
+<li><strong>images_to_ram</strong> – a boolean to control when save images in ram which allow a faster training, but it needs more RAM.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.delete_bad_annotation">
+<code class="descname">delete_bad_annotation</code><span class="sig-paren">(</span><em>bad_annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.delete_bad_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.delete_bad_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete an annotation from annotations file .txt.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bad_annotation</strong> – a string with the path of an image</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.load_annotations">
+<code class="descname">load_annotations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.load_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.load_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns annotations in array shape</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.parse_annotation">
+<code class="descname">parse_annotation</code><span class="sig-paren">(</span><em>annotation</em>, <em>mAP=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.parse_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.parse_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an annotation in an image with their bounding boxes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>annotation</strong> – an annotation line (path bounding box 1, class bounding box 2, class, …)</li>
+<li><strong>mAP</strong> – when it’s true this method won’t resize images and bounding boxes, otherwise it will do.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>images and their bounding boxes.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.preprocess_true_boxes">
+<code class="descname">preprocess_true_boxes</code><span class="sig-paren">(</span><em>bboxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.preprocess_true_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.preprocess_true_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>To prepare labels (true_boxes).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bboxes</strong> – a bounding boxes array.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Ground true bounding boxes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.random_crop">
+<code class="descname">random_crop</code><span class="sig-paren">(</span><em>image</em>, <em>bboxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.random_crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.random_crop" title="Permalink to this definition">¶</a></dt>
+<dd><p>There is a probability of 0.5 to make a crop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> – it can be an image or a batch of images.</li>
+<li><strong>bboxes</strong> – this are corresponding bounding boxes.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>images and their bounding boxes.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.random_horizontal_flip">
+<code class="descname">random_horizontal_flip</code><span class="sig-paren">(</span><em>image</em>, <em>bboxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.random_horizontal_flip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.random_horizontal_flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>There is a probability of 0.5 to make an horizontal flip</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> – it can be an image or a batch of images.</li>
+<li><strong>bboxes</strong> – this are corresponding bounding boxes.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>images and their bounding boxes.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.random_translate">
+<code class="descname">random_translate</code><span class="sig-paren">(</span><em>image</em>, <em>bboxes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/datasets_loader/yolov3_dataset_generator.html#YoloV3DatasetGenerator.random_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator.random_translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>There is a probability of 0.5 to shift in x and y images.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> – it can be an image or a batch of images.</li>
+<li><strong>bboxes</strong> – this are corresponding bounding boxes.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>images and their bounding boxes.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="module_compute.html" class="btn btn-neutral float-left" title="Compute" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="module_image_process.html" class="btn btn-neutral float-right" title="Image process" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

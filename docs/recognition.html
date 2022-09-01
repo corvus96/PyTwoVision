@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recognition &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Pytwovision’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Pytwovision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Recognition</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pytwovision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Recognition</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/recognition.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="recognition">
+<h1>Recognition<a class="headerlink" href="#recognition" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-pytwovision.recognition.selector"></span><dl class="class">
+<dt id="pytwovision.recognition.selector.NeuralNetwork">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.selector.</code><code class="descname">NeuralNetwork</code><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#NeuralNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Implementation defines the interface for all implementation classes. It
+doesn’t have to match the Abstraction’s interface. In fact, the two
+interfaces can be entirely different. Typically the Implementation interface
+provides only primitive operations, while the Abstraction defines higher-
+level operations based on those primitives.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytwovision.recognition.selector.Recognizer">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.selector.</code><code class="descname">Recognizer</code><span class="sig-paren">(</span><em>neural_network: pytwovision.recognition.selector.NeuralNetwork</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>An Abstraction that expects an implementation of a detector like:
+‘ObjectDetectorYoloV3’.</p>
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply evaluation using mAP
+:param model: a tesorflow detection model.
+:param dataset: an YoloV3DatasetGenerator instance with test dataset.
+:param classes_file: a string corresponding to the classes file (a .txt file with a list of classes) is located.
+:param score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
+:param iou_threshold: a parameter between (0, 1) which is used for nms algorithm.
+:param test_input_size: integer to resize an input image from their original dimensions to an square image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">mAP score</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.get_model">
+<code class="descname">get_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.get_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tensorflow model with an implemented network</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.inference">
+<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.inference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply inference with trained model
+:param image_path: a path to an image.
+:param input_size: integer to resize an input image from their original dimensions to an square image.
+:param score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
+:param iou_threshold: a parameter between (0, 1) which is used for nms algorithm
+:param nms_method: a string that can be  ‘nms’ or ‘soft-nms’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An array with bounding boxes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.print_model">
+<code class="descname">print_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.print_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.print_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print network summary for debugging purposes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.restore_weights">
+<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.restore_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load previously trained model weights
+:param weights_file: beginning by project root this is the path
+:param where is save your weights; example: “weights/weights_01.h5”
+:param use_checkpoint: if you wanna use a .ckpt file this variable should be True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train an ssd network.
+:param train_annotations_path: a string corresponding to the folder where train annotations are located.
+:param test_annotations_path: a string corresponding to the folder where test annotations are located.
+:param class_file_name: a string corresponding to the classes file (a .txt file with a list of classes) is located.
+:param checkpoint_path: a string corresponding to the checkpoint file that is inside of a checkpoints folder.
+:param use_checkpoint: a boolean that controls if use chepoint before train
+:param warmup_epochs: an hiperparameter that update learning rate like
+:param this paper https: //arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg
+:param epochs: Number of epochs to train.
+:param log_dir: a folder to save logs.
+:param save_only_best_model: if is true the model will be saved when
+:param best validation loss &gt; total validation loss/total test elements, but if it isn’t true model:
+:param will be saved always.:
+:param save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
+:param batch_size: an integer with the size of batches in test and train datasets.
+:param lr_init: a float which is initial learning rate.
+:param lr_end: a float which is final learning rate.
+:param strides: a list with the strides in a yolo model.
+:param anchors: these are the yolo anchors sizes.
+:param anchor_per_scale: an integer with the number of anchor boxes per scale.
+:param max_bbox_per_scale: nan integer with the number of bounding boxes per scale.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.selector.Recognizer.train_using_weights">
+<code class="descname">train_using_weights</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, weights_path, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.train_using_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.train_using_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train with transfer learning
+:param Arguments:
+:param train_annotations_path: a string corresponding to the folder where train annotations are located.
+:param test_annotations_path: a string corresponding to the folder where test annotations are located.
+:param class_file_name: a string corresponding to the classes file (a .txt file with a list of classes) is located.
+:param weights_path: a path which in case if it’s an url with weights like:
+:param ‘https: //pjreddie.com/media/files/yolov3.weights’ or ‘<a class="reference external" href="https://pjreddie.com/media/files/yolov3-tiny.weights">https://pjreddie.com/media/files/yolov3-tiny.weights</a>’
+:param this method first download the weights and then train the net:
+:param but if the path is a local file the method is going to load the weights and next train the network.:
+:param checkpoint_path: a string corresponding to the checkpoint file that is inside of a checkpoints folder.
+:param use_checkpoint: a boolean that controls if use chepoint before train
+:param warmup_epochs: an hiperparameter that update learning rate like
+:param this paper https: //arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg
+:param epochs: Number of epochs to train.
+:param log_dir: a folder to save logs.
+:param save_only_best_model: if is true the model will be saved when
+:param best validation loss &gt; total validation loss/total test elements, but if it isn’t true model:
+:param will be saved always.:
+:param save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
+:param batch_size: an integer with the size of batches in test and train datasets.
+:param lr_init: a float which is initial learning rate.
+:param lr_end: a float which is final learning rate.
+:param strides: a list with the strides in a yolo model.
+:param anchors: these are the yolo anchors sizes.
+:param anchor_per_scale: an integer with the number of anchor boxes per scale.
+:param max_bbox_per_scale: nan integer with the number of bounding boxes per scale.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-pytwovision.recognition.yolov3_detector"></span><dl class="class">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3">
+<em class="property">class </em><code class="descclassname">pytwovision.recognition.yolov3_detector.</code><code class="descname">ObjectDetectorYoloV3</code><span class="sig-paren">(</span><em>model_name, num_class, input_shape=[416, 416, 3], version='yolov3', training=False, gpu_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Made of an Yolo network model and a dataset generator.
+:param mode_name: an string to naming the model.
+:param num_class: an integer with the numbers of classes in the model.
+:param input_shape: A tuple with dims shape (height, weight, channels).
+:param version: it can be ‘yolov3’ or ‘yolov3_tiny’.
+:param training: a boolean that change depending if you want to train the model
+:param gpu_name: a gpu name if it is None this class search automatically a gpu compatible.</p>
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model">
+<code class="descname">model</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>A model instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class">
+<code class="descname">num_class</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>an integer with the numbers of classes in the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.version">
+<code class="descname">version</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>it can be ‘yolov3’ or ‘yolov3_tiny’.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name">
+<code class="descname">model_name</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>an string to naming the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape">
+<code class="descname">input_shape</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple with dims shape (height, weight, channels).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus">
+<code class="descname">gpus</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus" title="Permalink to this definition">¶</a></dt>
+<dd><p>a list with all allowed gpus.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors">
+<code class="descname">conv_tensors</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>these are the ouput of build yolov3 without prediction layer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model">
+<code class="descname">build_model</code><span class="sig-paren">(</span><em>conv_tensors</em>, <em>training</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.build_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the complete yolo model and return model instance
+:param conv_tensors: a tensor with convolutional layers of a
+:param yolo network without output  layers or prediction layers.:
+:param training: a boolean that change network structure, if is true the last
+:param layers will be predict tensors otherwise it will be output tensors.:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A yolo model.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply evaluation using mAP
+:param model: a tesorflow detection model.
+:param dataset: an YoloV3DatasetGenerator instance with test dataset.
+:param classes_file: a string corresponding to the classes file (a .txt file with a list of classes) is located.
+:param score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
+:param iou_threshold: a parameter between (0, 1) which is used for nms algorithm.
+:param test_input_size: integer to resize an input image from their original dimensions to an square image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">mAP score</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference">
+<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply inference with trained model
+:param image_path: a path to an image.
+:param input_size: integer to resize an input image from their original dimensions to an square image.
+:param score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.
+:param iou_threshold: a parameter between (0, 1) which is used for nms algorithm
+:param nms_method: a string that can be  ‘nms’ or ‘soft-nms’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An array with bounding boxes</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary">
+<code class="descname">print_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.print_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print network summary for debugging purposes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights">
+<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load previously trained model weights
+:param weights_file: beginning by project root this is the path
+:param where is save your weights; example: “weights/weights_01.h5”
+:param use_checkpoint: if you wanna use a .ckpt file this variable should be True.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train an yolov3 network or yolov3 tiny.
+:param train_annotations_path: a string corresponding to the folder where train annotations are located.
+:param test_annotations_path: a string corresponding to the folder where test annotations are located.
+:param class_file_name: a string corresponding to the classes file (a .txt file with a list of classes) is located.
+:param checkpoint_path: a string corresponding to the checkpoint file that is inside of a checkpoints folder.
+:param use_checkpoint: a boolean that controls if use chepoint before train
+:param warmup_epochs: an hiperparameter that update learning rate like
+:param this paper https: //arxiv.org/pdf/1812.01187.pdf&amp;usg=ALkJrhglKOPDjNt6SHGbphTHyMcT0cuMJg
+:param epochs: Number of epochs to train.
+:param log_dir: a folder to save logs.
+:param save_only_best_model: if is true the model will be saved when
+:param best validation loss &gt; total validation loss/total test elements, but if it isn’t true model:
+:param will be saved always.:
+:param save_all_checkpoints: it is a boolean, if is true model will be saved in each epoch.
+:param batch_size: an integer with the size of batches in test and train datasets.
+:param lr_init: a float which is initial learning rate
+:param lr_end: a float which is final learning rate
+:param strides: a list with the strides in a yolo model.
+:param anchors: these are the yolo anchors sizes.
+:param anchor_per_scale: an integer with the number of anchor boxes per scale.
+:param max_bbox_per_scale: nan integer with the number of bounding boxes per scale.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step">
+<code class="descname">train_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em>, <em>optimizer</em>, <em>lr_init=0.0001</em>, <em>lr_end=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>training step
+:param image_data: an image.
+:param target: labels
+:param optimizer: an tensorflow optimizer like Adams optimizer.
+:param lr_init: initial leraning rate hiperparameter.
+:param lr_end: final learning rate hiperparameter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(global_steps, optimizer.lr, giou_loss, conf_loss, prob_loss, total_loss)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step">
+<code class="descname">validate_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.validate_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validation step
+:param image_data: an image.
+:param target: labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(giou_loss, conf_loss, prob_loss, total_loss)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Pytwovision’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
