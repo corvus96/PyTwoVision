@@ -137,7 +137,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Pytwovision.tex', 'Pytwovision Documentation',
+    (master_doc, 'Py2vision.tex', 'Py2vision Documentation',
      'Guillermo Raven', 'manual'),
 ]
 
@@ -147,7 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pytwovision', 'Pytwovision Documentation',
+    (master_doc, 'py2vision', 'Py2vision Documentation',
      [author], 1)
 ]
 
@@ -158,8 +158,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Pytwovision', 'Pytwovision Documentation',
-     author, 'Pytwovision', 'One line description of project.',
+    (master_doc, 'Py2vision', 'Py2vision Documentation',
+     author, 'Py2vision', 'One line description of project.',
      'Miscellaneous'),
 ]
 
