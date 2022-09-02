@@ -20,5 +20,5 @@ Stereo Controller
 
 Examples
 ----------
-If you want to use an interactive code I recommend this tutorial: 
+If you want to use an interactive code I recommend this tutorial: https://github.com/corvus96/PyTwoVision/blob/master/tutorials/1_stereo_tutorial.ipynb
 
