@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py2vision.input_output.vision_system &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> py2vision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">py2vision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>py2vision.input_output.vision_system</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py2vision.input_output.vision_system</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">py2vision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">py2vision.recognition.detection_mode</span> <span class="kn">import</span> <span class="n">DetectRealTime</span>
+<span class="kn">from</span> <span class="nn">py2vision.recognition.detection_mode</span> <span class="kn">import</span> <span class="n">DetectImage</span>
+<span class="kn">from</span> <span class="nn">py2vision.stereo.match_method</span> <span class="kn">import</span> <span class="n">Matcher</span>
+<span class="kn">from</span> <span class="nn">py2vision.stereo.stereo_builder</span> <span class="kn">import</span> <span class="n">StereoController</span>
+<span class="kn">from</span> <span class="nn">py2vision.stereo.standard_stereo</span> <span class="kn">import</span> <span class="n">StandardStereoBuilder</span>
+
+<div class="viewcode-block" id="VisionSystem"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.vision_system.VisionSystem">[docs]</a><span class="k">class</span> <span class="nc">VisionSystem</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Provide an interface to apply recognition and stereo vision. Initialization of all necessary parameteres to implement an stereo-recognition system </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cam_left: a camera instance which can be streaming, mp4 file path, image path or even realtime source.</span>
+<span class="sd">        cam_right: a camera instance which can be streaming, mp4 file path, image path or even realtime source.</span>
+<span class="sd">        stereo_maps_path: a path stereo maps with rectify images.</span>
+<span class="sd">        q_matrix: a 4x4 array with the following structure, [[1 0   0          -cx     ][0 1   0          -cy     ][0 0   0           f      ][0 0 -1/Tx (cx - cx&#39;)/Tx ]]</span>
+<span class="sd">            cx: is the principal point x in left image</span>
+<span class="sd">            cx&#39;: is the principal point x in right image</span>
+<span class="sd">            cy: is the principal point y in left image</span>
+<span class="sd">            f: is the focal lenth in left image</span>
+<span class="sd">            Tx: The x coordinate in Translation matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">q_matrix</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camL</span> <span class="o">=</span> <span class="n">cam_left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camR</span> <span class="o">=</span> <span class="n">cam_right</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">StandardStereoBuilder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">camR</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span> <span class="o">=</span> <span class="n">StereoController</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">stereo_builder</span> <span class="o">=</span> <span class="n">builder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matcher</span> <span class="o">=</span> <span class="n">matcher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="o">=</span> <span class="n">q_matrix</span>
+
+<div class="viewcode-block" id="VisionSystem.realtime_or_video_pipeline"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">realtime_or_video_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> 
+                <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">,</span> 
+                <span class="n">post_process_match</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">128.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">otsu_thresh_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot; Implement a stereo recognition system for video or streaming </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like a video.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">            post_process_match: if is true apply post_process and return an improved disparity map, otherwise return left disparity map without post processing.</span>
+<span class="sd">            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</span>
+<span class="sd">            sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.</span>
+<span class="sd">            downsample_for_match: if true, will apply the blur on both frames and demultiply it. The downsampling factor can be 2, 4, 8, 16, 32, 64. If the downsample factor is 1 or None or False it will not apply the downsampling.</span>
+<span class="sd">            show_window: shows a window with the application.</span>
+<span class="sd">            otsu_thresh_inverse: The Otsu threshold transforms a grayscale image into a binary image, if this variable is True the binary image will favor darker pixels otherwise it will favor lighter pixels.</span>
+<span class="sd">            text_colors: a tuple that represents (R, G, B) colors for drawed text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">times</span><span class="p">,</span> <span class="n">times_2</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="n">detector</span> <span class="o">=</span> <span class="n">DetectRealTime</span><span class="p">()</span>
+        <span class="n">inputL</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="p">)</span>
+        <span class="n">inputR</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camR</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputL</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">,</span> <span class="n">inputL</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">prepare_input</span><span class="p">(</span><span class="n">inputL</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputL</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">):</span>
+                <span class="n">retL</span><span class="p">,</span> <span class="n">imgL</span> <span class="o">=</span> <span class="n">inputL</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">retR</span><span class="p">,</span> <span class="n">imgR</span> <span class="o">=</span> <span class="n">inputR</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">retL</span><span class="p">:</span> <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">retR</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">imgL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="p">)</span>
+                <span class="n">imgR</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camR</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">frameL</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">imgL</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+                <span class="n">frameL</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="c1"># Preprocess</span>
+            <span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">right_for_matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">pre_process_step</span><span class="p">(</span><span class="n">imgL</span><span class="p">,</span> <span class="n">imgR</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="p">)</span>
+            <span class="n">left_for_detector</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+            <span class="c1"># match and predict</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">left_disp</span><span class="p">,</span> <span class="n">right_disp</span><span class="p">,</span> <span class="n">left_matcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">left_for_matcher</span><span class="p">,</span> 
+                                                                                                <span class="n">right_for_matcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matcher</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">pred_bbox</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">left_for_detector</span><span class="p">)</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="c1"># post_process</span>
+            <span class="k">if</span> <span class="n">post_process_match</span><span class="p">:</span>
+                <span class="n">disparity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">post_process</span><span class="p">(</span><span class="n">left_for_matcher</span><span class="p">,</span> <span class="n">left_disp</span><span class="p">,</span> <span class="n">right_disp</span><span class="p">,</span> <span class="n">left_matcher</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">disparity</span> <span class="o">=</span> <span class="n">left_disp</span>
+            <span class="c1"># recover original size</span>
+            <span class="k">if</span> <span class="n">downsample_for_match</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+                    <span class="n">n_upsamples</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_upsamples</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">downsample_for_match</span><span class="p">)</span>
+                <span class="n">n_upsamples</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">n_upsamples</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_upsamples</span><span class="p">):</span>
+                    <span class="n">disparity</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">pyrUp</span><span class="p">(</span><span class="n">disparity</span><span class="p">)</span>
+            <span class="c1"># resize bboxes</span>
+            <span class="n">bboxes</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">disparity</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span>
+                                             <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+            <span class="c1"># get distance</span>
+            <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">bboxes</span><span class="p">:</span> 
+                <span class="n">blur</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">imgL</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">])],(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">blur</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">blur</span><span class="p">,</span><span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">otsu_thresh_inverse</span><span class="p">:</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">blur</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">THRESH_BINARY_INV</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">THRESH_OTSU</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">blur</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">THRESH_BINARY</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">THRESH_OTSU</span><span class="p">)</span>
+                <span class="n">mask_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+                <span class="n">mask_index</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mask_index</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+                <span class="n">mask_index</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+                <span class="n">points_3D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">estimate_3D_points</span><span class="p">(</span><span class="n">mask_index</span><span class="p">,</span> <span class="n">disparity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span>
+                <span class="n">points_3D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points_3D</span><span class="p">)</span>
+                <span class="n">average_homogeneous_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">points_3D</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+            <span class="c1"># divide by W</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">average_homogeneous_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">average_homogeneous_points</span><span class="p">)</span>
+                <span class="n">last_w</span> <span class="o">=</span> <span class="n">average_homogeneous_points</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="n">average_homogeneous_points</span><span class="o">/</span><span class="n">last_w</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">average_homogeneous_points</span><span class="p">)</span>
+                
+            <span class="n">t3</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t2</span><span class="o">-</span><span class="n">t1</span><span class="p">)</span>
+            <span class="n">times_2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t3</span><span class="o">-</span><span class="n">t1</span><span class="p">)</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+            <span class="n">times_2</span> <span class="o">=</span> <span class="n">times_2</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:]</span>
+            
+            <span class="n">ms</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span>
+            <span class="n">fps</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">ms</span>
+            <span class="n">fps2</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">/</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">times_2</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">times_2</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="c1"># draw on image</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time: </span><span class="si">{:.2f}</span><span class="s2">ms, Detection FPS: </span><span class="si">{:.1f}</span><span class="s2">, total FPS: </span><span class="si">{:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">fps2</span><span class="p">))</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">frameL</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">homogeneous_points</span><span class="o">=</span><span class="n">average_homogeneous_points</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="n">text_colors</span><span class="p">)</span>
+
+            <span class="n">cv</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s2">&quot;Time: </span><span class="si">{:.1f}</span><span class="s2">FPS&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+                          <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">show_window</span><span class="p">:</span>
+                <span class="n">detector</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">):</span>
+                <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+                <span class="k">break</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="VisionSystem.image_pipeline"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.vision_system.VisionSystem.image_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">image_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">416</span><span class="p">,</span> 
+                <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nms_method</span><span class="o">=</span><span class="s2">&quot;nms&quot;</span><span class="p">,</span> 
+                <span class="n">post_process_match</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="mf">128.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">otsu_thresh_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot; Implement a stereo recognition system for images.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: expects a tensorflow model trained.</span>
+<span class="sd">            class_file_name: it&#39;s the path of classes .txt file</span>
+<span class="sd">            output_path: if is an empty string, it won&#39;t be saved, but it is a path it save like a video.</span>
+<span class="sd">            input_size: integer to resize bounding boxes from their resized dimensions to original dimensions (input_size).</span>
+<span class="sd">            score_threshold: if the score of a bounding boxes is less than score_threshold, it will be discard.</span>
+<span class="sd">            iou_threshold: a parameter between (0, 1) which is used for nms algorithm</span>
+<span class="sd">            rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">            nms_method: a string that can be  &#39;nms&#39; or &#39;soft-nms&#39;.</span>
+<span class="sd">            post_process_match: if is true apply post_process and return an improved disparity map, otherwise return left disparity map without post processing.</span>
+<span class="sd">            lmbda: is a parameter defining the amount of regularization during filtering. Larger values force filtered disparity map edges to adhere more to source image edges. Typical value is 8000. Only valid in post processing step</span>
+<span class="sd">            sigma: is a parameter defining how sensitive the filtering process is to source image edges. Large values can lead to disparity leakage through low-contrast edges. Small values can make the filter too sensitive to noise and textures in the source image. Typical values range from 0.8 to 2.0. Only valid in post processing step.</span>
+<span class="sd">            downsample_for_match: if true, will apply the blur on both frames and demultiply it. The downsampling factor can be 2, 4, 8, 16, 32, 64. If the downsample factor is 1 or None or False it will not apply the downsampling.</span>
+<span class="sd">            show_window: shows a window with the application.</span>
+<span class="sd">            otsu_thresh_inverse: The Otsu threshold transforms a grayscale image into a binary image, if this variable is True the binary image will favor darker pixels otherwise it will favor lighter pixels.</span>
+<span class="sd">            text_colors: a tuple that represents (R, G, B) colors for drawed text.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            an image processed, bounding boxes and 3D points.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if input images are not some of this formats [&quot;.bmp&quot;, &quot;.dib&quot;, &quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.jpe&quot;, &quot;.png&quot;, &quot;.webp&quot;].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">detector</span> <span class="o">=</span> <span class="n">DetectImage</span><span class="p">()</span>
+        <span class="n">compatible_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.bmp&quot;</span><span class="p">,</span> <span class="s2">&quot;.dib&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpe&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.webp&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">compatible_outputs</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;output_path only can be one of this: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">compatible_outputs</span><span class="p">))</span>
+        <span class="n">imgL</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">imgL_for_matcher</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">imgR_for_matcher</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camR</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+        <span class="c1"># pre-process for detect</span>
+        <span class="n">left_for_detector</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">imgL</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+        <span class="c1"># compute disparity and predict</span>
+        <span class="n">disparity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">compute_disparity</span><span class="p">(</span><span class="n">imgL_for_matcher</span><span class="p">,</span> <span class="n">imgR_for_matcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matcher</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">post_process_match</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">pred_bbox</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">left_for_detector</span><span class="p">)</span>
+        <span class="c1"># resize bboxes</span>
+        <span class="n">bboxes</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">postprocess_boxes</span><span class="p">(</span><span class="n">disparity</span><span class="p">,</span> <span class="n">pred_bbox</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span>
+                                             <span class="n">score_threshold</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="p">,</span> <span class="n">nms_method</span><span class="p">)</span>
+        <span class="c1"># get distance</span>
+        <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">bboxes</span><span class="p">:</span> 
+            <span class="n">blur</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">imgL</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">])],(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">blur</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">blur</span><span class="p">,</span><span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">otsu_thresh_inverse</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">blur</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">THRESH_BINARY_INV</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">THRESH_OTSU</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">blur</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">THRESH_BINARY</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">THRESH_OTSU</span><span class="p">)</span>
+            <span class="n">mask_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="n">mask_index</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mask_index</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">mask_index</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+            <span class="n">points_3D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stereo_controller</span><span class="o">.</span><span class="n">stereo_builder</span><span class="o">.</span><span class="n">estimate_3D_points</span><span class="p">(</span><span class="n">mask_index</span><span class="p">,</span> <span class="n">disparity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span>
+            <span class="n">points_3D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points_3D</span><span class="p">)</span>
+            <span class="n">average_homogeneous_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">points_3D</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># divide by W</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">average_homogeneous_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">average_homogeneous_points</span><span class="p">)</span>
+            <span class="n">last_w</span> <span class="o">=</span> <span class="n">average_homogeneous_points</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="n">average_homogeneous_points</span><span class="o">/</span><span class="n">last_w</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="n">average_homogeneous_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">average_homogeneous_points</span><span class="p">)</span>
+        <span class="c1"># draw on image</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">imgL</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">rectangle_colors</span><span class="p">,</span> <span class="n">homogeneous_points</span><span class="o">=</span><span class="n">average_homogeneous_points</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="n">text_colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output_path</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">cv</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_window</span><span class="p">:</span>
+            <span class="c1"># Show the image</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="c1"># Load and hold the image</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># To close the window after the required kill value was provided</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">frame</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">average_homogeneous_points</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

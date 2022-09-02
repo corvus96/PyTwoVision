@@ -7,18 +7,18 @@ The concept of this module is based on being able to apply different effects to 
 The epicenter of this module
 -----------------------------
 
-    .. automodule:: pytwovision.image_process.frame_decorator
+    .. automodule:: py2vision.image_process.frame_decorator
         :members:
 
 Image transformations
 ----------------------
-    .. automodule:: pytwovision.image_process.resize_with_bbox
+    .. automodule:: py2vision.image_process.resize_with_bbox
         :members:
-    .. automodule:: pytwovision.image_process.resize
+    .. automodule:: py2vision.image_process.resize
         :members:
-    .. automodule:: pytwovision.image_process.rotate
+    .. automodule:: py2vision.image_process.rotate
         :members:
-    .. automodule:: pytwovision.image_process.split_pair
+    .. automodule:: py2vision.image_process.split_pair
         :members:
 
 How to use?
@@ -26,8 +26,8 @@ How to use?
 .. code-block:: python
     :linenos:
     
-    from pytwovision.image_process.frame_decorator import Frame
-    from pytwovision.image_process.resize import Resize
+    from py2vision.image_process.frame_decorator import Frame
+    from py2vision.image_process.resize import Resize
 
     width = 640
     height = 720

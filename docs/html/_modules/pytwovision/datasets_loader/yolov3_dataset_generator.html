@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.datasets_loader.yolov3_dataset_generator &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.datasets_loader.yolov3_dataset_generator &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Pytwovision</a>
+          <a href="../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -76,10 +76,10 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.utils.label_utils</span> <span class="k">import</span> <span class="n">read_class_names</span>
-<span class="kn">from</span> <span class="nn">pytwovision.image_process.frame_decorator</span> <span class="k">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">pytwovision.image_process.resize_with_bbox</span> <span class="k">import</span> <span class="n">ResizeWithBBox</span>
-<span class="kn">from</span> <span class="nn">pytwovision.compute.yolov3_calculus</span> <span class="k">import</span> <span class="n">YoloV3Calculus</span>
+<span class="kn">from</span> <span class="nn">pytwovision.utils.label_utils</span> <span class="kn">import</span> <span class="n">read_class_names</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.frame_decorator</span> <span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.resize_with_bbox</span> <span class="kn">import</span> <span class="n">ResizeWithBBox</span>
+<span class="kn">from</span> <span class="nn">pytwovision.compute.yolov3_calculus</span> <span class="kn">import</span> <span class="n">YoloV3Calculus</span>
 
 <div class="viewcode-block" id="YoloV3DatasetGenerator"><a class="viewcode-back" href="../../../module_datasets_loader.html#pytwovision.datasets_loader.yolov3_dataset_generator.YoloV3DatasetGenerator">[docs]</a><span class="k">class</span> <span class="nc">YoloV3DatasetGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -97,7 +97,7 @@
 <span class="sd">            max_bbox_per_scale: nan integer with the number of bounding boxes per scale. </span>
 <span class="sd">            images_to_ram: a boolean to control when save images in ram which allow a faster training, but it needs more RAM. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotations_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data_augmentation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotations_path</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data_augmentation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
                 <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">416</span><span class="p">,</span> <span class="mi">416</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">],</span>
                 <span class="n">anchors</span><span class="o">=</span><span class="p">[[[</span><span class="mi">10</span><span class="p">,</span>  <span class="mi">13</span><span class="p">],</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span>   <span class="mi">23</span><span class="p">]],</span>
                         <span class="p">[[</span><span class="mi">30</span><span class="p">,</span>  <span class="mi">61</span><span class="p">],</span> <span class="p">[</span><span class="mi">62</span><span class="p">,</span>   <span class="mi">45</span><span class="p">],</span> <span class="p">[</span><span class="mi">59</span><span class="p">,</span>  <span class="mi">119</span><span class="p">]],</span>
@@ -150,7 +150,7 @@
             <span class="n">final_annotations</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">image_path</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="n">index</span><span class="p">:],</span> <span class="n">image</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">final_annotations</span></div>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns its own instance&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -160,7 +160,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            bad_annotation: a string with the path of an image</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Deleting </span><span class="si">{bad_annotation}</span><span class="s1"> annotation line&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Deleting </span><span class="si">{</span><span class="n">bad_annotation</span><span class="si">}</span><span class="s1"> annotation line&#39;</span><span class="p">)</span>
         <span class="n">bad_image_name</span> <span class="o">=</span> <span class="n">bad_annotation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># can be used to delete bad image</span>
 
         <span class="c1"># remove bad annotation line from annotation file</span>
@@ -172,7 +172,7 @@
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span></div>
     
-    <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This method will be executed when you iterate this class</span>
 
 <span class="sd">        Returns: </span>
@@ -412,7 +412,7 @@
         <span class="n">sbboxes</span><span class="p">,</span> <span class="n">mbboxes</span><span class="p">,</span> <span class="n">lbboxes</span> <span class="o">=</span> <span class="n">bboxes_xywh</span>
         <span class="k">return</span> <span class="n">label_sbbox</span><span class="p">,</span> <span class="n">label_mbbox</span><span class="p">,</span> <span class="n">label_lbbox</span><span class="p">,</span> <span class="n">sbboxes</span><span class="p">,</span> <span class="n">mbboxes</span><span class="p">,</span> <span class="n">lbboxes</span></div>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get num of batches it will be num_samples / batch_size&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_batchs</span></div>
 </pre></div>

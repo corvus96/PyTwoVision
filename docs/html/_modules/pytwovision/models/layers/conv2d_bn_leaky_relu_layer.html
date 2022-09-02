@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.models.layers.conv2d_bn_leaky_relu_layer &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.models.layers.conv2d_bn_leaky_relu_layer &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">Pytwovision</a>
+          <a href="../../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -72,12 +72,12 @@
   <h1>Source code for pytwovision.models.layers.conv2d_bn_leaky_relu_layer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 
-<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="k">import</span> <span class="n">Conv2D</span>
-<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="k">import</span> <span class="n">LeakyReLU</span>
-<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="k">import</span> <span class="n">ZeroPadding2D</span>
-<span class="kn">from</span> <span class="nn">tensorflow.keras.regularizers</span> <span class="k">import</span> <span class="n">l2</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Conv2D</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">LeakyReLU</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">ZeroPadding2D</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.regularizers</span> <span class="kn">import</span> <span class="n">l2</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.models.layers.batch_normalization_layer</span> <span class="k">import</span> <span class="n">BatchNormalization</span>
+<span class="kn">from</span> <span class="nn">pytwovision.models.layers.batch_normalization_layer</span> <span class="kn">import</span> <span class="n">BatchNormalization</span>
 
 <div class="viewcode-block" id="conv2d_bn_leaky_relu_layer"><a class="viewcode-back" href="../../../../module_models.html#pytwovision.models.layers.conv2d_bn_leaky_relu_layer.conv2d_bn_leaky_relu_layer">[docs]</a><span class="k">def</span> <span class="nf">conv2d_bn_leaky_relu_layer</span><span class="p">(</span><span class="n">input_layer</span><span class="p">,</span> <span class="n">filters_shape</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">activate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bn</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A resnet block with depthwise separable convolutions to reduce the computational demand.</span>

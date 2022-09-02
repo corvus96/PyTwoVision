@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Object detection (Recognition) &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Object detection (Recognition) &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -25,7 +25,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Pytwovision
+            <a href="index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -59,7 +59,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Pytwovision</a>
+          <a href="index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -83,20 +83,20 @@
 <div class="section" id="networks-selector">
 <h2>Networks selector<a class="headerlink" href="#networks-selector" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.recognition.selector"></span><dl class="class">
-<dt id="pytwovision.recognition.selector.NeuralNetwork">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.selector.</code><code class="descname">NeuralNetwork</code><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#NeuralNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.recognition.selector"></span><dl class="class">
+<dt id="py2vision.recognition.selector.NeuralNetwork">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.selector.</code><code class="descname">NeuralNetwork</code><a class="reference internal" href="_modules/py2vision/recognition/selector.html#NeuralNetwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Implementation defines the interface for all implementation classes. It doesn’t have to match the Abstraction’s interface. In fact, the two interfaces can be entirely different. Typically the Implementation interface provides only primitive operations, while the Abstraction defines higher-level operations based on those primitives.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.recognition.selector.Recognizer">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.selector.</code><code class="descname">Recognizer</code><span class="sig-paren">(</span><em>neural_network: pytwovision.recognition.selector.NeuralNetwork</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.selector.</code><code class="descname">Recognizer</code><span class="sig-paren">(</span><em>neural_network: py2vision.recognition.selector.NeuralNetwork</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>An Abstraction that expects an implementation of a detector like:
 ‘ObjectDetectorYoloV3’.</p>
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply evaluation using mAP.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -120,14 +120,14 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.get_model">
-<code class="descname">get_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.get_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.get_model" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.get_model">
+<code class="descname">get_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.get_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.get_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a tensorflow model with an implemented network</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.inference">
-<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.inference" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.inference">
+<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.inference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply inference with trained model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -150,14 +150,14 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.print_model">
-<code class="descname">print_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.print_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.print_model" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.print_model">
+<code class="descname">print_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.print_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.print_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print network summary for debugging purposes.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.restore_weights">
-<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.restore_weights" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.restore_weights">
+<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.restore_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load previously trained model weights.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -174,8 +174,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.train">
-<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.train" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Train an ssd network.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -207,8 +207,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.selector.Recognizer.train_using_weights">
-<code class="descname">train_using_weights</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, weights_path, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/selector.html#Recognizer.train_using_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.selector.Recognizer.train_using_weights" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.selector.Recognizer.train_using_weights">
+<code class="descname">train_using_weights</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, weights_path, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/selector.html#Recognizer.train_using_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.selector.Recognizer.train_using_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Train with transfer learning.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -247,9 +247,9 @@
 <div class="section" id="yolov3-implementation">
 <h2>YOLOV3 implementation<a class="headerlink" href="#yolov3-implementation" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.recognition.yolov3_detector"></span><dl class="class">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.yolov3_detector.</code><code class="descname">ObjectDetectorYoloV3</code><span class="sig-paren">(</span><em>model_name, num_class, input_shape=[416, 416, 3], version='yolov3', training=False, gpu_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.recognition.yolov3_detector"></span><dl class="class">
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.yolov3_detector.</code><code class="descname">ObjectDetectorYoloV3</code><span class="sig-paren">(</span><em>model_name, num_class, input_shape=[416, 416, 3], version='yolov3', training=False, gpu_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Made of an Yolo network model and a dataset generator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -268,50 +268,50 @@
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model">
-<code class="descname">model</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.model">
+<code class="descname">model</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.model" title="Permalink to this definition">¶</a></dt>
 <dd><p>A model instance.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class">
-<code class="descname">num_class</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class">
+<code class="descname">num_class</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.num_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>an integer with the numbers of classes in the model.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.version">
-<code class="descname">version</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.version" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.version">
+<code class="descname">version</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>it can be ‘yolov3’ or ‘yolov3_tiny’.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name">
-<code class="descname">model_name</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name">
+<code class="descname">model_name</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.model_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>an string to naming the model.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape">
-<code class="descname">input_shape</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape">
+<code class="descname">input_shape</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.input_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tuple with dims shape (height, weight, channels).</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus">
-<code class="descname">gpus</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus">
+<code class="descname">gpus</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.gpus" title="Permalink to this definition">¶</a></dt>
 <dd><p>a list with all allowed gpus.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors">
-<code class="descname">conv_tensors</code><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors">
+<code class="descname">conv_tensors</code><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.conv_tensors" title="Permalink to this definition">¶</a></dt>
 <dd><p>these are the ouput of build yolov3 without prediction layer.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model">
-<code class="descname">build_model</code><span class="sig-paren">(</span><em>conv_tensors</em>, <em>training</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.build_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model">
+<code class="descname">build_model</code><span class="sig-paren">(</span><em>conv_tensors</em>, <em>training</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.build_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.build_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the complete yolo model and return model instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -331,8 +331,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>classes_file</em>, <em>score_threshold=0.05</em>, <em>iou_threshold=0.5</em>, <em>test_input_size=416</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply evaluation using mAP.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -356,8 +356,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference">
-<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference">
+<code class="descname">inference</code><span class="sig-paren">(</span><em>image_path</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.inference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply inference with trained model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -380,14 +380,14 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary">
-<code class="descname">print_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.print_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary">
+<code class="descname">print_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.print_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.print_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print network summary for debugging purposes.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights">
-<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights">
+<code class="descname">restore_weights</code><span class="sig-paren">(</span><em>weights_file</em>, <em>use_checkpoint=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.restore_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.restore_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load previously trained model weights.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -404,8 +404,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train">
-<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>train_annotations_path, test_annotations_path, class_file_name, checkpoint_path='checkpoints', use_checkpoint=False, warmup_epochs=2, epochs=100, log_dir='logs', save_only_best_model=True, save_all_checkpoints=False, batch_size=4, lr_init=0.0001, lr_end=1e-06, strides=[8, 16, 32], anchors=[[[10, 13], [16, 30], [33, 23]], [[30, 61], [62, 45], [59, 119]], [[116, 90], [156, 198], [373, 326]]], anchor_per_scale=3, max_bbox_per_scale=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Train an yolov3 network or yolov3 tiny.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -437,8 +437,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step">
-<code class="descname">train_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em>, <em>optimizer</em>, <em>lr_init=0.0001</em>, <em>lr_end=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step">
+<code class="descname">train_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em>, <em>optimizer</em>, <em>lr_init=0.0001</em>, <em>lr_end=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.train_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.train_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>training step.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -461,8 +461,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step">
-<code class="descname">validate_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.validate_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step">
+<code class="descname">validate_step</code><span class="sig-paren">(</span><em>image_data</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/yolov3_detector.html#ObjectDetectorYoloV3.validate_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.yolov3_detector.ObjectDetectorYoloV3.validate_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validation step.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -488,12 +488,12 @@
 <div class="section" id="inference-modes">
 <h2>Inference modes<a class="headerlink" href="#inference-modes" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.recognition.detection_mode"></span><dl class="class">
-<dt id="pytwovision.recognition.detection_mode.DetectImage">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectImage</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.recognition.detection_mode"></span><dl class="class">
+<dt id="py2vision.recognition.detection_mode.DetectImage">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.detection_mode.</code><code class="descname">DetectImage</code><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectImage" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectImage.detect">
-<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>input_path</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage.detect" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectImage.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>input_path</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectImage.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectImage.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply detection pipeline in an image, if you want to close the window just press ‘q’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -521,8 +521,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectImage.prepare_input">
-<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>image_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectImage.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>image_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectImage.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectImage.prepare_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a path an convert in an image array.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -537,8 +537,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectImage.show">
-<code class="descname">show</code><span class="sig-paren">(</span><em>image</em>, <em>output_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectImage.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectImage.show" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectImage.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>image</em>, <em>output_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectImage.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectImage.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a an image, then save it and finally show it.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -557,11 +557,11 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTime">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectRealTime</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTime">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.detection_mode.</code><code class="descname">DetectRealTime</code><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTime" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTime.detect">
-<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>camera: pytwovision.input_output.camera.Camera</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime.detect" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTime.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>camera: py2vision.input_output.camera.Camera</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTime.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTime.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply detection pipeline in realtime, if you want to close the window just press ‘q’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -586,8 +586,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTime.prepare_input">
-<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>vid</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTime.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>vid</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTime.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTime.prepare_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for writing and reading videos</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -607,8 +607,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTime.show">
-<code class="descname">show</code><span class="sig-paren">(</span><em>image</em>, <em>camera: pytwovision.input_output.camera.Camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTime.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTime.show" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTime.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>image</em>, <em>camera: py2vision.input_output.camera.Camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTime.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTime.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show an image</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -627,11 +627,11 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectRealTimeMP</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.detection_mode.</code><code class="descname">DetectRealTimeMP</code><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.detect">
-<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>camera: pytwovision.input_output.camera.Camera</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.detect" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>camera: py2vision.input_output.camera.Camera</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply detection pipeline using multiprocessing, if you want to close the window just press ‘q’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -655,8 +655,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization">
-<code class="descname">multi_process_initialization</code><span class="sig-paren">(</span><em>model</em>, <em>original_frames</em>, <em>frames_data</em>, <em>predicted_data</em>, <em>processed_frames</em>, <em>processing_times</em>, <em>final_frames</em>, <em>class_file_name</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.multi_process_initialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization">
+<code class="descname">multi_process_initialization</code><span class="sig-paren">(</span><em>model</em>, <em>original_frames</em>, <em>frames_data</em>, <em>predicted_data</em>, <em>processed_frames</em>, <em>processing_times</em>, <em>final_frames</em>, <em>class_file_name</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP.multi_process_initialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP.multi_process_initialization" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply an initialite multi processing prediction, postprocessing and show steps.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -687,8 +687,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp">
-<code class="descname">postprocess_mp</code><span class="sig-paren">(</span><em>predicted_data</em>, <em>original_frames</em>, <em>processed_frames</em>, <em>processing_times</em>, <em>input_size</em>, <em>class_file_name</em>, <em>score_threshold</em>, <em>iou_threshold</em>, <em>rectangle_colors</em>, <em>nms_method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.postprocess_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp">
+<code class="descname">postprocess_mp</code><span class="sig-paren">(</span><em>predicted_data</em>, <em>original_frames</em>, <em>processed_frames</em>, <em>processing_times</em>, <em>input_size</em>, <em>class_file_name</em>, <em>score_threshold</em>, <em>iou_threshold</em>, <em>rectangle_colors</em>, <em>nms_method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP.postprocess_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP.postprocess_mp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Improve bounding boxes using multiprocessing. It needs to be initialized.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -713,8 +713,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp">
-<code class="descname">predict_bbox_mp</code><span class="sig-paren">(</span><em>model</em>, <em>frames_data</em>, <em>predicted_data</em>, <em>processing_times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.predict_bbox_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp">
+<code class="descname">predict_bbox_mp</code><span class="sig-paren">(</span><em>model</em>, <em>frames_data</em>, <em>predicted_data</em>, <em>processing_times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP.predict_bbox_mp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP.predict_bbox_mp" title="Permalink to this definition">¶</a></dt>
 <dd><p>predict bounding boxes using multiprocessing. It needs to be initialized.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -733,8 +733,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.prepare_input">
-<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>vid</em>, <em>output_path</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>vid</em>, <em>output_path</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP.prepare_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for writing and reading videos.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -755,8 +755,8 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectRealTimeMP.show">
-<code class="descname">show</code><span class="sig-paren">(</span><em>processed_frames</em>, <em>final_frames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectRealTimeMP.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectRealTimeMP.show" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectRealTimeMP.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>processed_frames</em>, <em>final_frames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectRealTimeMP.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectRealTimeMP.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show preocessed input.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -775,11 +775,11 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.recognition.detection_mode.DetectVideo">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectVideo</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectVideo">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.detection_mode.</code><code class="descname">DetectVideo</code><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectVideo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectVideo" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectVideo.detect">
-<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>input_path</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo.detect" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectVideo.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><em>model</em>, <em>input_path</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectVideo.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectVideo.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply detection pipeline in a saved video, if you want to close the window just press ‘q’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -804,8 +804,8 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectVideo.prepare_input">
-<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>input_path</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectVideo.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><em>input_path</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectVideo.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectVideo.prepare_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for writing and reading videos.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -826,8 +826,8 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectVideo.show">
-<code class="descname">show</code><span class="sig-paren">(</span><em>image</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectVideo.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectVideo.show" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectVideo.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>image</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectVideo.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectVideo.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show an image.
 :param image: an image array.</p>
 </dd></dl>
@@ -835,12 +835,12 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode">
-<em class="property">class </em><code class="descclassname">pytwovision.recognition.detection_mode.</code><code class="descname">DetectionMode</code><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode">
+<em class="property">class </em><code class="descclassname">py2vision.recognition.detection_mode.</code><code class="descname">DetectionMode</code><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Abstract Class which defines detect method that contains the skeleton of detection algorithm with different methods such as detection on images, detection on video, detection using multiprocessing and real time detection.</p>
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.camera_input">
-<code class="descname">camera_input</code><span class="sig-paren">(</span><em>camera: pytwovision.input_output.camera.Camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.camera_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.camera_input" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.camera_input">
+<code class="descname">camera_input</code><span class="sig-paren">(</span><em>camera: py2vision.input_output.camera.Camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.camera_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.camera_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>If camera source is webcam or other it is gonna create attribute ‘vid’, otherwise return a frame from streaming.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -853,14 +853,14 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.detect">
-<code class="descname">detect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.detect" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.detect">
+<code class="descname">detect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply detection pipeline</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.draw">
-<code class="descname">draw</code><span class="sig-paren">(</span><em>original_image</em>, <em>bboxes</em>, <em>class_file_name</em>, <em>rectangle_colors</em>, <em>homogeneous_points=None</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.draw" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><em>original_image</em>, <em>bboxes</em>, <em>class_file_name</em>, <em>rectangle_colors</em>, <em>homogeneous_points=None</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.draw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw bounding boxes on images.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -883,8 +883,8 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.postprocess_boxes">
-<code class="descname">postprocess_boxes</code><span class="sig-paren">(</span><em>original_image</em>, <em>pred_bbox</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.postprocess_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.postprocess_boxes" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.postprocess_boxes">
+<code class="descname">postprocess_boxes</code><span class="sig-paren">(</span><em>original_image</em>, <em>pred_bbox</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>nms_method='nms'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.postprocess_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.postprocess_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a postprocess and non maximum supression step and resize bboxes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -908,8 +908,8 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.pre_process">
-<code class="descname">pre_process</code><span class="sig-paren">(</span><em>image</em>, <em>input_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.pre_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.pre_process" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.pre_process">
+<code class="descname">pre_process</code><span class="sig-paren">(</span><em>image</em>, <em>input_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.pre_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.pre_process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply resize images step.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -929,8 +929,8 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>model</em>, <em>image_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.predict" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>model</em>, <em>image_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a prediction step.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -950,14 +950,14 @@ and the last element is the frames per second</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.prepare_input">
-<code class="descname">prepare_input</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.prepare_input" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.prepare_input">
+<code class="descname">prepare_input</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.prepare_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.prepare_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>It’s the first step to convert inputs like video paths or images in compatible data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.recognition.detection_mode.DetectionMode.show">
-<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/recognition/detection_mode.html#DetectionMode.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.recognition.detection_mode.DetectionMode.show" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.recognition.detection_mode.DetectionMode.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/recognition/detection_mode.html#DetectionMode.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.recognition.detection_mode.DetectionMode.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show actual frame in a window</p>
 </dd></dl>
 

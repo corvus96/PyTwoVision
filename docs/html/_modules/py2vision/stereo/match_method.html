@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py2vision.stereo.match_method &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> py2vision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">py2vision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>py2vision.stereo.match_method</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py2vision.stereo.match_method</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+
+
+<div class="viewcode-block" id="Matcher"><a class="viewcode-back" href="../../../module_stereo.html#py2vision.stereo.match_method.Matcher">[docs]</a><span class="k">class</span> <span class="nc">Matcher</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Context defines the interface of interest to clients.</span>
+<span class="sd">    The matcher accepts a strategy through the constructor, but also provides a setter to change it at runtime.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">MatcherStrategy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span> <span class="o">=</span> <span class="n">strategy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatcherStrategy</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The Context maintains a reference to one of the Strategy objects. The</span>
+<span class="sd">        Context does not know the concrete class of a strategy. It should work</span>
+<span class="sd">        with all strategies via the Strategy interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span>
+
+    <span class="nd">@strategy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">MatcherStrategy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Usually, the Context allows replacing a Strategy object at runtime.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span> <span class="o">=</span> <span class="n">strategy</span>
+
+<div class="viewcode-block" id="Matcher.match"><a class="viewcode-back" href="../../../module_stereo.html#py2vision.stereo.match_method.Matcher.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The Context delegates some work to the Strategy object instead of</span>
+<span class="sd">        implementing multiple versions of the algorithm on its own.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span><span class="o">.</span><span class="n">match</span><span class="p">()</span></div></div>
+
+
+
+<div class="viewcode-block" id="MatcherStrategy"><a class="viewcode-back" href="../../../module_stereo.html#py2vision.stereo.match_method.MatcherStrategy">[docs]</a><span class="k">class</span> <span class="nc">MatcherStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Strategy interface declares operations common to all supported versions</span>
+<span class="sd">    of some algorithm.</span>
+
+<span class="sd">    The Context uses this interface to call the algorithm defined by Concrete</span>
+<span class="sd">    Strategies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="StereoSGBM"><a class="viewcode-back" href="../../../module_stereo.html#py2vision.stereo.match_method.StereoSGBM">[docs]</a><span class="k">class</span> <span class="nc">StereoSGBM</span><span class="p">(</span><span class="n">MatcherStrategy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; To create an instance of stereo SGBM algorithm.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        min_disp: Minimum possible disparity value. Normally, it is zero but sometimes rectification algorithms can shift images, so this parameter needs to be adjusted accordingly.</span>
+<span class="sd">        max_disp: Maximum disparity minus minimum disparity. The value is always greater than zero. In the current implementation, this parameter must be divisible by 16.</span>
+<span class="sd">        window_size: Matched block size. It must be an odd number &gt;=1 . Normally, it should be somewhere in the 3..11 range.</span>
+<span class="sd">        p1: The first parameter controlling the disparity smoothness. </span>
+<span class="sd">        p2: The second parameter controlling the disparity smoothness. The larger the values are, the smoother the disparity is. P1 is the penalty on the disparity change by plus or minus 1 between neighbor pixels. P2 is the penalty on the disparity change by more than 1 between neighbor pixels. The algorithm requires P2 &gt; P1 . See stereo_match.cpp sample where some reasonably good P1 and P2 values are shown (like 8*number_of_image_channels*SADWindowSize*SADWindowSize and 32*number_of_image_channels*SADWindowSize*SADWindowSize, respectively).</span>
+<span class="sd">        pre_filter_cap: Truncation value for the prefiltered image pixels. The algorithm first computes x-derivative at each pixel and clips its value by [-preFilterCap, preFilterCap] interval. The result values are passed to the Birchfield-Tomasi pixel cost function.</span>
+<span class="sd">        mode: Set it to StereoSGBM_MODE_HH to run the full-scale two-pass dynamic programming algorithm. It will consume O(W*H*numDisparities) bytes, which is large for 640x480 stereo and huge for HD-size pictures. By default, it is set to false .</span>
+<span class="sd">        speckle_window_size: Maximum size of smooth disparity regions to consider their noise speckles and invalidate. Set it to 0 to disable speckle filtering. Otherwise, set it somewhere in the 50-200 range.</span>
+<span class="sd">        speckle_range: Maximum disparity variation within each connected component. If you do speckle filtering, set the parameter to a positive value, it will be implicitly multiplied by 16. Normally, 1 or 2 is good enough.</span>
+<span class="sd">        uniqueness_ratio: Margin in percentage by which the best (minimum) computed cost function value should &quot;win&quot; the second best value to consider the found match correct. Normally, a value within the 5-15 range is good enough.</span>
+<span class="sd">        disp_12_max_diff: Maximum allowed difference (in integer pixel units) in the left-right disparity check. Set it to a non-positive value to disable the check.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_disp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_disp</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="mi">96</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">pre_filter_cap</span><span class="o">=</span><span class="mi">63</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">StereoSGBM_MODE_HH</span><span class="p">,</span> <span class="n">speckle_window_size</span><span class="o">=</span><span class="mi">1100</span><span class="p">,</span> <span class="n">speckle_range</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uniqueness_ratio</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">disp_12_max_diff</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">max_disp</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">max_disp</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Incorrect max_disparity value: it should be positive and divisible by 16&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">window_size</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">window_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Incorrect window_size value: it should be positive and odd&quot;</span><span class="p">)</span>
+        <span class="n">max_disp</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">max_disp</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">max_disp</span> <span class="o">+=</span> <span class="mi">16</span><span class="o">-</span><span class="p">(</span><span class="n">max_disp</span> <span class="o">%</span> <span class="mi">16</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_disp</span> <span class="o">=</span> <span class="n">min_disp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_disp</span> <span class="o">=</span> <span class="n">max_disp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_filter_cap</span> <span class="o">=</span> <span class="n">pre_filter_cap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speckle_window_size</span> <span class="o">=</span> <span class="n">speckle_window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speckle_range</span> <span class="o">=</span> <span class="n">speckle_range</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniqueness_ratio</span> <span class="o">=</span> <span class="n">uniqueness_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp_12_max_diff</span> <span class="o">=</span> <span class="n">disp_12_max_diff</span>
+
+<div class="viewcode-block" id="StereoSGBM.match"><a class="viewcode-back" href="../../../module_stereo.html#py2vision.stereo.match_method.StereoSGBM.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return stereo sgbm instance &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cv</span><span class="o">.</span><span class="n">StereoSGBM_create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_disp</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_disp</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disp_12_max_diff</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_filter_cap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniqueness_ratio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speckle_window_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speckle_range</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

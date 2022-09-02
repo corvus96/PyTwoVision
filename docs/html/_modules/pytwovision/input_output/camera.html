@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.input_output.camera &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.input_output.camera &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Pytwovision</a>
+          <a href="../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -78,9 +78,9 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">errno</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.image_process.frame_decorator</span> <span class="k">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">pytwovision.image_process.resize</span> <span class="k">import</span> <span class="n">Resize</span>
-<span class="kn">from</span> <span class="nn">pytwovision.image_process.rotate</span> <span class="k">import</span> <span class="n">Rotate</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.frame_decorator</span> <span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.resize</span> <span class="kn">import</span> <span class="n">Resize</span>
+<span class="kn">from</span> <span class="nn">pytwovision.image_process.rotate</span> <span class="kn">import</span> <span class="n">Rotate</span>
 
 <div class="viewcode-block" id="Camera"><a class="viewcode-back" href="../../../module_input_output.html#pytwovision.input_output.camera.Camera">[docs]</a><span class="k">class</span> <span class="nc">Camera</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters. </span>
@@ -89,7 +89,7 @@
 <span class="sd">        id: A string to identify our camera.</span>
 <span class="sd">        source: When you use webcam you need to put (int) 0, if you want to use videos or streaming, you will need to put his URL or path even you can put in a video file or a image path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
         <span class="c1"># define type of source</span>

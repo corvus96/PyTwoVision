@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utilities &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Utilities &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Pytwovision
+            <a href="index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -64,7 +64,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Pytwovision</a>
+          <a href="index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -88,25 +88,25 @@
 <div class="section" id="annotations-parser">
 <h2>Annotations Parser<a class="headerlink" href="#annotations-parser" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.utils.annotations_parser"></span><dl class="class">
-<dt id="pytwovision.utils.annotations_parser.AnnotationsFormat">
-<em class="property">class </em><code class="descclassname">pytwovision.utils.annotations_parser.</code><code class="descname">AnnotationsFormat</code><a class="reference internal" href="_modules/pytwovision/utils/annotations_parser.html#AnnotationsFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_parser.AnnotationsFormat" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.utils.annotations_parser"></span><dl class="class">
+<dt id="py2vision.utils.annotations_parser.AnnotationsFormat">
+<em class="property">class </em><code class="descclassname">py2vision.utils.annotations_parser.</code><code class="descname">AnnotationsFormat</code><a class="reference internal" href="_modules/py2vision/utils/annotations_parser.html#AnnotationsFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_parser.AnnotationsFormat" title="Permalink to this definition">¶</a></dt>
 <dd><p>The AnnotationsFormat Interface declares a set of visiting methods that correspond to Parser classes. The signature of a visiting method allows the visitor to identify the exact class of the Parser that it’s dealing with.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.utils.annotations_parser.Parser">
-<em class="property">class </em><code class="descclassname">pytwovision.utils.annotations_parser.</code><code class="descname">Parser</code><a class="reference internal" href="_modules/pytwovision/utils/annotations_parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_parser.Parser" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_parser.Parser">
+<em class="property">class </em><code class="descclassname">py2vision.utils.annotations_parser.</code><code class="descname">Parser</code><a class="reference internal" href="_modules/py2vision/utils/annotations_parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_parser.Parser" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Parser interface declares an <cite>parse</cite> method that should take the base AnnotationsFormat interface as an argument.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.utils.annotations_parser.XmlParser">
-<em class="property">class </em><code class="descclassname">pytwovision.utils.annotations_parser.</code><code class="descname">XmlParser</code><a class="reference internal" href="_modules/pytwovision/utils/annotations_parser.html#XmlParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_parser.XmlParser" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_parser.XmlParser">
+<em class="property">class </em><code class="descclassname">py2vision.utils.annotations_parser.</code><code class="descname">XmlParser</code><a class="reference internal" href="_modules/py2vision/utils/annotations_parser.html#XmlParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_parser.XmlParser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Each Concrete Parser must implement the <cite>parse</cite> method in such a way that it calls the annotationsFormat’s method corresponding to the Parser’s class.</p>
 <dl class="method">
-<dt id="pytwovision.utils.annotations_parser.XmlParser.parse">
-<code class="descname">parse</code><span class="sig-paren">(</span><em>anno: pytwovision.utils.annotations_parser.AnnotationsFormat</em>, <em>xml_path</em>, <em>annotations_output_name</em>, <em>classes_output_name</em>, <em>image_path</em>, <em>work_dir=None</em>, <em>print_output=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/annotations_parser.html#XmlParser.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_parser.XmlParser.parse" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_parser.XmlParser.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>anno: py2vision.utils.annotations_parser.AnnotationsFormat</em>, <em>xml_path</em>, <em>annotations_output_name</em>, <em>classes_output_name</em>, <em>image_path</em>, <em>work_dir=None</em>, <em>print_output=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/annotations_parser.html#XmlParser.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_parser.XmlParser.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method convert annotations  from COCO or PASCAL VOC dataset in xml format to be compatible with an especific network model. Exporting a text file for annotations and a text file for classes names</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -129,25 +129,25 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.utils.annotations_parser.YoloV3AnnotationsFormat">
-<em class="property">class </em><code class="descclassname">pytwovision.utils.annotations_parser.</code><code class="descname">YoloV3AnnotationsFormat</code><a class="reference internal" href="_modules/pytwovision/utils/annotations_parser.html#YoloV3AnnotationsFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_parser.YoloV3AnnotationsFormat" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_parser.YoloV3AnnotationsFormat">
+<em class="property">class </em><code class="descclassname">py2vision.utils.annotations_parser.</code><code class="descname">YoloV3AnnotationsFormat</code><a class="reference internal" href="_modules/py2vision/utils/annotations_parser.html#YoloV3AnnotationsFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_parser.YoloV3AnnotationsFormat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a group of xml annotations to transform in a .txt file compatible with YoloV3 dataset</p>
 </dd></dl>
 
 </div></blockquote>
 <div class="section" id="example-of-code">
 <h3>Example of code<a class="headerlink" href="#example-of-code" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytwovision.utils.annotations_parser</span> <span class="kn">import</span> <span class="n">XmlParser</span><span class="p">,</span> <span class="n">YoloV3AnnotationsFormat</span>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">from</span> <span class="nn">py2vision.utils.annotations_parser</span> <span class="kn">import</span> <span class="n">XmlParser</span><span class="p">,</span> <span class="n">YoloV3AnnotationsFormat</span>
 
 <span class="n">anno_out_file</span> <span class="o">=</span> <span class="s2">&quot;test_anno_file&quot;</span>
 <span class="n">xml_path</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/annotations&quot;</span>
@@ -158,16 +158,16 @@
 <span class="n">parser</span> <span class="o">=</span> <span class="n">XmlParser</span><span class="p">()</span>
 <span class="n">anno_format</span> <span class="o">=</span> <span class="n">YoloV3AnnotationsFormat</span><span class="p">()</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">anno_format</span><span class="p">,</span> <span class="n">xml_path</span><span class="p">,</span> <span class="n">anno_out_file</span><span class="p">,</span> <span class="n">classes_out_file</span><span class="p">,</span> <span class="n">images_path</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">)</span>
-</pre></div>
-</td></tr></table></div>
+</pre></div></td></tr></table></div>
+</div>
 </div>
 </div>
 <div class="section" id="annotations-helper">
 <h2>Annotations Helper<a class="headerlink" href="#annotations-helper" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.utils.annotations_helper"></span><dl class="class">
-<dt id="pytwovision.utils.annotations_helper.AnnotationsHelper">
-<em class="property">class </em><code class="descclassname">pytwovision.utils.annotations_helper.</code><code class="descname">AnnotationsHelper</code><span class="sig-paren">(</span><em>annotations_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/annotations_helper.html#AnnotationsHelper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_helper.AnnotationsHelper" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.utils.annotations_helper"></span><dl class="class">
+<dt id="py2vision.utils.annotations_helper.AnnotationsHelper">
+<em class="property">class </em><code class="descclassname">py2vision.utils.annotations_helper.</code><code class="descname">AnnotationsHelper</code><span class="sig-paren">(</span><em>annotations_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/annotations_helper.html#AnnotationsHelper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_helper.AnnotationsHelper" title="Permalink to this definition">¶</a></dt>
 <dd><p>This help to split annotations in .txt format.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -178,8 +178,8 @@
 </tbody>
 </table>
 <dl class="method">
-<dt id="pytwovision.utils.annotations_helper.AnnotationsHelper.export">
-<code class="descname">export</code><span class="sig-paren">(</span><em>data</em>, <em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/annotations_helper.html#AnnotationsHelper.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_helper.AnnotationsHelper.export" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_helper.AnnotationsHelper.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>data</em>, <em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/annotations_helper.html#AnnotationsHelper.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_helper.AnnotationsHelper.export" title="Permalink to this definition">¶</a></dt>
 <dd><p>To export a dataframe like a .txt file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -196,14 +196,14 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.utils.annotations_helper.AnnotationsHelper.shuffle">
-<code class="descname">shuffle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/annotations_helper.html#AnnotationsHelper.shuffle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_helper.AnnotationsHelper.shuffle" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_helper.AnnotationsHelper.shuffle">
+<code class="descname">shuffle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/annotations_helper.html#AnnotationsHelper.shuffle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_helper.AnnotationsHelper.shuffle" title="Permalink to this definition">¶</a></dt>
 <dd><p>shuffle annotations</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.utils.annotations_helper.AnnotationsHelper.split">
-<code class="descname">split</code><span class="sig-paren">(</span><em>train_percentage=0.8</em>, <em>random_state=25</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/annotations_helper.html#AnnotationsHelper.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.annotations_helper.AnnotationsHelper.split" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.annotations_helper.AnnotationsHelper.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>train_percentage=0.8</em>, <em>random_state=25</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/annotations_helper.html#AnnotationsHelper.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.annotations_helper.AnnotationsHelper.split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Split annotations in two dataframes in reference of a percentage.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -227,33 +227,33 @@
 </div></blockquote>
 <div class="section" id="id1">
 <h3>Example of code<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytwovision.utils.annotations_parser</span> <span class="kn">import</span> <span class="n">XmlParser</span><span class="p">,</span> <span class="n">YoloV3AnnotationsFormat</span>
-<span class="kn">from</span> <span class="nn">pytwovision.utils.annotations_helper</span> <span class="kn">import</span> <span class="n">AnnotationsHelper</span>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">from</span> <span class="nn">py2vision.utils.annotations_parser</span> <span class="kn">import</span> <span class="n">XmlParser</span><span class="p">,</span> <span class="n">YoloV3AnnotationsFormat</span>
+<span class="kn">from</span> <span class="nn">py2vision.utils.annotations_helper</span> <span class="kn">import</span> <span class="n">AnnotationsHelper</span>
 
 <span class="n">anno_out_file</span> <span class="o">=</span> <span class="s2">&quot;annotations_formated&quot;</span>
 <span class="n">xml_path</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/annotations&quot;</span>
@@ -272,22 +272,22 @@
 <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">anno_format</span><span class="p">,</span> <span class="n">xml_path</span><span class="p">,</span> <span class="n">anno_out_file</span><span class="p">,</span> <span class="n">classes_file</span><span class="p">,</span> <span class="n">images_path</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">)</span>
 
 <span class="n">training_percen</span> <span class="o">=</span> <span class="mf">0.8</span>
-<span class="n">anno_out_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;{}.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">anno_out_file</span><span class="p">))</span>
+<span class="n">anno_out_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">anno_out_file</span><span class="p">))</span>
 <span class="n">anno_helper</span> <span class="o">=</span> <span class="n">AnnotationsHelper</span><span class="p">(</span><span class="n">anno_out_full_path</span><span class="p">)</span>
 
 <span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">anno_helper</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">training_percen</span><span class="p">)</span>
 <span class="n">anno_helper</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;train.txt&quot;</span><span class="p">))</span>
 <span class="n">anno_helper</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;test.txt&quot;</span><span class="p">))</span>
-</pre></div>
-</td></tr></table></div>
+</pre></div></td></tr></table></div>
+</div>
 </div>
 </div>
 <div class="section" id="draw-functions">
 <h2>Draw functions<a class="headerlink" href="#draw-functions" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.utils.draw"></span><dl class="function">
-<dt id="pytwovision.utils.draw.draw_bbox">
-<code class="descclassname">pytwovision.utils.draw.</code><code class="descname">draw_bbox</code><span class="sig-paren">(</span><em>image</em>, <em>bboxes</em>, <em>class_file_name</em>, <em>show_label=True</em>, <em>show_confidence=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em>, <em>rectangle_colors=''</em>, <em>tracking=False</em>, <em>homogeneous_points=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/draw.html#draw_bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.draw.draw_bbox" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.utils.draw"></span><dl class="function">
+<dt id="py2vision.utils.draw.draw_bbox">
+<code class="descclassname">py2vision.utils.draw.</code><code class="descname">draw_bbox</code><span class="sig-paren">(</span><em>image</em>, <em>bboxes</em>, <em>class_file_name</em>, <em>show_label=True</em>, <em>show_confidence=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em>, <em>rectangle_colors=''</em>, <em>tracking=False</em>, <em>homogeneous_points=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/draw.html#draw_bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.draw.draw_bbox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw bounding boxes on images</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -313,8 +313,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="pytwovision.utils.draw.draw_lines">
-<code class="descclassname">pytwovision.utils.draw.</code><code class="descname">draw_lines</code><span class="sig-paren">(</span><em>img1</em>, <em>img2</em>, <em>lines</em>, <em>pts1</em>, <em>pts2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/draw.html#draw_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.draw.draw_lines" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.draw.draw_lines">
+<code class="descclassname">py2vision.utils.draw.</code><code class="descname">draw_lines</code><span class="sig-paren">(</span><em>img1</em>, <em>img2</em>, <em>lines</em>, <em>pts1</em>, <em>pts2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/draw.html#draw_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.draw.draw_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>img1 - image on which we draw the epilines for the points in img2 lines - corresponding epilines</p>
 </dd></dl>
 
@@ -323,21 +323,21 @@
 <div class="section" id="label-utils">
 <h2>Label utils<a class="headerlink" href="#label-utils" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.utils.label_utils"></span><dl class="function">
-<dt id="pytwovision.utils.label_utils.class2index">
-<code class="descclassname">pytwovision.utils.label_utils.</code><code class="descname">class2index</code><span class="sig-paren">(</span><em>class_name</em>, <em>classes: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/label_utils.html#class2index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.label_utils.class2index" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.utils.label_utils"></span><dl class="function">
+<dt id="py2vision.utils.label_utils.class2index">
+<code class="descclassname">py2vision.utils.label_utils.</code><code class="descname">class2index</code><span class="sig-paren">(</span><em>class_name</em>, <em>classes: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/label_utils.html#class2index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.label_utils.class2index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert class name (string) to index (int)</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pytwovision.utils.label_utils.index2class">
-<code class="descclassname">pytwovision.utils.label_utils.</code><code class="descname">index2class</code><span class="sig-paren">(</span><em>index</em>, <em>classes: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/label_utils.html#index2class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.label_utils.index2class" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.label_utils.index2class">
+<code class="descclassname">py2vision.utils.label_utils.</code><code class="descname">index2class</code><span class="sig-paren">(</span><em>index</em>, <em>classes: list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/label_utils.html#index2class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.label_utils.index2class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert index (int) to class name (string)</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pytwovision.utils.label_utils.label_map">
-<code class="descclassname">pytwovision.utils.label_utils.</code><code class="descname">label_map</code><span class="sig-paren">(</span><em>labels</em>, <em>dst_path=None</em>, <em>name='label_map'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/label_utils.html#label_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.label_utils.label_map" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.label_utils.label_map">
+<code class="descclassname">py2vision.utils.label_utils.</code><code class="descname">label_map</code><span class="sig-paren">(</span><em>labels</em>, <em>dst_path=None</em>, <em>name='label_map'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/label_utils.html#label_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.label_utils.label_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>An easy way to convert classes names and ids to a .pbtxt file compatible with tensorflow models API.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -365,8 +365,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="pytwovision.utils.label_utils.read_class_names">
-<code class="descclassname">pytwovision.utils.label_utils.</code><code class="descname">read_class_names</code><span class="sig-paren">(</span><em>class_file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/utils/label_utils.html#read_class_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.utils.label_utils.read_class_names" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.utils.label_utils.read_class_names">
+<code class="descclassname">py2vision.utils.label_utils.</code><code class="descname">read_class_names</code><span class="sig-paren">(</span><em>class_file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/utils/label_utils.html#read_class_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.utils.label_utils.read_class_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>loads class name from a file to a dict</p>
 </dd></dl>
 

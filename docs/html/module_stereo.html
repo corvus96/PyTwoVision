@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stereo Vision &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Stereo Vision &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -25,7 +25,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Pytwovision
+            <a href="index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -59,7 +59,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Pytwovision</a>
+          <a href="index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -83,21 +83,21 @@
 <div class="section" id="implement-sgbm-algorithm">
 <h2>Implement SGBM Algorithm<a class="headerlink" href="#implement-sgbm-algorithm" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.stereo.match_method"></span><dl class="class">
-<dt id="pytwovision.stereo.match_method.Matcher">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.match_method.</code><code class="descname">Matcher</code><span class="sig-paren">(</span><em>strategy: pytwovision.stereo.match_method.MatcherStrategy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#Matcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.Matcher" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.stereo.match_method"></span><dl class="class">
+<dt id="py2vision.stereo.match_method.Matcher">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.match_method.</code><code class="descname">Matcher</code><span class="sig-paren">(</span><em>strategy: py2vision.stereo.match_method.MatcherStrategy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/match_method.html#Matcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.match_method.Matcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Context defines the interface of interest to clients.
 The matcher accepts a strategy through the constructor, but also provides a setter to change it at runtime.</p>
 <dl class="method">
-<dt id="pytwovision.stereo.match_method.Matcher.match">
-<code class="descname">match</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#Matcher.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.Matcher.match" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.match_method.Matcher.match">
+<code class="descname">match</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/match_method.html#Matcher.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.match_method.Matcher.match" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Context delegates some work to the Strategy object instead of
 implementing multiple versions of the algorithm on its own.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.stereo.match_method.Matcher.strategy">
-<code class="descname">strategy</code><a class="headerlink" href="#pytwovision.stereo.match_method.Matcher.strategy" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.match_method.Matcher.strategy">
+<code class="descname">strategy</code><a class="headerlink" href="#py2vision.stereo.match_method.Matcher.strategy" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Context maintains a reference to one of the Strategy objects. The
 Context does not know the concrete class of a strategy. It should work
 with all strategies via the Strategy interface.</p>
@@ -106,8 +106,8 @@ with all strategies via the Strategy interface.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.stereo.match_method.MatcherStrategy">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.match_method.</code><code class="descname">MatcherStrategy</code><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#MatcherStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.MatcherStrategy" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.match_method.MatcherStrategy">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.match_method.</code><code class="descname">MatcherStrategy</code><a class="reference internal" href="_modules/py2vision/stereo/match_method.html#MatcherStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.match_method.MatcherStrategy" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Strategy interface declares operations common to all supported versions
 of some algorithm.</p>
 <p>The Context uses this interface to call the algorithm defined by Concrete
@@ -115,8 +115,8 @@ Strategies.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.stereo.match_method.StereoSGBM">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.match_method.</code><code class="descname">StereoSGBM</code><span class="sig-paren">(</span><em>min_disp=0</em>, <em>max_disp=160</em>, <em>window_size=3</em>, <em>p1=216</em>, <em>p2=864</em>, <em>pre_filter_cap=63</em>, <em>mode=1</em>, <em>speckle_window_size=1100</em>, <em>speckle_range=1</em>, <em>uniqueness_ratio=5</em>, <em>disp_12_max_diff=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#StereoSGBM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.StereoSGBM" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.match_method.StereoSGBM">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.match_method.</code><code class="descname">StereoSGBM</code><span class="sig-paren">(</span><em>min_disp=0</em>, <em>max_disp=160</em>, <em>window_size=3</em>, <em>p1=216</em>, <em>p2=864</em>, <em>pre_filter_cap=63</em>, <em>mode=1</em>, <em>speckle_window_size=1100</em>, <em>speckle_range=1</em>, <em>uniqueness_ratio=5</em>, <em>disp_12_max_diff=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/match_method.html#StereoSGBM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.match_method.StereoSGBM" title="Permalink to this definition">¶</a></dt>
 <dd><p>To create an instance of stereo SGBM algorithm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -140,8 +140,8 @@ Strategies.</p>
 </tbody>
 </table>
 <dl class="method">
-<dt id="pytwovision.stereo.match_method.StereoSGBM.match">
-<code class="descname">match</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/match_method.html#StereoSGBM.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.match_method.StereoSGBM.match" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.match_method.StereoSGBM.match">
+<code class="descname">match</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/match_method.html#StereoSGBM.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.match_method.StereoSGBM.match" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return stereo sgbm instance</p>
 </dd></dl>
 
@@ -152,31 +152,31 @@ Strategies.</p>
 <div class="section" id="standard-stereo-builder">
 <h2>Standard Stereo Builder<a class="headerlink" href="#standard-stereo-builder" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.stereo.standard_stereo"></span><dl class="class">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.standard_stereo.</code><code class="descname">StandardStereo</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>fish_eye=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.stereo.standard_stereo"></span><dl class="class">
+<dt id="py2vision.stereo.standard_stereo.StandardStereo">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.standard_stereo.</code><code class="descname">StandardStereo</code><span class="sig-paren">(</span><em>cam_left: py2vision.input_output.camera.Camera</em>, <em>cam_right: py2vision.input_output.camera.Camera</em>, <em>fish_eye=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo" title="Permalink to this definition">¶</a></dt>
 <dd><p>An emulation of a real world stereo system with his relevant parameters, like fundamental matrix, rotation matrix, translation matrix and esential matrix.</p>
 <dl class="attribute">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.camL">
-<code class="descname">camL</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.camL" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.camL">
+<code class="descname">camL</code><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.camL" title="Permalink to this definition">¶</a></dt>
 <dd><p>left camera instance.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.camR">
-<code class="descname">camR</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.camR" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.camR">
+<code class="descname">camR</code><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.camR" title="Permalink to this definition">¶</a></dt>
 <dd><p>right camera instance.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.fish_eye">
-<code class="descname">fish_eye</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.fish_eye" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.fish_eye">
+<code class="descname">fish_eye</code><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.fish_eye" title="Permalink to this definition">¶</a></dt>
 <dd><p>A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it’ll use normal calibration, fish eye is recomended when cameras has an field of view &gt; 160.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.calibrate">
-<code class="descname">calibrate</code><span class="sig-paren">(</span><em>images_left_path</em>, <em>images_right_path</em>, <em>pattern_type='chessboard'</em>, <em>pattern_size=(8</em>, <em>5)</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.calibrate" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.calibrate">
+<code class="descname">calibrate</code><span class="sig-paren">(</span><em>images_left_path</em>, <em>images_right_path</em>, <em>pattern_type='chessboard'</em>, <em>pattern_size=(8</em>, <em>5)</em>, <em>show=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereo.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.calibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute intrinsics and extrinsics parameters for two cameras at once.
 Note: if you want a good calibration your images in ‘images_left_path’ and ‘images_right_path’ have to follow a format for example: example/left_images/photo_1.jpg and example/right_images/photo_1.jpg the number is important because calibrate method order the pair of images with sorted method.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -204,8 +204,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.get_stereo_maps">
-<code class="descname">get_stereo_maps</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.get_stereo_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.get_stereo_maps" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.get_stereo_maps">
+<code class="descname">get_stereo_maps</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereo.get_stereo_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.get_stereo_maps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads stereo maps parameters from a xml file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -218,8 +218,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.print_parameters">
-<code class="descname">print_parameters</code><span class="sig-paren">(</span><em>one_camera_parameters=['matrix', 'dist_coeffs'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.print_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.print_parameters" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.print_parameters">
+<code class="descname">print_parameters</code><span class="sig-paren">(</span><em>one_camera_parameters=['matrix', 'dist_coeffs'], stereo_parameters=['Q', 'rot', 'trans', 'e_matrix', 'f_matrix']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereo.print_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.print_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print required individual camera parameters and stereo parameters already defined.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -236,8 +236,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.rectify">
-<code class="descname">rectify</code><span class="sig-paren">(</span><em>image_left__dims</em>, <em>image_right_dims</em>, <em>export_file_name='stereoMap'</em>, <em>alpha=1</em>, <em>output_size=(0</em>, <em>0)</em>, <em>export_file=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.rectify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.rectify" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.rectify">
+<code class="descname">rectify</code><span class="sig-paren">(</span><em>image_left__dims</em>, <em>image_right_dims</em>, <em>export_file_name='stereoMap'</em>, <em>alpha=1</em>, <em>output_size=(0</em>, <em>0)</em>, <em>export_file=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereo.rectify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.rectify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stereo rectification maps and export left and right stereo maps in xml format. Note: you will need to calibrate first</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -261,8 +261,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereo.take_dual_photos">
-<code class="descname">take_dual_photos</code><span class="sig-paren">(</span><em>num_photos=15</em>, <em>save_dir_left='images_left'</em>, <em>save_dir_right='images_right'</em>, <em>prefix_name='photo'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereo.take_dual_photos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereo.take_dual_photos" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereo.take_dual_photos">
+<code class="descname">take_dual_photos</code><span class="sig-paren">(</span><em>num_photos=15</em>, <em>save_dir_left='images_left'</em>, <em>save_dir_right='images_right'</em>, <em>prefix_name='photo'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereo.take_dual_photos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereo.take_dual_photos" title="Permalink to this definition">¶</a></dt>
 <dd><p>A simple way to take photos in console and save in a folder.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -286,30 +286,30 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.standard_stereo.</code><code class="descname">StandardStereoBuilder</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>stereo_maps_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.standard_stereo.</code><code class="descname">StandardStereoBuilder</code><span class="sig-paren">(</span><em>cam_left: py2vision.input_output.camera.Camera</em>, <em>cam_right: py2vision.input_output.camera.Camera</em>, <em>stereo_maps_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement methods to get depth using OpenCV matchers like SGBM or BM.</p>
 <dl class="attribute">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.camL">
-<code class="descname">camL</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.camL" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.camL">
+<code class="descname">camL</code><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.camL" title="Permalink to this definition">¶</a></dt>
 <dd><p>left camera instance.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.camR">
-<code class="descname">camR</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.camR" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.camR">
+<code class="descname">camR</code><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.camR" title="Permalink to this definition">¶</a></dt>
 <dd><p>right camera instance.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.stereo_maps_path">
-<code class="descname">stereo_maps_path</code><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.stereo_maps_path" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.stereo_maps_path">
+<code class="descname">stereo_maps_path</code><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.stereo_maps_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>an xml with Stereo rectification maps</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_3D_points">
-<code class="descname">estimate_3D_points</code><span class="sig-paren">(</span><em>points</em>, <em>disparity</em>, <em>Q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_3D_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_3D_points" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.estimate_3D_points">
+<code class="descname">estimate_3D_points</code><span class="sig-paren">(</span><em>points</em>, <em>disparity</em>, <em>Q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_3D_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.estimate_3D_points" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert image plane points to homogeneous 3d points.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -330,8 +330,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_depth_map">
-<code class="descname">estimate_depth_map</code><span class="sig-paren">(</span><em>disparity</em>, <em>Q</em>, <em>frame</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_depth_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_depth_map" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.estimate_depth_map">
+<code class="descname">estimate_depth_map</code><span class="sig-paren">(</span><em>disparity</em>, <em>Q</em>, <em>frame</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_depth_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.estimate_depth_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert disparity map to depth map.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -353,8 +353,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_disparity_colormap">
-<code class="descname">estimate_disparity_colormap</code><span class="sig-paren">(</span><em>disparity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_disparity_colormap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.estimate_disparity_colormap" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.estimate_disparity_colormap">
+<code class="descname">estimate_disparity_colormap</code><span class="sig-paren">(</span><em>disparity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.estimate_disparity_colormap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.estimate_disparity_colormap" title="Permalink to this definition">¶</a></dt>
 <dd><p>It converts disparity maps with a shape of (w, h, 1) to  (w, h, 3).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -369,8 +369,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.find_epilines">
-<code class="descname">find_epilines</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.find_epilines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.find_epilines" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.find_epilines">
+<code class="descname">find_epilines</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.find_epilines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.find_epilines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw epilines to both frames.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -390,14 +390,14 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.get_product">
-<code class="descname">get_product</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.get_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.get_product" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.get_product">
+<code class="descname">get_product</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.get_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.get_product" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return: StandardStereo builded object</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.match">
-<code class="descname">match</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.match" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.match">
+<code class="descname">match</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: py2vision.stereo.match_method.Matcher</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.match" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply stereo SGBM.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -418,8 +418,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.post_process">
-<code class="descname">post_process</code><span class="sig-paren">(</span><em>frameL</em>, <em>left_disp</em>, <em>right_disp</em>, <em>matcher</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.post_process" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.post_process">
+<code class="descname">post_process</code><span class="sig-paren">(</span><em>frameL</em>, <em>left_disp</em>, <em>right_disp</em>, <em>matcher</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.post_process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply wls filter in disparity maps to smooth contours.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -444,8 +444,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.pre_process">
-<code class="descname">pre_process</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>downsample=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.pre_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.pre_process" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.pre_process">
+<code class="descname">pre_process</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>downsample=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.pre_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.pre_process" title="Permalink to this definition">¶</a></dt>
 <dd><p>First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -466,8 +466,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.standard_stereo.StandardStereoBuilder.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>stereo_maps_path</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/pytwovision/stereo/standard_stereo.html#StandardStereoBuilder.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.standard_stereo.StandardStereoBuilder.reset" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.standard_stereo.StandardStereoBuilder.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>cam_left: py2vision.input_output.camera.Camera</em>, <em>cam_right: py2vision.input_output.camera.Camera</em>, <em>stereo_maps_path</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/py2vision/stereo/standard_stereo.html#StandardStereoBuilder.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.standard_stereo.StandardStereoBuilder.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialitation of product</p>
 </dd></dl>
 
@@ -478,13 +478,13 @@ and the third one is rms error (these have to be less than 1).</p>
 <div class="section" id="stereo-controller">
 <h2>Stereo Controller<a class="headerlink" href="#stereo-controller" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><span class="target" id="module-pytwovision.stereo.stereo_builder"></span><dl class="class">
-<dt id="pytwovision.stereo.stereo_builder.StereoController">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.stereo_builder.</code><code class="descname">StereoController</code><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController" title="Permalink to this definition">¶</a></dt>
+<div><span class="target" id="module-py2vision.stereo.stereo_builder"></span><dl class="class">
+<dt id="py2vision.stereo.stereo_builder.StereoController">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.stereo_builder.</code><code class="descname">StereoController</code><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController" title="Permalink to this definition">¶</a></dt>
 <dd><p>The StereoController is only responsible for executing the stereo steps in a particular sequence. It is helpful when producing products according to a specific order or configuration.</p>
 <dl class="method">
-<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_3D_map">
-<code class="descname">compute_3D_map</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>Q</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_3D_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_3D_map" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoController.compute_3D_map">
+<code class="descname">compute_3D_map</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>Q</em>, <em>matcher: py2vision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController.compute_3D_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController.compute_3D_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute depth map.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -511,8 +511,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_3D_points">
-<code class="descname">compute_3D_points</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>points</em>, <em>Q</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_3D_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_3D_points" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoController.compute_3D_points">
+<code class="descname">compute_3D_points</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>points</em>, <em>Q</em>, <em>matcher: py2vision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController.compute_3D_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController.compute_3D_points" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute 3D points for an input array that can be [[x1, y1], [x2, y2], [x3, y3], … [xn, yn]].</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -540,8 +540,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_disparity">
-<code class="descname">compute_disparity</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_disparity" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoController.compute_disparity">
+<code class="descname">compute_disparity</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: py2vision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController.compute_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController.compute_disparity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the pre process step, next compute left and right disparity maps, and finally execute the post process with a wls filter to improve the final result.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -567,8 +567,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.stereo_builder.StereoController.compute_disparity_color_map">
-<code class="descname">compute_disparity_color_map</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.compute_disparity_color_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.compute_disparity_color_map" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoController.compute_disparity_color_map">
+<code class="descname">compute_disparity_color_map</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>matcher: py2vision.stereo.match_method.Matcher</em>, <em>downsample=2</em>, <em>lmbda=8000</em>, <em>sigma=1.5</em>, <em>post_process=True</em>, <em>metrics=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController.compute_disparity_color_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController.compute_disparity_color_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the pre process step, next compute left and right disparity maps, then execute the post process with a wls filter to improve the final result, and finally compute disparity map with color.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -594,8 +594,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.stereo_builder.StereoController.get_epilines">
-<code class="descname">get_epilines</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.get_epilines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.get_epilines" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoController.get_epilines">
+<code class="descname">get_epilines</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController.get_epilines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController.get_epilines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw epilines to both frames.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -615,8 +615,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.stereo.stereo_builder.StereoController.pre_process_step">
-<code class="descname">pre_process_step</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>downsample=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoController.pre_process_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoController.pre_process_step" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoController.pre_process_step">
+<code class="descname">pre_process_step</code><span class="sig-paren">(</span><em>frameL</em>, <em>frameR</em>, <em>downsample=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoController.pre_process_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoController.pre_process_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>First, it transform from BGR to gray, next apply rectification and finally apply pyramid subsampling.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -639,8 +639,8 @@ and the third one is rms error (these have to be less than 1).</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pytwovision.stereo.stereo_builder.StereoSystemBuilder">
-<em class="property">class </em><code class="descclassname">pytwovision.stereo.stereo_builder.</code><code class="descname">StereoSystemBuilder</code><a class="reference internal" href="_modules/pytwovision/stereo/stereo_builder.html#StereoSystemBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.stereo.stereo_builder.StereoSystemBuilder" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.stereo.stereo_builder.StereoSystemBuilder">
+<em class="property">class </em><code class="descclassname">py2vision.stereo.stereo_builder.</code><code class="descname">StereoSystemBuilder</code><a class="reference internal" href="_modules/py2vision/stereo/stereo_builder.html#StereoSystemBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.stereo.stereo_builder.StereoSystemBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Builder interface specifies methods for stereo contoller</p>
 </dd></dl>
 

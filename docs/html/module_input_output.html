@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inputs and Outputs &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Inputs and Outputs &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -25,7 +25,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Pytwovision
+            <a href="index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -41,11 +41,11 @@
 <li class="toctree-l1"><a class="reference internal" href="module_datasets_loader.html">Datasets loader</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_image_process.html">Image process</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Inputs and Outputs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-pytwovision.input_output.camera">Inputs like</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-py2vision.input_output.camera">Inputs like</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#how-to-calibrate-a-single-camera">How to calibrate a single camera?</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pytwovision.input_output.vision_system">Outputs like</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-py2vision.input_output.vision_system">Outputs like</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#how-to-implement-a-position-system">How to implement a position system?</a></li>
 </ul>
 </li>
@@ -63,7 +63,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Pytwovision</a>
+          <a href="index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -84,11 +84,11 @@
   <div class="section" id="inputs-and-outputs">
 <h1>Inputs and Outputs<a class="headerlink" href="#inputs-and-outputs" title="Permalink to this headline">¶</a></h1>
 <p>Contains the classes that allow the input of data to the stereo and recognition system through external hardware such as cameras, video files or even live transmission via wifi, in addition to obtaining the intrinsic and extrinsic parameters of the physical medium that captured the images. On the other hand, its other function is to merge the capabilities of the recognition module and the stereo module with the VisionSystem class.</p>
-<div class="section" id="module-pytwovision.input_output.camera">
-<span id="inputs-like"></span><h2>Inputs like<a class="headerlink" href="#module-pytwovision.input_output.camera" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-py2vision.input_output.camera">
+<span id="inputs-like"></span><h2>Inputs like<a class="headerlink" href="#module-py2vision.input_output.camera" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytwovision.input_output.camera.Camera">
-<em class="property">class </em><code class="descclassname">pytwovision.input_output.camera.</code><code class="descname">Camera</code><span class="sig-paren">(</span><em>id</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.camera.Camera">
+<em class="property">class </em><code class="descclassname">py2vision.input_output.camera.</code><code class="descname">Camera</code><span class="sig-paren">(</span><em>id</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/camera.html#Camera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.camera.Camera" title="Permalink to this definition">¶</a></dt>
 <dd><p>An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -103,8 +103,8 @@
 </tbody>
 </table>
 <dl class="method">
-<dt id="pytwovision.input_output.camera.Camera.calibrate">
-<code class="descname">calibrate</code><span class="sig-paren">(</span><em>images_path=''</em>, <em>pattern_type='chessboard'</em>, <em>pattern_size=(8</em>, <em>5)</em>, <em>export_file=True</em>, <em>show=True</em>, <em>fish_eye=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera.calibrate" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.camera.Camera.calibrate">
+<code class="descname">calibrate</code><span class="sig-paren">(</span><em>images_path=''</em>, <em>pattern_type='chessboard'</em>, <em>pattern_size=(8</em>, <em>5)</em>, <em>export_file=True</em>, <em>show=True</em>, <em>fish_eye=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/camera.html#Camera.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.camera.Camera.calibrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute camera parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -135,8 +135,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.input_output.camera.Camera.get_parameters">
-<code class="descname">get_parameters</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera.get_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.camera.Camera.get_parameters">
+<code class="descname">get_parameters</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/camera.html#Camera.get_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.camera.Camera.get_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads camera parameters from a xml file
 :param path: a path where is saved xml file. (Note: if you don’t have any parameters you can use calibrate method first and then pass true in export file argument)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -150,8 +150,8 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.input_output.camera.Camera.take_photos">
-<code class="descname">take_photos</code><span class="sig-paren">(</span><em>num_photos=15</em>, <em>save_dir='images'</em>, <em>prefix_name='photo'</em>, <em>rotate=0</em>, <em>resize=False</em>, <em>resize_dim=(640</em>, <em>480)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/camera.html#Camera.take_photos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.camera.Camera.take_photos" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.camera.Camera.take_photos">
+<code class="descname">take_photos</code><span class="sig-paren">(</span><em>num_photos=15</em>, <em>save_dir='images'</em>, <em>prefix_name='photo'</em>, <em>rotate=0</em>, <em>resize=False</em>, <em>resize_dim=(640</em>, <em>480)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/camera.html#Camera.take_photos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.camera.Camera.take_photos" title="Permalink to this definition">¶</a></dt>
 <dd><p>A simple way to take photos in console and save in a folder.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -178,22 +178,22 @@
 
 <div class="section" id="how-to-calibrate-a-single-camera">
 <h3>How to calibrate a single camera?<a class="headerlink" href="#how-to-calibrate-a-single-camera" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">from</span> <span class="nn">py2vision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
 
 <span class="n">fisheye_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;fisheye&quot;</span><span class="p">,</span> <span class="s2">&quot;A_PATH_OR_A_NAME_FOR_CALIBRATION_IT_DOESN&#39;T_MATTER&quot;</span><span class="p">)</span>
-<span class="n">fisheye_camera</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="s2">&quot;A_CALIBRATION_IMAGE_FOLDER_PATH&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">export_file</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-</pre></div>
-</td></tr></table></div>
+<span class="n">fisheye_camera</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="s2">&quot;A_CALIBRATION_IMAGE_FOLDER_PATH&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">export_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
 </div>
 </div>
-<div class="section" id="module-pytwovision.input_output.vision_system">
-<span id="outputs-like"></span><h2>Outputs like<a class="headerlink" href="#module-pytwovision.input_output.vision_system" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-py2vision.input_output.vision_system">
+<span id="outputs-like"></span><h2>Outputs like<a class="headerlink" href="#module-py2vision.input_output.vision_system" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytwovision.input_output.vision_system.VisionSystem">
-<em class="property">class </em><code class="descclassname">pytwovision.input_output.vision_system.</code><code class="descname">VisionSystem</code><span class="sig-paren">(</span><em>cam_left: pytwovision.input_output.camera.Camera</em>, <em>cam_right: pytwovision.input_output.camera.Camera</em>, <em>stereo_maps_path</em>, <em>matcher: pytwovision.stereo.match_method.Matcher</em>, <em>q_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/vision_system.html#VisionSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.vision_system.VisionSystem" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.vision_system.VisionSystem">
+<em class="property">class </em><code class="descclassname">py2vision.input_output.vision_system.</code><code class="descname">VisionSystem</code><span class="sig-paren">(</span><em>cam_left: py2vision.input_output.camera.Camera</em>, <em>cam_right: py2vision.input_output.camera.Camera</em>, <em>stereo_maps_path</em>, <em>matcher: py2vision.stereo.match_method.Matcher</em>, <em>q_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/vision_system.html#VisionSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.vision_system.VisionSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide an interface to apply recognition and stereo vision. Initialization of all necessary parameteres to implement an stereo-recognition system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -215,8 +215,8 @@ Tx: The x coordinate in Translation matrix</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="pytwovision.input_output.vision_system.VisionSystem.image_pipeline">
-<code class="descname">image_pipeline</code><span class="sig-paren">(</span><em>model</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>post_process_match=True</em>, <em>lmbda=128.0</em>, <em>sigma=1.5</em>, <em>downsample_for_match=2</em>, <em>show_window=True</em>, <em>otsu_thresh_inverse=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/vision_system.html#VisionSystem.image_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.vision_system.VisionSystem.image_pipeline" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.vision_system.VisionSystem.image_pipeline">
+<code class="descname">image_pipeline</code><span class="sig-paren">(</span><em>model</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>post_process_match=True</em>, <em>lmbda=128.0</em>, <em>sigma=1.5</em>, <em>downsample_for_match=2</em>, <em>show_window=True</em>, <em>otsu_thresh_inverse=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/vision_system.html#VisionSystem.image_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.vision_system.VisionSystem.image_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement a stereo recognition system for images.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -252,8 +252,8 @@ Tx: The x coordinate in Translation matrix</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytwovision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline">
-<code class="descname">realtime_or_video_pipeline</code><span class="sig-paren">(</span><em>model</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>post_process_match=True</em>, <em>lmbda=128.0</em>, <em>sigma=1.5</em>, <em>downsample_for_match=2</em>, <em>show_window=True</em>, <em>otsu_thresh_inverse=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytwovision/input_output/vision_system.html#VisionSystem.realtime_or_video_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pytwovision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline" title="Permalink to this definition">¶</a></dt>
+<dt id="py2vision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline">
+<code class="descname">realtime_or_video_pipeline</code><span class="sig-paren">(</span><em>model</em>, <em>class_file_name</em>, <em>output_path=''</em>, <em>input_size=416</em>, <em>score_threshold=0.3</em>, <em>iou_threshold=0.45</em>, <em>rectangle_colors=''</em>, <em>nms_method='nms'</em>, <em>post_process_match=True</em>, <em>lmbda=128.0</em>, <em>sigma=1.5</em>, <em>downsample_for_match=2</em>, <em>show_window=True</em>, <em>otsu_thresh_inverse=True</em>, <em>text_colors=(255</em>, <em>255</em>, <em>0)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py2vision/input_output/vision_system.html#VisionSystem.realtime_or_video_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py2vision.input_output.vision_system.VisionSystem.realtime_or_video_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement a stereo recognition system for video or streaming</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -286,56 +286,56 @@ Tx: The x coordinate in Translation matrix</li>
 
 <div class="section" id="how-to-implement-a-position-system">
 <h3>How to implement a position system?<a class="headerlink" href="#how-to-implement-a-position-system" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.input_output.vision_system</span> <span class="kn">import</span> <span class="n">VisionSystem</span>
-<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.standard_stereo</span> <span class="kn">import</span> <span class="n">StandardStereo</span>
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="kn">import</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">StereoSGBM</span>
-<span class="kn">from</span> <span class="nn">pytwovision.recognition.yolov3_detector</span> <span class="kn">import</span> <span class="n">ObjectDetectorYoloV3</span>
-<span class="kn">from</span> <span class="nn">pytwovision.recognition.selector</span> <span class="kn">import</span> <span class="n">Recognizer</span>
+<span class="kn">from</span> <span class="nn">py2vision.input_output.vision_system</span> <span class="kn">import</span> <span class="n">VisionSystem</span>
+<span class="kn">from</span> <span class="nn">py2vision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">py2vision.stereo.standard_stereo</span> <span class="kn">import</span> <span class="n">StandardStereo</span>
+<span class="kn">from</span> <span class="nn">py2vision.stereo.match_method</span> <span class="kn">import</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">StereoSGBM</span>
+<span class="kn">from</span> <span class="nn">py2vision.recognition.yolov3_detector</span> <span class="kn">import</span> <span class="n">ObjectDetectorYoloV3</span>
+<span class="kn">from</span> <span class="nn">py2vision.recognition.selector</span> <span class="kn">import</span> <span class="n">Recognizer</span>
 
 <span class="n">anno_out_file</span> <span class="o">=</span> <span class="s2">&quot;annotations_formated&quot;</span>
 <span class="n">xml_path</span> <span class="o">=</span> <span class="s2">&quot;tests/test_dataset/annotations&quot;</span>
@@ -351,8 +351,8 @@ Tx: The x coordinate in Translation matrix</li>
 <span class="n">left_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;left_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/left/left_indoor_photo_5.png&quot;</span><span class="p">)</span>
 <span class="n">right_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;right_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/right/right_indoor_photo_5.png&quot;</span><span class="p">)</span>
 <span class="n">stereo_pair_fisheye</span> <span class="o">=</span> <span class="n">StandardStereo</span><span class="p">(</span><span class="n">left_camera</span><span class="p">,</span> <span class="n">right_camera</span><span class="p">)</span>
-<span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="s2">&quot;tests/assets/left_camera_calibration&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/right_camera_calibration&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">rectify</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">export_file</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">export_file_name</span><span class="o">=</span><span class="n">stereo_maps_path</span><span class="p">)</span>
+<span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="s2">&quot;tests/assets/left_camera_calibration&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/right_camera_calibration&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">rectify</span><span class="p">((</span><span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">),</span> <span class="n">export_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">export_file_name</span><span class="o">=</span><span class="n">stereo_maps_path</span><span class="p">)</span>
 <span class="c1"># Add path format</span>
 <span class="n">stereo_maps_path</span> <span class="o">=</span> <span class="n">stereo_maps_path</span> <span class="o">+</span> <span class="s2">&quot;.xml&quot;</span>
 <span class="n">sgbm</span> <span class="o">=</span> <span class="n">StereoSGBM</span><span class="p">(</span><span class="n">min_disp</span><span class="o">=-</span><span class="mi">32</span><span class="p">,</span> <span class="n">max_disp</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="mi">107</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="mi">710</span><span class="p">,</span> <span class="n">pre_filter_cap</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">speckle_window_size</span><span class="o">=</span><span class="mi">117</span><span class="p">,</span> <span class="n">speckle_range</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">uniqueness_ratio</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">disp_12_max_diff</span><span class="o">=-</span><span class="mi">38</span><span class="p">)</span>
@@ -362,7 +362,7 @@ Tx: The x coordinate in Translation matrix</li>
 <span class="n">left_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;left_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/left/left_plant_1.png&quot;</span><span class="p">)</span>
 <span class="n">right_camera</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="s2">&quot;right_camera&quot;</span><span class="p">,</span> <span class="s2">&quot;tests/assets/photo/right/right_plant_1.png&quot;</span><span class="p">)</span>
 <span class="n">vis_sys</span> <span class="o">=</span> <span class="n">VisionSystem</span><span class="p">(</span><span class="n">left_camera</span><span class="p">,</span> <span class="n">right_camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">,</span> <span class="n">matcher</span><span class="p">,</span> <span class="n">stereo_pair_fisheye</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span>
-<span class="n">yolov3</span> <span class="o">=</span> <span class="n">ObjectDetectorYoloV3</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">yolov3</span> <span class="o">=</span> <span class="n">ObjectDetectorYoloV3</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">recognizer</span> <span class="o">=</span> <span class="n">Recognizer</span><span class="p">(</span><span class="n">yolov3</span><span class="p">)</span>
 <span class="n">link_yolov3_weights</span> <span class="o">=</span> <span class="s2">&quot;https://pjreddie.com/media/files/yolov3.weights&quot;</span>
 <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">link_yolov3_weights</span><span class="p">)</span>
@@ -370,9 +370,9 @@ Tx: The x coordinate in Translation matrix</li>
 <span class="n">recognizer</span><span class="o">.</span><span class="n">restore_weights</span><span class="p">(</span><span class="n">weights_file</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span>
 <span class="c1"># Here the magic happens</span>
-<span class="n">vis_sys</span><span class="o">.</span><span class="n">image_pipeline</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">classes_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;test_position.jpg&quot;</span><span class="p">),</span>  <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">otsu_thresh_inverse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-</pre></div>
-</td></tr></table></div>
+<span class="n">vis_sys</span><span class="o">.</span><span class="n">image_pipeline</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">classes_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s2">&quot;test_position.jpg&quot;</span><span class="p">),</span>  <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">downsample_for_match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">otsu_thresh_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div></td></tr></table></div>
+</div>
 </div>
 </div>
 </div>

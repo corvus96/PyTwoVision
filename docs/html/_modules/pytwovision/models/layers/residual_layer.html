@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.models.layers.residual_layer &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.models.layers.residual_layer &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">Pytwovision</a>
+          <a href="../../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -72,7 +72,7 @@
   <h1>Source code for pytwovision.models.layers.residual_layer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.models.layers.conv2d_bn_leaky_relu_layer</span> <span class="k">import</span> <span class="n">conv2d_bn_leaky_relu_layer</span>
+<span class="kn">from</span> <span class="nn">pytwovision.models.layers.conv2d_bn_leaky_relu_layer</span> <span class="kn">import</span> <span class="n">conv2d_bn_leaky_relu_layer</span>
 
 <div class="viewcode-block" id="residual_layer"><a class="viewcode-back" href="../../../../module_models.html#pytwovision.models.layers.residual_layer.residual_layer">[docs]</a><span class="k">def</span> <span class="nf">residual_layer</span><span class="p">(</span><span class="n">input_layer</span><span class="p">,</span> <span class="n">input_channel</span><span class="p">,</span> <span class="n">filter_num1</span><span class="p">,</span> <span class="n">filter_num2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A residual block with two Convolutional-batch normalization-leakyReLu layers stacked one above other.</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.stereo.match_method &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.stereo.match_method &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Pytwovision</a>
+          <a href="../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -70,8 +70,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pytwovision.stereo.match_method</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">annotations</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
 <span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
 
@@ -82,7 +82,7 @@
 <span class="sd">    The matcher accepts a strategy through the constructor, but also provides a setter to change it at runtime.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">MatcherStrategy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">MatcherStrategy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_strategy</span> <span class="o">=</span> <span class="n">strategy</span>
 
     <span class="nd">@property</span>
@@ -141,7 +141,7 @@
 <span class="sd">        uniqueness_ratio: Margin in percentage by which the best (minimum) computed cost function value should &quot;win&quot; the second best value to consider the found match correct. Normally, a value within the 5-15 range is good enough.</span>
 <span class="sd">        disp_12_max_diff: Maximum allowed difference (in integer pixel units) in the left-right disparity check. Set it to a non-positive value to disable the check.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_disp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_disp</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="mi">96</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">pre_filter_cap</span><span class="o">=</span><span class="mi">63</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">StereoSGBM_MODE_HH</span><span class="p">,</span> <span class="n">speckle_window_size</span><span class="o">=</span><span class="mi">1100</span><span class="p">,</span> <span class="n">speckle_range</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uniqueness_ratio</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">disp_12_max_diff</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_disp</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_disp</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">p2</span><span class="o">=</span><span class="mi">96</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">pre_filter_cap</span><span class="o">=</span><span class="mi">63</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">StereoSGBM_MODE_HH</span><span class="p">,</span> <span class="n">speckle_window_size</span><span class="o">=</span><span class="mi">1100</span><span class="p">,</span> <span class="n">speckle_range</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">uniqueness_ratio</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">disp_12_max_diff</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">max_disp</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">max_disp</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span>

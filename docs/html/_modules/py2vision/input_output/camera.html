@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py2vision.input_output.camera &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> py2vision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">py2vision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>py2vision.input_output.camera</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py2vision.input_output.camera</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+
+<span class="kn">from</span> <span class="nn">py2vision.image_process.frame_decorator</span> <span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">py2vision.image_process.resize</span> <span class="kn">import</span> <span class="n">Resize</span>
+<span class="kn">from</span> <span class="nn">py2vision.image_process.rotate</span> <span class="kn">import</span> <span class="n">Rotate</span>
+
+<div class="viewcode-block" id="Camera"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.camera.Camera">[docs]</a><span class="k">class</span> <span class="nc">Camera</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;An emulation of a real world camera with his relevant parameters, like camera matrix, extrinsics and intrinsics parameters. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id: A string to identify our camera.</span>
+<span class="sd">        source: When you use webcam you need to put (int) 0, if you want to use videos or streaming, you will need to put his URL or path even you can put in a video file or a image path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="c1"># define type of source</span>
+        <span class="n">regex</span> <span class="o">=</span> <span class="s1">&#39;((http|https)://)(www.)?&#39;</span> <span class="o">+</span> <span class="s1">&#39;[a-zA-Z0-9@:%._</span><span class="se">\\</span><span class="s1">+~#?&amp;//=]{2,256}</span><span class="se">\\</span><span class="s1">.[a-z]&#39;</span> <span class="o">+</span> <span class="s1">&#39;{2,6}</span><span class="se">\\</span><span class="s1">b([-a-zA-Z0-9@:%._</span><span class="se">\\</span><span class="s1">+~#?&amp;//=]*)&#39;</span>
+        <span class="n">regular_exp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regular_exp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">=</span> <span class="s1">&#39;stream&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">=</span> <span class="s1">&#39;webcam&#39;</span>
+
+<div class="viewcode-block" id="Camera.take_photos"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.camera.Camera.take_photos">[docs]</a>    <span class="k">def</span> <span class="nf">take_photos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_photos</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s2">&quot;images&quot;</span><span class="p">,</span> <span class="n">prefix_name</span><span class="o">=</span><span class="s2">&quot;photo&quot;</span><span class="p">,</span> <span class="n">rotate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resize_dim</span><span class="o">=</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span><span class="mi">480</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot; A simple way to take photos in console and save in a folder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_photos: Number of photos to take, 15 by default.</span>
+<span class="sd">            save_dir: Directory name where the photos will be saved.</span>
+<span class="sd">            prefix_name: A prefix for the names of the photos.</span>
+<span class="sd">            rotate: rotate input image around his center, 0 grades by default.</span>
+<span class="sd">            resize: To resize input image.</span>
+<span class="sd">            resize_dim: resize input image dimensions (width, height), its default is (640, 480).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            OSError: if folder exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initial directory</span>
+        <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="c1"># make directory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>   
+            <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s1">&#39;other&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s1">&#39;webcam&#39;</span><span class="p">:</span>
+            <span class="n">cap</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cannot open camera&quot;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_photos</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please press enter to take a photo&quot;</span><span class="p">)</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s1">&#39;stream&#39;</span><span class="p">:</span>
+                    <span class="n">img_resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+                    <span class="n">img_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">img_resp</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+                    <span class="n">frame</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">imdecode</span><span class="p">(</span><span class="n">img_arr</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">rotate</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">transf_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                        <span class="n">frame</span> <span class="o">=</span> <span class="n">Rotate</span><span class="p">(</span><span class="n">transf_frame</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+                        <span class="n">frame</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">resize</span><span class="p">:</span>
+                        <span class="n">transf_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                        <span class="n">frame</span> <span class="o">=</span> <span class="n">Resize</span><span class="p">(</span><span class="n">transf_frame</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">resize_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">resize_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="s2">&quot;streaming: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">cv</span><span class="o">.</span><span class="n">WINDOW_NORMAL</span><span class="p">)</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;streaming: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">frame</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_source</span> <span class="o">==</span> <span class="s1">&#39;other&#39;</span> <span class="ow">or</span> <span class="s1">&#39;webcam&#39;</span><span class="p">:</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">rotate</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">transf_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                        <span class="n">frame</span> <span class="o">=</span> <span class="n">Rotate</span><span class="p">(</span><span class="n">transf_frame</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+                        <span class="n">frame</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">resize</span><span class="p">:</span>
+                        <span class="n">transf_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                        <span class="n">frame</span> <span class="o">=</span> <span class="n">Resize</span><span class="p">(</span><span class="n">transf_frame</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">resize_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">resize_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;webcam: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">frame</span><span class="p">)</span>
+                <span class="n">input_key</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">input_key</span> <span class="o">==</span> <span class="mi">32</span><span class="p">:</span>
+                    <span class="c1">#space pressed</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_name</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">frame</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;saved as </span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix_name</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> photos left&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_photos</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">input_key</span> <span class="o">==</span> <span class="mi">27</span><span class="p">:</span>
+                    <span class="c1">#esc pressed</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Escape hit, closing...&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">input_key</span> <span class="o">==</span> <span class="mi">27</span><span class="p">:</span>
+                <span class="c1">#esc pressed</span>
+                <span class="k">break</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+        <span class="c1"># restore to initial directory</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Camera.calibrate"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.camera.Camera.calibrate">[docs]</a>    <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">pattern_type</span><span class="o">=</span><span class="s1">&#39;chessboard&#39;</span><span class="p">,</span> <span class="n">pattern_size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">export_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fish_eye</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Compute camera parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            images_path: folder where is saved calibration pattern photos.</span>
+<span class="sd">            pattern_type: It can be &quot;circles&quot; pattern or &quot;chessboard&quot; pattern (default).</span>
+<span class="sd">            pattern_size: If pattern_type is &quot;chessboard&quot;  this the Number of inner corners per a chessboard row and column. But If pattern_type is &quot;circles&quot; this will be the number of circles per row and column. </span>
+<span class="sd">            export_file: To export camera parameters on xml file.</span>
+<span class="sd">            show: if is true it show corners or centers found by calibration algorithm  at each iteration.</span>
+<span class="sd">            fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it&#39;ll use normal calibration, fish eye is recomended when cameras has an field of view &gt; 160.</span>
+
+<span class="sd">        Returns: </span>
+<span class="sd">            RMS calibration&#39;s error.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            OSError: If didn&#39;t find photos on images_path folder.</span>
+<span class="sd">            ValueError: If pattern_type is different of &#39;chessboard&#39; or &#39;circles&#39; or when</span>
+<span class="sd">            fish_eye isn&#39;t a boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chessboard&quot;</span><span class="p">,</span> <span class="s2">&quot;circles&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pattern_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_patterns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;pattern_type only can be &#39;chessboard&#39; or &#39;circles&#39;&quot;</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">fish_eye</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fish_eye has to be a boolean&quot;</span><span class="p">)</span> 
+        <span class="c1"># adjust image path</span>
+        <span class="n">images_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">images_path</span><span class="p">)</span>
+        <span class="c1"># available formats</span>
+        <span class="n">formats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*.svg&#39;</span><span class="p">,</span> <span class="s1">&#39;*.png&#39;</span><span class="p">,</span> <span class="s1">&#39;*.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;*.bmp&#39;</span><span class="p">,</span> <span class="s1">&#39;*.jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;*.raw&#39;</span><span class="p">]</span>
+        <span class="c1"># get files names</span>
+        <span class="n">files_grabbed</span> <span class="o">=</span> <span class="p">[</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">((</span><span class="n">images_path</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">images_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">]</span>
+        <span class="c1"># flatting files list</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">files_grabbed</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+        
+        <span class="c1"># termination criteria</span>
+        <span class="k">if</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">criteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">criteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        
+        <span class="c1"># prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)</span>
+        <span class="k">if</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">objp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">objp</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">:</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">objp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">objp</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">:</span><span class="n">pattern_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Arrays to store object points and image points from all the images.</span>
+        <span class="n">objpoints</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># 3d point in real world space</span>
+        <span class="n">imgpoints</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># 2d points in image plane.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span>
+            <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                <span class="n">gray</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+                <span class="c1"># Find the chess board corners</span>
+                <span class="k">if</span> <span class="n">pattern_type</span> <span class="o">==</span> <span class="s1">&#39;chessboard&#39;</span> <span class="ow">and</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="p">,</span> <span class="n">corners</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">pattern_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">pattern_type</span> <span class="o">==</span> <span class="s1">&#39;circles&#39;</span> <span class="ow">and</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="p">,</span> <span class="n">corners</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">findCirclesGrid</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">pattern_size</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">pattern_type</span> <span class="o">==</span> <span class="s1">&#39;chessboard&#39;</span> <span class="ow">and</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="p">,</span> <span class="n">corners</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">pattern_size</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">CALIB_CB_ADAPTIVE_THRESH</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">CALIB_CB_FAST_CHECK</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">CALIB_CB_NORMALIZE_IMAGE</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">pattern_type</span> <span class="o">==</span> <span class="s1">&#39;circles&#39;</span> <span class="ow">and</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="p">,</span> <span class="n">corners</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">findCirclesGrid</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">pattern_size</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">CALIB_CB_ADAPTIVE_THRESH</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">CALIB_CB_FAST_CHECK</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">CALIB_CB_NORMALIZE_IMAGE</span><span class="p">)</span>
+                <span class="c1"># If found, add object points, image points (after refining them)</span>
+                <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">objpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">objp</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>   
+                        <span class="n">corners</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span><span class="n">corners</span><span class="p">,</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">criteria</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">corners</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">criteria</span><span class="p">)</span>
+                    <span class="n">imgpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corners</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                    <span class="c1"># Draw and display the corners</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">drawChessboardCorners</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pattern_size</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">WINDOW_NORMAL</span><span class="p">)</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">3000</span><span class="p">)</span>
+                    <span class="n">cv</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">fish_eye</span><span class="p">:</span>
+                <span class="n">flags</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">fisheye</span><span class="o">.</span><span class="n">CALIB_RECOMPUTE_EXTRINSIC</span> <span class="o">+</span> <span class="n">cv</span><span class="o">.</span><span class="n">fisheye</span><span class="o">.</span><span class="n">CALIB_FIX_SKEW</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">rvecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">objpoints</span><span class="p">))]</span>
+                <span class="n">tvecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">objpoints</span><span class="p">))]</span>
+
+            <span class="k">if</span> <span class="n">fish_eye</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rvecs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tvecs</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">calibrateCamera</span><span class="p">(</span><span class="n">objpoints</span><span class="p">,</span> <span class="n">imgpoints</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">getOptimalNewCameraMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_coeffs</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+               
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rvecs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tvecs</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">fisheye</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="n">objpoints</span><span class="p">,</span> <span class="n">imgpoints</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">tvecs</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span><span class="o">+</span><span class="n">cv</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;camera error </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="c1"># export an xml with camera parameters</span>
+            <span class="k">if</span> <span class="n">export_file</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saving parameters!&quot;</span><span class="p">)</span>
+                <span class="n">cv_file</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">FileStorage</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_parameters.xml&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="n">cv</span><span class="o">.</span><span class="n">FILE_STORAGE_WRITE</span><span class="p">)</span>
+                <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;camera_mtx&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span>
+                <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;distortion_coeff&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_coeffs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rvec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rvecs</span><span class="p">):</span>
+                    <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;rotation_mtx_col_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">rvec</span><span class="p">)</span> 
+                <span class="n">num_rvecs</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;num_rvecs&#39;</span><span class="p">,</span> <span class="n">num_rvecs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tvec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tvecs</span><span class="p">):</span>
+                    <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;translation_mtx_col_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tvec</span><span class="p">)</span>
+                <span class="n">num_tvecs</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;num_tvecs&#39;</span><span class="p">,</span> <span class="n">num_tvecs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;roi&quot;</span><span class="p">):</span>
+                    <span class="n">cv_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ROI&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">)</span>
+                <span class="n">cv_file</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved as </span><span class="si">{}</span><span class="s2">_parameters.xml&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not find any image in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">images_path</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">error</span></div>
+
+<div class="viewcode-block" id="Camera.get_parameters"><a class="viewcode-back" href="../../../module_input_output.html#py2vision.input_output.camera.Camera.get_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Loads camera parameters from a xml file</span>
+<span class="sd">        Args: </span>
+<span class="sd">            path: a path where is saved xml file. (Note: if you don&#39;t have any parameters you can use calibrate method first and then pass true in export file argument)</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            OSError: when path is wrong.</span>
+<span class="sd">         &quot;&quot;&quot;</span>
+
+        <span class="c1"># file storage read</span>
+        <span class="n">cv_file</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">FileStorage</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">FILE_STORAGE_READ</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cv_file</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Looks like </span><span class="si">{}</span><span class="s2"> doesn&#39;t exist!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;camera_mtx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mat</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_coeffs</span> <span class="o">=</span> <span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;distortion_coeff&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mat</span><span class="p">()</span>
+        <span class="n">num_rvecs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;num_rvecs&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rvecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;rotation_mtx_col_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="o">.</span><span class="n">mat</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rvecs</span><span class="p">)]</span>
+        <span class="n">num_tvecs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;num_tvecs&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tvecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;translation_mtx_col_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="o">.</span><span class="n">mat</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_tvecs</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;roi&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cv_file</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;ROI&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mat</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">cv_file</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

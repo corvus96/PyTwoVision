@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>py2vision.utils.draw &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> py2vision
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_datasets_loader.html">Datasets loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_image_process.html">Image process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_input_output.html">Inputs and Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_models.html">Tensorflow models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_recognition.html">Object detection (Recognition)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_stereo.html">Stereo Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">py2vision</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>py2vision.utils.draw</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for py2vision.utils.draw</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">colorsys</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+
+<span class="kn">from</span> <span class="nn">py2vision.utils.label_utils</span> <span class="kn">import</span> <span class="n">read_class_names</span>
+
+<div class="viewcode-block" id="draw_lines"><a class="viewcode-back" href="../../../module_utils.html#py2vision.utils.draw.draw_lines">[docs]</a><span class="k">def</span> <span class="nf">draw_lines</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span><span class="n">img2</span><span class="p">,</span><span class="n">lines</span><span class="p">,</span><span class="n">pts1</span><span class="p">,</span><span class="n">pts2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; img1 - image on which we draw the epilines for the points in img2 lines - corresponding epilines &#39;&#39;&#39;</span>
+    <span class="n">r</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">img1</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">img1</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span><span class="n">cv</span><span class="o">.</span><span class="n">COLOR_GRAY2BGR</span><span class="p">)</span>
+    <span class="n">img2</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span><span class="n">cv</span><span class="o">.</span><span class="n">COLOR_GRAY2BGR</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span><span class="p">,</span><span class="n">pt1</span><span class="p">,</span><span class="n">pt2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span><span class="n">pts1</span><span class="p">,</span><span class="n">pts2</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">x0</span><span class="p">,</span><span class="n">y0</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">])</span>
+        <span class="n">x1</span><span class="p">,</span><span class="n">y1</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">[</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">)</span><span class="o">/</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">])</span>
+        <span class="n">img1</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="p">(</span><span class="n">x0</span><span class="p">,</span><span class="n">y0</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">),</span> <span class="n">color</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">img1</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt1</span><span class="p">),</span><span class="mi">5</span><span class="p">,</span><span class="n">color</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">img2</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt2</span><span class="p">),</span><span class="mi">5</span><span class="p">,</span><span class="n">color</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img1</span><span class="p">,</span><span class="n">img2</span></div>
+
+<div class="viewcode-block" id="draw_bbox"><a class="viewcode-back" href="../../../module_utils.html#py2vision.utils.draw.draw_bbox">[docs]</a><span class="k">def</span> <span class="nf">draw_bbox</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">bboxes</span><span class="p">,</span> <span class="n">class_file_name</span><span class="p">,</span> <span class="n">show_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_confidence</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">text_colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">rectangle_colors</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">tracking</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">homogeneous_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>   
+    <span class="sd">&quot;&quot;&quot;Draw bounding boxes on images</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image: an array which correspond with an image</span>
+<span class="sd">        bboxes: their bounding boxes.</span>
+<span class="sd">        class_file_name: a path with a .txt file where the classes are saved.</span>
+<span class="sd">        show_label: a boolean to show or hide object label.</span>
+<span class="sd">        show_confidence: a boolean to show or hide confidence level.</span>
+<span class="sd">        text_colors: a tuple that represents (R, G, B) colors.</span>
+<span class="sd">        rectangle_colors: if this parameter is a string empty bounding box colors will be assing by default, however if rectangle_colors is a tuple like: (R, G, B) that will be bounding box colors.</span>
+<span class="sd">        homogeneous_points: an array with dimensions n x 4 where each row is like (X, Y, Z, W). However if is None it won&#39;t be drawed.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        An image with bounding boxes and homogeneous coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">classes</span> <span class="o">=</span> <span class="n">read_class_names</span><span class="p">(</span><span class="n">class_file_name</span><span class="p">)</span>
+    <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
+    <span class="n">image_h</span><span class="p">,</span> <span class="n">image_w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">hsv_tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">num_classes</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_classes</span><span class="p">)]</span>
+    <span class="c1">#print(&quot;hsv_tuples&quot;, hsv_tuples)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">colorsys</span><span class="o">.</span><span class="n">hsv_to_rgb</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="n">hsv_tuples</span><span class="p">))</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)),</span> <span class="n">colors</span><span class="p">))</span>
+
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bboxes</span><span class="p">):</span>
+        <span class="n">coor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bbox</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">class_ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">bbox_color</span> <span class="o">=</span> <span class="n">rectangle_colors</span> <span class="k">if</span> <span class="n">rectangle_colors</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="n">colors</span><span class="p">[</span><span class="n">class_ind</span><span class="p">]</span>
+        <span class="n">bbox_thick</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.6</span> <span class="o">*</span> <span class="p">(</span><span class="n">image_h</span> <span class="o">+</span> <span class="n">image_w</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bbox_thick</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span> <span class="n">bbox_thick</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">fontScale</span> <span class="o">=</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">bbox_thick</span>
+        <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coor</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="n">coor</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">coor</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+        <span class="c1"># put object rectangle</span>
+        <span class="n">cv</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span> <span class="n">bbox_color</span><span class="p">,</span> <span class="n">bbox_thick</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">show_label</span><span class="p">:</span>
+            <span class="c1"># get text label</span>
+            <span class="n">score_str</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="k">if</span> <span class="n">show_confidence</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">tracking</span><span class="p">:</span> <span class="n">score_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">classes</span><span class="p">[</span><span class="n">class_ind</span><span class="p">])</span> <span class="o">+</span> <span class="n">score_str</span>
+
+            <span class="c1"># get text size</span>
+            <span class="p">(</span><span class="n">text_width</span><span class="p">,</span> <span class="n">text_height</span><span class="p">),</span> <span class="n">baseline</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">getTextSize</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span>
+                                                                  <span class="n">fontScale</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">bbox_thick</span><span class="p">)</span>
+            <span class="c1"># put filled text rectangle</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">text_width</span><span class="p">,</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">text_height</span> <span class="o">-</span> <span class="n">baseline</span><span class="p">),</span> <span class="n">bbox_color</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">FILLED</span><span class="p">)</span>
+
+            <span class="c1"># put text above rectangle</span>
+            <span class="n">cv</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="o">-</span><span class="mi">4</span><span class="p">),</span> <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span>
+                        <span class="n">fontScale</span><span class="p">,</span> <span class="n">text_colors</span><span class="p">,</span> <span class="n">bbox_thick</span><span class="p">,</span> <span class="n">lineType</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">homogeneous_points</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y_position</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">+</span> <span class="mi">14</span>
+            <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y:&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">string_coor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coordinates</span><span class="p">):</span>
+                <span class="n">coor_label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">string_coor</span><span class="p">,</span> <span class="n">homogeneous_points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">num</span><span class="p">])</span>
+                <span class="n">cv</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">coor_label</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">y_position</span><span class="p">),</span> <span class="n">cv</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span> <span class="n">fontScale</span><span class="p">,</span> <span class="n">text_colors</span><span class="p">,</span> <span class="n">bbox_thick</span><span class="p">,</span> <span class="n">lineType</span><span class="o">=</span><span class="n">cv</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">)</span>
+                <span class="n">y_position</span> <span class="o">+=</span> <span class="mi">14</span>
+
+
+    <span class="k">return</span> <span class="n">image</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Guillermo Raven.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.stereo.standard_stereo &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.stereo.standard_stereo &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Pytwovision</a>
+          <a href="../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -77,11 +77,11 @@
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.stereo_builder</span> <span class="k">import</span> <span class="n">StereoSystemBuilder</span>
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="k">import</span> <span class="n">Matcher</span>
-<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="k">import</span> <span class="n">Camera</span>
-<span class="kn">from</span> <span class="nn">pytwovision.utils.draw</span> <span class="k">import</span> <span class="n">draw_lines</span>
-<span class="kn">from</span> <span class="nn">pytwovision.compute.error_compute</span> <span class="k">import</span> <span class="n">re_projection_error</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.stereo_builder</span> <span class="kn">import</span> <span class="n">StereoSystemBuilder</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="kn">import</span> <span class="n">Matcher</span>
+<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">pytwovision.utils.draw</span> <span class="kn">import</span> <span class="n">draw_lines</span>
+<span class="kn">from</span> <span class="nn">pytwovision.compute.error_compute</span> <span class="kn">import</span> <span class="n">re_projection_error</span>
 
 
 <div class="viewcode-block" id="StandardStereo"><a class="viewcode-back" href="../../../module_stereo.html#pytwovision.stereo.standard_stereo.StandardStereo">[docs]</a><span class="k">class</span> <span class="nc">StandardStereo</span><span class="p">:</span>
@@ -92,7 +92,7 @@
 <span class="sd">        camR: right camera instance.</span>
 <span class="sd">        fish_eye: A boolean if is true it will calibrate with cv2.fisheye.calibrate if no it&#39;ll use normal calibration, fish eye is recomended when cameras has an field of view &gt; 160.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">fish_eye</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">fish_eye</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">fish_eye</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fish_eye has to be a boolean&quot;</span><span class="p">)</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">camL</span> <span class="o">=</span> <span class="n">cam_left</span>
@@ -456,7 +456,7 @@
 <span class="sd">        stereo_maps_path: an xml with Stereo rectification maps</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A fresh builder instance should contain a blank product object, which is used in further assembly.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

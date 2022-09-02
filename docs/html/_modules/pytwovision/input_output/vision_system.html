@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytwovision.input_output.vision_system &mdash; Pytwovision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>pytwovision.input_output.vision_system &mdash; py2vision 1.0 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -23,7 +23,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> Pytwovision
+            <a href="../../../index.html" class="icon icon-home"> py2vision
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -51,7 +51,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Pytwovision</a>
+          <a href="../../../index.html">py2vision</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -75,12 +75,12 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="k">import</span> <span class="n">Camera</span>
-<span class="kn">from</span> <span class="nn">pytwovision.recognition.detection_mode</span> <span class="k">import</span> <span class="n">DetectRealTime</span>
-<span class="kn">from</span> <span class="nn">pytwovision.recognition.detection_mode</span> <span class="k">import</span> <span class="n">DetectImage</span>
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="k">import</span> <span class="n">Matcher</span>
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.stereo_builder</span> <span class="k">import</span> <span class="n">StereoController</span>
-<span class="kn">from</span> <span class="nn">pytwovision.stereo.standard_stereo</span> <span class="k">import</span> <span class="n">StandardStereoBuilder</span>
+<span class="kn">from</span> <span class="nn">pytwovision.input_output.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">pytwovision.recognition.detection_mode</span> <span class="kn">import</span> <span class="n">DetectRealTime</span>
+<span class="kn">from</span> <span class="nn">pytwovision.recognition.detection_mode</span> <span class="kn">import</span> <span class="n">DetectImage</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.match_method</span> <span class="kn">import</span> <span class="n">Matcher</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.stereo_builder</span> <span class="kn">import</span> <span class="n">StereoController</span>
+<span class="kn">from</span> <span class="nn">pytwovision.stereo.standard_stereo</span> <span class="kn">import</span> <span class="n">StandardStereoBuilder</span>
 
 <div class="viewcode-block" id="VisionSystem"><a class="viewcode-back" href="../../../module_input_output.html#pytwovision.input_output.vision_system.VisionSystem">[docs]</a><span class="k">class</span> <span class="nc">VisionSystem</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Provide an interface to apply recognition and stereo vision. Initialization of all necessary parameteres to implement an stereo-recognition system </span>
@@ -96,7 +96,7 @@
 <span class="sd">            f: is the focal lenth in left image</span>
 <span class="sd">            Tx: The x coordinate in Translation matrix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">q_matrix</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cam_left</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">cam_right</span><span class="p">:</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">,</span> <span class="n">matcher</span><span class="p">:</span> <span class="n">Matcher</span><span class="p">,</span> <span class="n">q_matrix</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">camL</span> <span class="o">=</span> <span class="n">cam_left</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">camR</span> <span class="o">=</span> <span class="n">cam_right</span>
         <span class="n">builder</span> <span class="o">=</span> <span class="n">StandardStereoBuilder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">camL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">camR</span><span class="p">,</span> <span class="n">stereo_maps_path</span><span class="p">)</span>
