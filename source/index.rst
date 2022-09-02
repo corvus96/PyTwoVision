@@ -52,7 +52,6 @@ Dependencies
 * tensorflow == 2.8.0
 * opencv-contrib-python==4.6.0.66
 * wget == 3.2
-* matplotlib==3.5.1
 * pandas
 * pyyaml 
 * h5py

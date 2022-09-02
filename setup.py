@@ -12,7 +12,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="py2vision", # Replace with your own username
-    version="1.0.2",
+    version="1.0.3",
     license='MIT',
     author="Guillermo Jose Raven Lusinche",
     author_email="guillermoraven96@gmail.com",
@@ -40,7 +40,6 @@ setuptools.setup(
         'tensorflow == 2.8.0',
         'opencv-contrib-python==4.6.0.66',
         'wget == 3.2',
-        'matplotlib==3.5.1',
         'pandas',
         'pyyaml', 
         'h5py'
