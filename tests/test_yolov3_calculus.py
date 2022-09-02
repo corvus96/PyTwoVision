@@ -3,10 +3,10 @@ import unittest
 import numpy as np
 import tensorflow as tf
 
-from pytwovision.compute.yolov3_calculus import YoloV3Calculus
-from pytwovision.models.models_manager import ModelManager
-from pytwovision.models.blocks.backbone_block import BackboneBlock
-from pytwovision.models.blocks.backbone_block import darknet53
+from py2vision.compute.yolov3_calculus import YoloV3Calculus
+from py2vision.models.models_manager import ModelManager
+from py2vision.models.blocks.backbone_block import BackboneBlock
+from py2vision.models.blocks.backbone_block import darknet53
 
 class TestYoloV3Calculus(unittest.TestCase):
     def setUp(self):

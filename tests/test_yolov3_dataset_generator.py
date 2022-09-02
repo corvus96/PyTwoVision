@@ -2,8 +2,8 @@ import unittest
 import os
 import shutil
 
-from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
-from pytwovision.datasets_loader.yolov3_dataset_generator import YoloV3DatasetGenerator
+from py2vision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
+from py2vision.datasets_loader.yolov3_dataset_generator import YoloV3DatasetGenerator
 
 class TestYoloV3DatasetGenerator(unittest.TestCase):
     def setUp(self):

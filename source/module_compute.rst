@@ -7,7 +7,7 @@ Calculate the reprojection error
 --------------------------
 It can be useful when you need to obtain the calibration of the error of the cameras, the calibration is when you find the intrinsic and extrinsic parameters of a camera, such as: distortions, center of projections, focal lengths and so on.
 
-    .. automodule:: pytwovision.compute.error_compute
+    .. automodule:: py2vision.compute.error_compute
         :members:
 
 Yolo V3 Computations
@@ -16,7 +16,7 @@ The class YoloV3Calculus is responsible for adding the prediction layer in a YOL
 
 It is also in charge of calculating the IoU value and applying the **Non maximum suppression** algorithm to filter the bounding boxes that do not meet a certain threshold, in order to obtain predictions with a lower amount of noise and calculate the network error.
 
-    .. automodule:: pytwovision.compute.yolov3_calculus
+    .. automodule:: py2vision.compute.yolov3_calculus
         :members:
 
 

@@ -6,7 +6,7 @@ Contains the classes that allow the input of data to the stereo and recognition 
 Inputs like
 ------------
 
-.. automodule:: pytwovision.input_output.camera
+.. automodule:: py2vision.input_output.camera
         :members:
 
 How to calibrate a single camera?
@@ -14,14 +14,14 @@ How to calibrate a single camera?
 .. code-block:: python
     :linenos:
 
-    from pytwovision.input_output.camera import Camera
+    from py2vision.input_output.camera import Camera
 
     fisheye_camera = Camera("fisheye", "A_PATH_OR_A_NAME_FOR_CALIBRATION_IT_DOESN'T_MATTER")
     fisheye_camera.calibrate("A_CALIBRATION_IMAGE_FOLDER_PATH", show=False, export_file=False)
 
 Outputs like
 -------------
-.. automodule:: pytwovision.input_output.vision_system
+.. automodule:: py2vision.input_output.vision_system
         :members:
         
 How to implement a position system?
@@ -31,12 +31,12 @@ How to implement a position system?
 
     import os
 
-    from pytwovision.input_output.vision_system import VisionSystem
-    from pytwovision.input_output.camera import Camera
-    from pytwovision.stereo.standard_stereo import StandardStereo
-    from pytwovision.stereo.match_method import Matcher, StereoSGBM
-    from pytwovision.recognition.yolov3_detector import ObjectDetectorYoloV3
-    from pytwovision.recognition.selector import Recognizer
+    from py2vision.input_output.vision_system import VisionSystem
+    from py2vision.input_output.camera import Camera
+    from py2vision.stereo.standard_stereo import StandardStereo
+    from py2vision.stereo.match_method import Matcher, StereoSGBM
+    from py2vision.recognition.yolov3_detector import ObjectDetectorYoloV3
+    from py2vision.recognition.selector import Recognizer
 
     anno_out_file = "annotations_formated"
     xml_path = "tests/test_dataset/annotations"

@@ -2,8 +2,8 @@ import unittest
 import os
 import shutil
 
-from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
-from pytwovision.utils.annotations_helper import AnnotationsHelper
+from py2vision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
+from py2vision.utils.annotations_helper import AnnotationsHelper
 
 class TestAnnotationsParser(unittest.TestCase):
     def setUp(self) -> None:

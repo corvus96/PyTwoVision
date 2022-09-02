@@ -11,15 +11,17 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pytwovision-skycorvus96", # Replace with your own username
-    version="0.0.1",
+    name="py2vision", # Replace with your own username
+    version="1.0.2",
+    license='MIT',
     author="Guillermo Jose Raven Lusinche",
     author_email="guillermoraven96@gmail.com",
     description="A package to implement a stereo vision system trained with deep learning",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/corvus96/PyTwoVision",
     packages=setuptools.find_packages(),
+    package_dir={'py2vision': 'py2vision'},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -34,8 +36,13 @@ setuptools.setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'numpy',
-        'tensorflow',
-        'cv2',
+        'numpy == 1.21.5',
+        'tensorflow == 2.8.0',
+        'opencv-contrib-python==4.6.0.66',
+        'wget == 3.2',
+        'matplotlib==3.5.1',
+        'pandas',
+        'pyyaml', 
+        'h5py'
     ]
 )

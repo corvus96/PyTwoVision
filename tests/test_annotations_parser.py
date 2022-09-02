@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
+from py2vision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
 
 
 class TestAnnotationsParser(unittest.TestCase):

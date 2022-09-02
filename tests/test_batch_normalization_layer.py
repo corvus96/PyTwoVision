@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import tensorflow as tf
 
-from pytwovision.models.layers.batch_normalization_layer import BatchNormalization
+from py2vision.models.layers.batch_normalization_layer import BatchNormalization
 
 class TestBatchNormalizationLayer(unittest.TestCase):
         def test_std_desviation_decrease(self):

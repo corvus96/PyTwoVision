@@ -5,17 +5,17 @@ Includes stereo mechanism
 
 Implement SGBM Algorithm
 ---------------------------
-    .. automodule:: pytwovision.stereo.match_method
+    .. automodule:: py2vision.stereo.match_method
         :members:
 
 Standard Stereo Builder
 --------------------------
-    .. automodule:: pytwovision.stereo.standard_stereo
+    .. automodule:: py2vision.stereo.standard_stereo
         :members:
 
 Stereo Controller
 --------------------------
-    .. automodule:: pytwovision.stereo.stereo_builder
+    .. automodule:: py2vision.stereo.stereo_builder
         :members:
 
 Examples

@@ -4,10 +4,10 @@ import json
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider, Button
 
-from pytwovision.stereo.standard_stereo import StandardStereoBuilder
-from pytwovision.input_output.camera import Camera
-from pytwovision.stereo.standard_stereo import StandardStereo
-from pytwovision.stereo.match_method import Matcher, StereoSGBM
+from py2vision.stereo.standard_stereo import StandardStereoBuilder
+from py2vision.input_output.camera import Camera
+from py2vision.stereo.standard_stereo import StandardStereo
+from py2vision.stereo.match_method import Matcher, StereoSGBM
 
 left_camera = Camera("left_camera", "imx_219_A")
 right_camera = Camera("right_camera", "imx_219_B")

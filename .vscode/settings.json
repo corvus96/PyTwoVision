@@ -1,11 +1,11 @@
 {
     "python.linting.enabled": true,
     "python.analysis.extraPaths": [
-        "./pytwovision",
+        "./py2vision",
         "/usr/bin/python3"
     ],
     "python.autoComplete.extraPaths": [
-        "./pytwovision"
+        "./py2vision"
     ],
     "python.linting.pylintArgs": [
         "--rcfile=./.pylintrc"

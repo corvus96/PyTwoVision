@@ -6,11 +6,11 @@ import shutil
 import wget
 import glob
 
-from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
-from pytwovision.recognition.yolov3_detector import ObjectDetectorYoloV3
-from pytwovision.utils.annotations_helper import AnnotationsHelper
-from pytwovision.utils.label_utils import read_class_names
-from pytwovision.datasets_loader.yolov3_dataset_generator import YoloV3DatasetGenerator
+from py2vision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
+from py2vision.recognition.yolov3_detector import ObjectDetectorYoloV3
+from py2vision.utils.annotations_helper import AnnotationsHelper
+from py2vision.utils.label_utils import read_class_names
+from py2vision.datasets_loader.yolov3_dataset_generator import YoloV3DatasetGenerator
 
 class TestObjectDetectorYoloV3(unittest.TestCase):
     def setUp(self):

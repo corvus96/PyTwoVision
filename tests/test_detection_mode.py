@@ -3,11 +3,11 @@ import os
 import shutil
 import tensorflow as tf
 
-from pytwovision.recognition.detection_mode import DetectImage, DetectRealTime, DetectRealTimeMP
-from pytwovision.recognition.selector import Recognizer
-from pytwovision.recognition.yolov3_detector import ObjectDetectorYoloV3
-from pytwovision.utils.label_utils import read_class_names
-from pytwovision.input_output.camera import Camera
+from py2vision.recognition.detection_mode import DetectImage, DetectRealTime, DetectRealTimeMP
+from py2vision.recognition.selector import Recognizer
+from py2vision.recognition.yolov3_detector import ObjectDetectorYoloV3
+from py2vision.utils.label_utils import read_class_names
+from py2vision.input_output.camera import Camera
 
 class TestDetectionMode(unittest.TestCase):
     def setUp(self):
