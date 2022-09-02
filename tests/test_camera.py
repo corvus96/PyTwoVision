@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from pytwovision.input_output.camera import Camera
+from py2vision.input_output.camera import Camera
 
 class TestCamera(unittest.TestCase):
     def setUp(self):

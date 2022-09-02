@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from pytwovision.models.layers.upsample_layer import UpsampleLayer
+from py2vision.models.layers.upsample_layer import UpsampleLayer
 
 class TestUpsampleLayer(unittest.TestCase):
     def setUp(self):

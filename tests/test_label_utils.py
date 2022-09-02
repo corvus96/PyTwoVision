@@ -1,7 +1,7 @@
 import unittest
 import os 
 
-from pytwovision.utils.label_utils import label_map, index2class, class2index
+from py2vision.utils.label_utils import label_map, index2class, class2index
 
 class TestLabelUtils(unittest.TestCase):
     def setUp(self):

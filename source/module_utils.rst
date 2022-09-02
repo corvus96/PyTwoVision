@@ -6,7 +6,7 @@ Here you will find all those functionalities that do not fit in the rest of the 
 
 Annotations Parser
 -------------------
-    .. automodule:: pytwovision.utils.annotations_parser
+    .. automodule:: py2vision.utils.annotations_parser
         :members:
 
 Example of code
@@ -14,7 +14,7 @@ Example of code
 .. code-block:: python
     :linenos:
 
-    from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
+    from py2vision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
 
     anno_out_file = "test_anno_file"
     xml_path = "tests/test_dataset/annotations"
@@ -28,7 +28,7 @@ Example of code
 
 Annotations Helper
 -------------------
-    .. automodule:: pytwovision.utils.annotations_helper
+    .. automodule:: py2vision.utils.annotations_helper
         :members:
 
 Example of code
@@ -36,8 +36,8 @@ Example of code
 .. code-block:: python
     :linenos:
 
-    from pytwovision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
-    from pytwovision.utils.annotations_helper import AnnotationsHelper
+    from py2vision.utils.annotations_parser import XmlParser, YoloV3AnnotationsFormat
+    from py2vision.utils.annotations_helper import AnnotationsHelper
 
     anno_out_file = "annotations_formated"
     xml_path = "tests/test_dataset/annotations"
@@ -65,10 +65,10 @@ Example of code
 
 Draw functions
 -------------------
-    .. automodule:: pytwovision.utils.draw 
+    .. automodule:: py2vision.utils.draw 
         :members:
 
 Label utils
 -------------------
-    .. automodule:: pytwovision.utils.label_utils
+    .. automodule:: py2vision.utils.label_utils
         :members:

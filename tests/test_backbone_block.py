@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 
-from pytwovision.models.blocks.backbone_block import BackboneBlock
-from pytwovision.models.blocks.backbone_block import darknet53, darknet19_tiny
+from py2vision.models.blocks.backbone_block import BackboneBlock
+from py2vision.models.blocks.backbone_block import darknet53, darknet19_tiny
 
 
 class TestBackboneBlock(unittest.TestCase):

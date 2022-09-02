@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from pytwovision.models.layers.residual_layer import residual_layer
+from py2vision.models.layers.residual_layer import residual_layer
 
 class TestResidualLayer(unittest.TestCase):
         def test_layer_output(self):

@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Pytwovision'
+project = 'py2vision'
 copyright = '2022, Guillermo Raven'
 author = 'Guillermo Raven'
 
@@ -110,7 +110,7 @@ html_static_path = ['doc_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Pytwovisiondoc'
+htmlhelp_basename = 'py2visiondoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------

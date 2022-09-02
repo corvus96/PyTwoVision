@@ -1,7 +1,7 @@
 import unittest
 
-from pytwovision.recognition.selector import Recognizer
-from pytwovision.recognition.yolov3_detector import ObjectDetectorYoloV3
+from py2vision.recognition.selector import Recognizer
+from py2vision.recognition.yolov3_detector import ObjectDetectorYoloV3
 
 class TestSelector(unittest.TestCase):
 

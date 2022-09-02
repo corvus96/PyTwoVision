@@ -5,17 +5,17 @@ Encompasses training, inference, printing the network structure, evaluating it a
 
 Networks selector
 ------------------
-    .. automodule:: pytwovision.recognition.selector
+    .. automodule:: py2vision.recognition.selector
         :members:
 
 YOLOV3 implementation
 ---------------------
-    .. automodule:: pytwovision.recognition.yolov3_detector
+    .. automodule:: py2vision.recognition.yolov3_detector
         :members:
 
 Inference modes
 ------------------
-    .. automodule:: pytwovision.recognition.detection_mode
+    .. automodule:: py2vision.recognition.detection_mode
         :members:
 
 Examples

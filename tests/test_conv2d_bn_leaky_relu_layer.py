@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from pytwovision.models.layers.conv2d_bn_leaky_relu_layer import conv2d_bn_leaky_relu_layer
+from py2vision.models.layers.conv2d_bn_leaky_relu_layer import conv2d_bn_leaky_relu_layer
 
 class TestConv2dBNLeakyReluLayer(unittest.TestCase):
         

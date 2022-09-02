@@ -3,11 +3,11 @@ import os
 import cv2 as cv
 import math as mt
 
-from pytwovision.input_output.camera import Camera
-from pytwovision.stereo.standard_stereo import StandardStereo
-from pytwovision.stereo.standard_stereo import StandardStereoBuilder
-from pytwovision.stereo.match_method import Matcher
-from pytwovision.stereo.match_method import StereoSGBM
+from py2vision.input_output.camera import Camera
+from py2vision.stereo.standard_stereo import StandardStereo
+from py2vision.stereo.standard_stereo import StandardStereoBuilder
+from py2vision.stereo.match_method import Matcher
+from py2vision.stereo.match_method import StereoSGBM
 
 class TestStandardStereo(unittest.TestCase):
     def setUp(self):

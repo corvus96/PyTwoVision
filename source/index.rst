@@ -1,23 +1,23 @@
-.. Pytwovision documentation master file, created by
+.. Py2vision documentation master file, created by
    sphinx-quickstart on Mon Jul 11 02:45:03 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 =======================================
-Welcome to Pytwovision's documentation!
+Welcome to Py2vision's documentation!
 =======================================
-Here you can see every detail about pytwovision package which is a tool to do object positioning with stereo vision and object detection, this package can be used in Robotics and Computer Vision.
+Here you can see every detail about py2vision package which is a tool to do object positioning with stereo vision and object detection, this package can be used in Robotics and Computer Vision.
 
 Installation
 ------------
 Open a console and write this:
-:command:`pip install pytwovision`
+:command:`pip install py2vision`
 
 .. important::
 
    If you already have the opencv package installed, you have to uninstall it with :command:`pip uninstall opencv-python` and install opencv-contrib-python version 4.6.0.66.
 
-What could you archieve with pytwovision?
+What could you archieve with py2vision?
 -----------------------------------------
 #. It will allow you to obtain disparity maps using SGBM algorithm.
 #. Get distances in the 3D space.
