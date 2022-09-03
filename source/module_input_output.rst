@@ -28,7 +28,8 @@ How to implement a position system?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: python
     :linenos:
-
+    
+    import wget
     import os
 
     from py2vision.input_output.vision_system import VisionSystem
@@ -38,21 +39,20 @@ How to implement a position system?
     from py2vision.recognition.yolov3_detector import ObjectDetectorYoloV3
     from py2vision.recognition.selector import Recognizer
 
-    anno_out_file = "annotations_formated"
-    xml_path = "tests/test_dataset/annotations"
-    classes_file = "tests/test_dataset/classes/coco.names"
-    work_dir = "tests/test_dataset/to_generator_test"
-    images_path = "tests/test_dataset/images"
+    # You can get coco.names here https://github.com/pjreddie/darknet/blob/master/data/coco.names
+    classes_file = "coco.names"
+    work_dir = "work_dir"
     stereo_maps_path = "stereoMap"
+
     try:
         os.mkdir(work_dir)
     except:
         pass
 
-    left_camera = Camera("left_camera", "tests/assets/photo/left/left_indoor_photo_5.png")
-    right_camera = Camera("right_camera", "tests/assets/photo/right/right_indoor_photo_5.png")
+    left_camera = Camera("left_camera", "left/left_indoor_photo_5.png")
+    right_camera = Camera("right_camera", "right/right_indoor_photo_5.png")
     stereo_pair_fisheye = StandardStereo(left_camera, right_camera)
-    stereo_pair_fisheye.calibrate("tests/assets/left_camera_calibration", "tests/assets/right_camera_calibration", show=False)
+    stereo_pair_fisheye.calibrate("left_camera_calibration_folder", "right_camera_calibration_folder", show=False)
     stereo_pair_fisheye.rectify((640, 720), (640, 720), export_file=True, export_file_name=stereo_maps_path)
     # Add path format
     stereo_maps_path = stereo_maps_path + ".xml"
@@ -60,9 +60,6 @@ How to implement a position system?
     matcher = Matcher(sgbm)
     lmbda = 13673
     sigma = 1.3175
-    left_camera = Camera("left_camera", "tests/assets/photo/left/left_plant_1.png")
-    right_camera = Camera("right_camera", "tests/assets/photo/right/right_plant_1.png")
-    vis_sys = VisionSystem(left_camera, right_camera, stereo_maps_path, matcher, stereo_pair_fisheye.Q)
     yolov3 = ObjectDetectorYoloV3("test", 80, training=False)
     recognizer = Recognizer(yolov3)
     link_yolov3_weights = "https://pjreddie.com/media/files/yolov3.weights"
@@ -70,5 +67,6 @@ How to implement a position system?
     weights_file = os.path.basename(link_yolov3_weights)
     recognizer.restore_weights(weights_file)
     model = recognizer.get_model()
+    vis_sys = VisionSystem(left_camera, right_camera, stereo_maps_path, matcher, stereo_pair_fisheye.Q)
     # Here the magic happens
     vis_sys.image_pipeline(model, classes_file, os.path.join(work_dir, "test_position.jpg"),  lmbda=lmbda, sigma=sigma, downsample_for_match=None, show_window=True, score_threshold=0.5, iou_threshold=0.6, otsu_thresh_inverse=True, text_colors=(0, 0, 0))
